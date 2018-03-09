@@ -48,7 +48,8 @@ DISTFILES += \
     Qt5Core.dll \
     Qt5Gui.dll \
     Qt5Widgets.dll \
-    seflogo.png
+    seflogo.png \
+    README.md
 
 INCLUDEPATH += \
     ../.lib/boost \
