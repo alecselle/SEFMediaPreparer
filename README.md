@@ -6,6 +6,6 @@ Initial Release. Basic features are working.<br/>
 Files tagged with 'NF' do not include ffmpeg.
 
 ## Coming Soon...
-1. Installer
-2. Use of ffmpeg libraries instead of executables
-3. Static Version
+1. - [ ] Installer
+2. - [ ] Use of ffmpeg libraries instead of executables
+3. - [ ] Static Version
