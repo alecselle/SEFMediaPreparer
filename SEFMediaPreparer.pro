@@ -51,9 +51,8 @@ DISTFILES += \
     seflogo.png
 
 INCLUDEPATH += \
-    ../Lib/boost \
-    ../Lib/json/include \
-    ../Lib/ffmpeg \
+    ../.lib/boost \
+    ../.lib/json/include \
+    ../.lib/ffmpeg \
 
-LIBS += -L../Lib/boost/stage/lib \
-        -LC:/Users/conta/AppData/Local/Qt/5.10.1/msvc2017_64/lib
+LIBS += -L../.lib/boost/stage/lib

@@ -1,6 +1,4 @@
 #include "MediaPreparer.h"
-#include <Config.h>
-#include <Preset.h>
 
 #include <QApplication>
 
