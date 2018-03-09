@@ -8,13 +8,16 @@ GUI for ffmpeg that allows processes and converts an entire library, adhering to
 
 ## Branches
 - [SEFMediaPreparer/master](https://github.com/alecselle/sefmediapreparer/tree/master)
-    - Current Full Release
+- Current Full Release
+
 - [SEFMediaPreparer/beta](https://github.com/alecselle/sefmediapreparer/tree/beta)
-    - Current Beta Release
+- Current Beta Release
+
 - [SEFMediaPreparer/alpha](https://github.com/alecselle/sefmediapreparer/tree/alpha)
-    - Current Alpha Release
+- Current Alpha Release
+
 ## [![Build Status](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer/badge/icon)](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer/) [SEFMediaPreparer/development](https://github.com/alecselle/sefmediapreparer/tree/development)
-	- Live Development Updates
+- Live Development Updates
 
 ## Coming Soon...
 1. Use of ffmpeg libraries instead of executables
