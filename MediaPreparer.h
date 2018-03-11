@@ -90,8 +90,8 @@ class MediaPreparer : public QWidget {
 	void InitGUI();
 
 	void updateGUI();
-	// void updateEncodeList();
 
+	// void updateEncodeList();
 	// void toggleEncodeFile(int position, int null = NULL);
 
 	void encodeTab(bool display);
