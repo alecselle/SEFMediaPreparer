@@ -27,9 +27,6 @@ namespace ba = boost::algorithm;
 using namespace nlohmann;
 using namespace std;
 
-/**
- * Constructor
- */
 MediaPreparer::MediaPreparer(QWidget *parent) : QWidget(parent), ui(new Ui::MediaPreparer) {
 	ui->setupUi(this);
 	Init();
@@ -43,28 +40,22 @@ void MediaPreparer::closeEvent(QCloseEvent *event) {
 	}
 }
 
-/**
- * Deconstructor
- */
 MediaPreparer::~MediaPreparer() {
 	if (diffPreset()) savePreset("Auto Saved");
 	saveConfig();
 	delete ui;
 }
 
-/**
- * Load Library, call using workerScan
- */
 void MediaPreparer::scanLibrary(bf::path dir) {
 	emit started_workerScan();
 
-	emit progress_updated(QString("Checking Directory..."), 0);
+	emit progress_updated_scan(QString("Checking Directory..."), 0);
 
 	if (bf::exists(dir)) {
 
 		ui->setting_dirOutput->setText(QString((dir.string() + "\\Converted").c_str()));
 
-		emit progress_updated(QString("Scanning Files..."), 0);
+		emit progress_updated_scan(QString("Scanning Files..."), 0);
 		log("Scanning directory: " + dir.string());
 
 		bool recursive = ui->setting_subdirectories->isChecked();
@@ -79,7 +70,7 @@ void MediaPreparer::scanLibrary(bf::path dir) {
 												 QString("format=duration:stream=codec_type:stream=codec_name"),
 												 QString("-of"), QString("json"), QString(file.pathStr().c_str())});
 
-				emit progress_updated(QString((file.nameStr() + file.extensionStr()).c_str()));
+				emit progress_updated_scan(QString((file.nameStr() + file.extensionStr()).c_str()));
 				log("Reading File: " + file.pathStr());
 
 				process.start();
@@ -87,8 +78,8 @@ void MediaPreparer::scanLibrary(bf::path dir) {
 				QByteArray out = process.readAllStandardOutput();
 				file.loadFileInfo(json::parse(out.begin(), out.end()));
 
-				emit item_added(i);
-				emit progress_updated((int)(((double)i / (double)library->size()) * 1000.0));
+				emit item_added_scan(i);
+				emit progress_updated_scan((int)(((double)i / (double)library->size()) * 1000.0));
 			}
 			setEncodeOptions();
 			library->duration();
@@ -100,20 +91,17 @@ void MediaPreparer::scanLibrary(bf::path dir) {
 
 	if (!cancelScan) {
 		if (library->size() > 0) {
-			emit progress_updated(QString("Complete..."), 1000);
+			emit progress_updated_scan(QString("Complete..."), 1000);
 		} else {
-			emit progress_updated(QString("Invalid Directory..."), 0);
+			emit progress_updated_scan(QString("Invalid Directory..."), 0);
 		}
 	} else {
-		emit progress_updated(QString("Canceled..."), 0);
+		emit progress_updated_scan(QString("Canceled..."), 0);
 	}
 
 	emit finished_workerScan();
 }
 
-/**
- * Encode Library, call using workerEncode
- */
 void MediaPreparer::encodeLibrary() {
 	emit started_workerEncode();
 
@@ -121,7 +109,8 @@ void MediaPreparer::encodeLibrary() {
 		File &file = library->getFileEncode(i);
 		encodeIndex = i;
 
-		emit progress_updated(QString(file.nameStr().c_str()), ((double)i / (double)library->sizeEncode()) * 1000.0);
+		emit progress_updated_scan(QString(file.nameStr().c_str()),
+								   ((double)i / (double)library->sizeEncode()) * 1000.0);
 		emit progress_updated_encode(QString("Encoding File"), 0);
 		emit item_changed_encode(i);
 
@@ -201,29 +190,23 @@ void MediaPreparer::encodeLibrary() {
 				}
 			}
 		}
-		emit progress_updated((int)(((double)i / (double)library->sizeEncode()) * 1000.0));
+		emit progress_updated_scan((int)(((double)i / (double)library->sizeEncode()) * 1000.0));
 	}
 	if (!cancelEncode) {
-		emit progress_updated("Complete...", 1000);
+		emit progress_updated_scan("Complete...", 1000);
 	} else {
-		emit progress_updated("Canceled...", 0);
+		emit progress_updated_scan("Canceled...", 0);
 	}
 
 	emit finished_workerEncode();
 }
 
-/**
- * Runs scanLibrary(dir) as workerScan
- */
-void MediaPreparer::runWorkerScan(bf::path dir) {
+void MediaPreparer::runWorkerScan() {
 	if (!workerScan.isRunning() && workerScan.isFinished()) {
-		workerScan = QtConcurrent::run(this, &MediaPreparer::scanLibrary, dir);
+		workerScan = QtConcurrent::run(this, &MediaPreparer::scanLibrary, getPath());
 	}
 }
 
-/**
- * Runs encodeLibrary() as workerEncode
- */
 void MediaPreparer::runWorkerEncode() {
 	if (!workerEncode.isRunning() && workerEncode.isFinished()) {
 		workerEncode = QtConcurrent::run(this, &MediaPreparer::encodeLibrary);
@@ -243,9 +226,7 @@ void MediaPreparer::toggleEncodeFile(int position, int null) {
 	}
 }
 */
-/**
- * Set UI elements to defaults specified in Config
- */
+
 void MediaPreparer::loadConfig() {
 	blockAllSignals(true);
 	ui->setting_vCodec->clear();
@@ -271,9 +252,6 @@ void MediaPreparer::loadConfig() {
 	blockAllSignals(false);
 }
 
-/**
- * Checks if directories are valid
- */
 bool MediaPreparer::checkConfig() {
 	if (!bf::exists(ui->setting_directory->text().toStdString().c_str())) return false;
 	if (!(library->size() > 0)) return false;
@@ -286,14 +264,8 @@ bool MediaPreparer::checkConfig() {
 	return true;
 }
 
-/**
- * Save Config to file using current values
- */
 void MediaPreparer::saveConfig() { settings->saveConfig(); }
 
-/**
- * Loads a preset file from specified path
- */
 void MediaPreparer::loadPreset(string preset) {
 	blockAllSignals(true);
 	settings->loadPreset(preset);
@@ -311,9 +283,8 @@ void MediaPreparer::loadPreset(string preset) {
 	setEncodeOptions();
 }
 
-/**
- * Checks if current values match the preset
- */
+void MediaPreparer::loadPreset(QString preset) { loadPreset(preset.toStdString()); }
+
 bool MediaPreparer::diffPreset() {
 	if (ui->setting_vCodec->currentText().toStdString().compare(settings->vCodec) != 0) return true;
 	if (ui->setting_aCodec->currentText().toStdString().compare(settings->aCodec) != 0) return true;
@@ -326,24 +297,15 @@ bool MediaPreparer::diffPreset() {
 	return false;
 }
 
-/**
- * Save current values to a preset
- */
 void MediaPreparer::savePreset(std::string name) {
 	setEncodeOptions();
 	settings->savePresetAs(name);
 	loadPreset(settings->presetName);
-	emit progress_updated(QString(("Saved Preset: " + name).c_str()));
+	emit progress_updated_scan(QString(("Saved Preset: " + name).c_str()));
 }
 
-/**
- *  Save current values to the Custom preset
- */
 void MediaPreparer::savePreset() { savePreset("Custom"); }
 
-/**
- * Store current values
- */
 void MediaPreparer::setEncodeOptions() {
 	settings->vCodec = ba::trim_copy(ui->setting_vCodec->currentText().toStdString());
 	settings->aCodec = ba::trim_copy(ui->setting_aCodec->currentText().toStdString());
@@ -358,23 +320,14 @@ void MediaPreparer::setEncodeOptions() {
 	ui->button_encode->setText(QString(("Encode [" + to_string(library->sizeEncode()) + "]").c_str()));
 }
 
-/**
- * Converts string to bf::path with escaped backslashes
- */
 bf::path MediaPreparer::getPath(string path) {
 	ba::replace_all(path, "/", "\\");
 	ui->setting_directory->setText(QString(path.c_str()));
 	return bf::path(path);
 }
 
-/**
- * Retrieves current directory value as bf::path
- */
 bf::path MediaPreparer::getPath() { return getPath(ui->setting_directory->text().toStdString()); }
 
-/**
- * Toggle Lock on UI elements for Load
- */
 void MediaPreparer::lockUILoad(bool b) {
 	bool toggle;
 	if (b) {
@@ -397,9 +350,6 @@ void MediaPreparer::lockUILoad(bool b) {
 	}
 }
 
-/**
- * Toggle Lock on UI elements for Encode
- */
 void MediaPreparer::lockUIEncode(bool b) {
 	bool toggle;
 	if (b) {
@@ -455,9 +405,6 @@ void MediaPreparer::updateGUI() {
 	}
 }
 
-/**
- * Show/Hide Encode tab
- */
 void MediaPreparer::encodeTab(bool b) {
 	if (b) {
 		ui->container_settings_tabs->addTab(containerEncode, QString("Encode"));
@@ -490,21 +437,28 @@ void MediaPreparer::Init() {
 	createTrayIcon();
 	InitGUI();
 
-	connect(this, SIGNAL(started_workerScan()), this, SLOT(on_started_workerScan()));
-	connect(this, SIGNAL(item_added(int)), this, SLOT(on_item_added(int)));
-	connect(this, SIGNAL(finished_workerScan()), this, SLOT(on_finished_workerScan()));
+	connect(this, SIGNAL(started_workerScan()), this, SLOT(workerScanStart()));
+	connect(this, SIGNAL(item_added_scan(int)), this, SLOT(workerScanAddItem(int)));
+	connect(this, SIGNAL(finished_workerScan()), this, SLOT(workerScanEnd()));
 
-	connect(this, SIGNAL(started_workerEncode()), this, SLOT(on_started_workerEncode()));
-	connect(this, SIGNAL(item_changed_encode(int)), this, SLOT(on_item_changed_encode(int)));
-	connect(this, SIGNAL(finished_workerEncode()), this, SLOT(on_finished_workerEncode()));
+	connect(this, SIGNAL(started_workerEncode()), this, SLOT(workerEncodeStart()));
+	connect(this, SIGNAL(item_changed_encode(int)), this, SLOT(workerEncodeChangeItem(int)));
+	connect(this, SIGNAL(finished_workerEncode()), this, SLOT(workerEncodeEnd()));
 
-	connect(this, SIGNAL(progress_updated(QString, int)), this, SLOT(on_progress_updated(QString, int)));
-	connect(this, SIGNAL(progress_updated(QString)), this, SLOT(on_progress_updated(QString)));
-	connect(this, SIGNAL(progress_updated(int)), this, SLOT(on_progress_updated(int)));
+	connect(this, SIGNAL(progress_updated_scan(QString, int)), this, SLOT(workerScanUpdateProgress(QString, int)));
+	connect(this, SIGNAL(progress_updated_scan(QString)), this, SLOT(workerScanUpdateProgress(QString)));
+	connect(this, SIGNAL(progress_updated_scan(int)), this, SLOT(workerScanUpdateProgress(int)));
 
-	connect(this, SIGNAL(progress_updated_encode(QString, int)), this, SLOT(on_progress_updated_encode(QString, int)));
-	connect(this, SIGNAL(progress_updated_encode(QString)), this, SLOT(on_progress_updated_encode(QString)));
-	connect(this, SIGNAL(progress_updated_encode(int)), this, SLOT(on_progress_updated_encode(int)));
+	connect(this, SIGNAL(progress_updated_encode(QString, int)), this, SLOT(workerEncodeUpdateProgress(QString, int)));
+	connect(this, SIGNAL(progress_updated_encode(QString)), this, SLOT(workerEncodeUpdateProgress(QString)));
+	connect(this, SIGNAL(progress_updated_encode(int)), this, SLOT(workerEncodeUpdateProgress(int)));
+
+	connect(ui->button_savePreset, SIGNAL(clicked()), this, SLOT(savePreset()));
+
+	connect(ui->setting_preset, SIGNAL(currentTextChanged(const QString)), this, SLOT(loadPreset(QString)));
+
+	connect(ui->button_scan_directory, SIGNAL(clicked()), this, SLOT(runWorkerScan()));
+	connect(ui->setting_directory, SIGNAL(returnPressed()), this, SLOT(runWorkerScan()));
 
 	connect(ui->button_browse_directory, SIGNAL(clicked()), signalMapper, SLOT(map()));
 	signalMapper->setMapping(ui->button_browse_directory, 0);
@@ -580,9 +534,6 @@ void MediaPreparer::InitGUI() {
 	blockAllSignals(false);
 }
 
-/**
- * Log msg to file with timestamp
- */
 void MediaPreparer::log(string msg) {
 	bf::fstream fs;
 	fs.open(settings->logPath, bf::fstream::in | bf::fstream::out | bf::fstream::app);
@@ -655,7 +606,7 @@ void MediaPreparer::browseDialog(int type) {
 		switch (type) {
 		case 0:
 			ui->setting_directory->setText(dir[0]);
-			runWorkerScan(getPath());
+			runWorkerScan();
 			break;
 		case 1:
 			ui->setting_dirOutput->setText(dir[0]);
@@ -701,26 +652,18 @@ bool MediaPreparer::cancel() {
 		}
 	}
 }
-/**
- * Toggle all qt signals
- */
+
 void MediaPreparer::blockAllSignals(bool b) {
 	QList<QWidget *> widgets = ui->container_main->findChildren<QWidget *>();
 	foreach (QWidget *x, widgets) { x->blockSignals(b); }
 }
 
-/**
- * workerScan block
- */
-void MediaPreparer::on_button_scan_directory_clicked() { runWorkerScan(getPath()); }
-void MediaPreparer::on_setting_directory_returnPressed() { runWorkerScan(getPath()); }
-
-void MediaPreparer::on_started_workerScan() {
+void MediaPreparer::workerScanStart() {
 	ui->list_VideoLibrary->clearContents();
 	lockUILoad(true);
 }
 
-void MediaPreparer::on_item_added(int pos) {
+void MediaPreparer::workerScanAddItem(int pos) {
 	blockAllSignals(true);
 	File item = library->getFile(pos);
 	ui->label_fileCount->setText(
@@ -737,15 +680,11 @@ void MediaPreparer::on_item_added(int pos) {
 	blockAllSignals(false);
 }
 
-void MediaPreparer::on_finished_workerScan() {
+void MediaPreparer::workerScanEnd() {
 	lockUILoad(false);
 	activateWindow();
 }
-// End workerScan block
 
-/**
- * workerEncode block
- */
 void MediaPreparer::on_button_encode_clicked() {
 	if (workerEncode.isRunning()) {
 		cancelEncode = true;
@@ -761,13 +700,13 @@ void MediaPreparer::on_button_encode_clicked() {
 	}
 }
 
-void MediaPreparer::on_started_workerEncode() {
+void MediaPreparer::workerEncodeStart() {
 
 	lockUIEncode(true);
 	workerTimeStamp.start();
 }
 
-void MediaPreparer::on_item_changed_encode(int pos) {
+void MediaPreparer::workerEncodeChangeItem(int pos) {
 	blockAllSignals(true);
 	if (pos > 0) {
 		ui->value_encode_lastFile->setText(
@@ -793,38 +732,25 @@ void MediaPreparer::on_item_changed_encode(int pos) {
 	blockAllSignals(false);
 }
 
-void MediaPreparer::on_finished_workerEncode() {
+void MediaPreparer::workerEncodeEnd() {
 	lockUIEncode(false);
 	activateWindow();
 }
-// End workerEncode block
 
-/**
- * Progress bars block
- */
-void MediaPreparer::on_progress_updated(QString msg, int percent) {
+void MediaPreparer::workerScanUpdateProgress(QString msg, int percent) {
 	ui->progress_worker->setFormat(msg);
 	ui->progress_worker->setValue(percent);
 }
 
-void MediaPreparer::on_progress_updated(QString msg) { ui->progress_worker->setFormat(msg); }
+void MediaPreparer::workerScanUpdateProgress(QString msg) { ui->progress_worker->setFormat(msg); }
 
-void MediaPreparer::on_progress_updated(int percent) { ui->progress_worker->setValue(percent); }
+void MediaPreparer::workerScanUpdateProgress(int percent) { ui->progress_worker->setValue(percent); }
 
-void MediaPreparer::on_progress_updated_encode(QString msg, int percent) {
+void MediaPreparer::workerEncodeUpdateProgress(QString msg, int percent) {
 	ui->progress_encode->setFormat(msg);
 	ui->progress_worker->setValue(percent);
 }
 
-void MediaPreparer::on_progress_updated_encode(QString msg) { ui->progress_encode->setFormat(msg); }
+void MediaPreparer::workerEncodeUpdateProgress(QString msg) { ui->progress_encode->setFormat(msg); }
 
-void MediaPreparer::on_progress_updated_encode(int percent) { ui->progress_worker->setValue(percent); }
-// End Progress bars block
-
-/**
- * Preset block
- */
-void MediaPreparer::on_button_savePreset_clicked() { savePreset(); }
-
-void MediaPreparer::on_setting_preset_currentTextChanged(const QString &arg1) { loadPreset(arg1.toStdString()); }
-// End Preset block
+void MediaPreparer::workerEncodeUpdateProgress(int percent) { ui->progress_worker->setValue(percent); }

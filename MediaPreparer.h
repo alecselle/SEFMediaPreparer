@@ -52,19 +52,8 @@ class MediaPreparer : public QWidget {
 	void closeEvent(QCloseEvent *);
 
 	void scanLibrary(boost::filesystem::path directoryPath);
-	void runWorkerScan(boost::filesystem::path directoryPath);
 
 	void encodeLibrary();
-	void runWorkerEncode();
-
-	void saveConfig();
-	void loadConfig();
-	bool checkConfig();
-
-	bool diffPreset();
-	void savePreset(std::string presetName);
-	void savePreset();
-	void loadPreset(std::string presetName);
 
 	boost::filesystem::path getPath(std::string pathString);
 	boost::filesystem::path getPath();
@@ -78,19 +67,21 @@ class MediaPreparer : public QWidget {
 	~MediaPreparer();
 
   private slots:
-	void on_started_workerScan();
-	void on_item_added(int itemPosition);
-	void on_progress_updated(QString message, int progress);
-	void on_progress_updated(QString message);
-	void on_progress_updated(int progress);
-	void on_finished_workerScan();
+	void runWorkerScan();
+	void workerScanStart();
+	void workerScanAddItem(int itemPosition);
+	void workerScanUpdateProgress(QString message, int progress);
+	void workerScanUpdateProgress(QString message);
+	void workerScanUpdateProgress(int progress);
+	void workerScanEnd();
 
-	void on_started_workerEncode();
-	void on_item_changed_encode(int itemPosition);
-	void on_progress_updated_encode(QString message, int progress);
-	void on_progress_updated_encode(QString message);
-	void on_progress_updated_encode(int progress);
-	void on_finished_workerEncode();
+	void runWorkerEncode();
+	void workerEncodeStart();
+	void workerEncodeChangeItem(int itemPosition);
+	void workerEncodeUpdateProgress(QString message, int progress);
+	void workerEncodeUpdateProgress(QString message);
+	void workerEncodeUpdateProgress(int progress);
+	void workerEncodeEnd();
 
 	void log(std::string message);
 	void log(QString message);
@@ -112,6 +103,16 @@ class MediaPreparer : public QWidget {
 	void showTrayMessage(QString message);
 	void trayIconActivated(QSystemTrayIcon::ActivationReason);
 
+	void saveConfig();
+	void loadConfig();
+	bool checkConfig();
+
+	bool diffPreset();
+	void savePreset(std::string presetName);
+	void savePreset();
+	void loadPreset(std::string presetName);
+	void loadPreset(QString presetName);
+
 	void setEncodeOptions();
 
 	void browseDialog(int type = 0);
@@ -120,13 +121,6 @@ class MediaPreparer : public QWidget {
 	bool cancel();
 
 	void blockAllSignals(bool block);
-
-	void on_button_scan_directory_clicked();
-	void on_setting_directory_returnPressed();
-
-	void on_setting_preset_currentTextChanged(const QString &presetName);
-
-	void on_button_savePreset_clicked();
 
 	void on_button_encode_clicked();
 
@@ -137,10 +131,10 @@ class MediaPreparer : public QWidget {
 	void started_workerEncode();
 	void finished_workerEncode();
 
-	void item_added(int itemPosition);
-	void progress_updated(QString message, int progress);
-	void progress_updated(QString message);
-	void progress_updated(int progress);
+	void item_added_scan(int itemPosition);
+	void progress_updated_scan(QString message, int progress);
+	void progress_updated_scan(QString message);
+	void progress_updated_scan(int progress);
 
 	void item_changed_encode(int itemPosition);
 	void progress_updated_encode(QString message, int progress);
