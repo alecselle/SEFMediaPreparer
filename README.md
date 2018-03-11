@@ -6,17 +6,10 @@ GUI for ffmpeg that allows processes and converts an entire library, adhering to
 *Files tagged with 'NF' do not include ffmpeg.*<br/>
 **Initial Release. Basic features are working.**
 
-## Branches
+## Branches [![Build Status](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer%20Dev/badge/icon)](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer%20Dev/)
 ## [master](https://github.com/alecselle/sefmediapreparer/tree/master)
-- Current Full Release
-
-## [beta](https://github.com/alecselle/sefmediapreparer/tree/beta)
-- Current Beta Release
-
-## [alpha](https://github.com/alecselle/sefmediapreparer/tree/alpha)
-- Current Alpha Release
-
-## [development](https://github.com/alecselle/sefmediapreparer/tree/development) [![Build Status](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer%20Dev/badge/icon)](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer%20Dev/)
+- Current Release
+## [development](https://github.com/alecselle/sefmediapreparer/tree/development)
 - Live Development Updates
 
 ## Coming Soon...
