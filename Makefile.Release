@@ -141,7 +141,7 @@ release\SEFMediaPreparer_resource.res: SEFMediaPreparer_resource.rc
 	rc /NOLOGO $(DEFINES) -fo release\SEFMediaPreparer_resource.res SEFMediaPreparer_resource.rc
 
 qmake: FORCE
-	@$(QMAKE) -o Makefile.Release SEFMediaPreparer.pro
+	@$(QMAKE) -o Makefile.Release SEFMediaPreparer.pro -spec win32-msvc
 
 qmake_all: FORCE
 
