@@ -1,5 +1,7 @@
 SEFMediaPreparer.pro
-SEFMediaPreparer.pro.user 
-Releases
-Releases/*
+SEFMediaPreparer.pro.user
+.qmake.stash
+Releases/
+debug/
+release/
 deploy.bat

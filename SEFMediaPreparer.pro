@@ -36,7 +36,9 @@ HEADERS += \
         MediaPreparer.h \
     VideoLibrary.h \
     File.h \
-    Settings.h
+    Settings.h \
+    SEF Media Preparer_resource.rc \
+    ui_MediaPreparer.h
 
 FORMS += \
         MediaPreparer.ui
@@ -50,11 +52,12 @@ DISTFILES += \
     Qt5Widgets.dll \
     seflogo.png \
     README.md \
-    LICENSE
+    LICENSE \
+    .clang-format \
+    .gitignore \
+    deploy.bat
 
 INCLUDEPATH += \
-    ../.lib/boost \
-    ../.lib/json/include \
-    ../.lib/ffmpeg \
+    ./include
 
-LIBS += -L../.lib/boost/stage/lib
+LIBS += -L./include/libs
