@@ -8,7 +8,7 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = "SEF Media Preparer"
+TARGET = "SEFMediaPreparer"
 TEMPLATE = app
 RC_ICONS = seflogo.ico
 
@@ -37,8 +37,7 @@ HEADERS += \
     VideoLibrary.h \
     File.h \
     Settings.h \
-    SEF Media Preparer_resource.rc \
-    ui_MediaPreparer.h
+    SEFMediaPreparer_resource.rc
 
 FORMS += \
         MediaPreparer.ui
