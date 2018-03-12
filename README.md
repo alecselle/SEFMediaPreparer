@@ -9,10 +9,17 @@ Graphical program that processes video files to determine whether they match spe
 
 ## Branches [![Build Status](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer/job/SEF%20Media%20Preparer%20(Development)/badge/icon)](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer/job/SEF%20Media%20Preparer%20(Development)/)
 [master](https://github.com/alecselle/sefmediapreparer/tree/master) - Current Release
-[development](https://github.com/alecselle/sefmediapreparer/tree/development) - Live Development
+[development](https://github.com/alecselle/sefmediapreparer/tree/development) - *Live* Development
 
 ## Build Instructions
-SEF Media Preparer was
+Requirements: *(Most can be filled by downloading [Qt](https://www.qt.io/download) and selecting MSVC packages)*
+    1. [Visual Studio Build Tools](http://landinghub.visualstudio.com/visual-cpp-build-tools)
+	2. [qmake](https://www.qt.io/download)
+	3. [jom](https://wiki.qt.io/Jom)
+
+Building: *(Import into Qt Creator to simplify procedure)*
+    1. > qmake.exe <Source Directory> -spec win32-msvc
+	2. > jom.exe qmake_all
 
 ## Coming Soon...
 1. Use of ffmpeg libraries instead of executables
