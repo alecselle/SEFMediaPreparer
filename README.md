@@ -5,9 +5,9 @@ Currently uses ffmpeg binaries to process files, make sure that ffmpeg.exe and f
 
 <br/>
 
-## Current Release: [1.1.0-alpha](https://github.com/alecselle/sefmediapreparer/releases)
+## Current Release: [1.1.1-alpha](https://github.com/alecselle/sefmediapreparer/releases)
 *Files tagged with 'NF' do not include ffmpeg.*<br/>
-**Initial Release. Basic features are working.**
+**Support update. Dependency hotfix.**
 
 <br/>
 
