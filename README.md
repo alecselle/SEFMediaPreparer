@@ -10,16 +10,17 @@ Currently uses ffmpeg binaries to process files, make sure that ffmpeg.exe and f
 
 ## Branches [![Build Status](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer/job/SEF%20Media%20Preparer%20(Development)/badge/icon)](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer/job/SEF%20Media%20Preparer%20(Development)/)
 [master](https://github.com/alecselle/sefmediapreparer/tree/master) - Current Release<br/>
-[development](https://github.com/alecselle/sefmediapreparer/tree/development) - *Live* Development
+[development](https://github.com/alecselle/sefmediapreparer/tree/development) - **Live** Development
 
 ## Build Instructions
-### Requirements *(Most can be filled by downloading [Qt](https://www.qt.io/download) and selecting MSVC packages)*
+### Requirements
+*(Most can be filled by downloading [Qt](https://www.qt.io/download) and selecting MSVC packages)*
 1. [Visual Studio Build Tools](http://landinghub.visualstudio.com/visual-cpp-build-tools)<br/>
 2. [qmake](https://www.qt.io/download)<br/>
 3. [jom](https://wiki.qt.io/Jom)<br/>
 ### Building
 `build.bat [-vcvarsall <path to vcvarsall.bat>] [-qmake <path to qmake>] [-jom <path to jom>]`
-or<br/>
+<br/>or<br/>
 ```
 vcvarsall.bat amd64 *(Setup Environment)*
 qmake.exe <project file (.pro)> -spec win32-msvc *(Create Makefile)*
