@@ -229,7 +229,6 @@ Makefile: SEFMediaPreparer.pro C:\Users\conta\AppData\Local\Qt\5.10.1\msvc2017_6
 		C:\Users\conta\AppData\Local\Qt\5.10.1\msvc2017_64\mkspecs\features\qt_config.prf \
 		C:\Users\conta\AppData\Local\Qt\5.10.1\msvc2017_64\mkspecs\win32-msvc\qmake.conf \
 		C:\Users\conta\AppData\Local\Qt\5.10.1\msvc2017_64\mkspecs\features\spec_post.prf \
-		.qmake.stash \
 		C:\Users\conta\AppData\Local\Qt\5.10.1\msvc2017_64\mkspecs\features\exclusive_builds.prf \
 		C:\Users\conta\AppData\Local\Qt\5.10.1\msvc2017_64\mkspecs\common\msvc-version.conf \
 		C:\Users\conta\AppData\Local\Qt\5.10.1\msvc2017_64\mkspecs\features\toolchain.prf \
@@ -412,7 +411,6 @@ C:\Users\conta\AppData\Local\Qt\5.10.1\msvc2017_64\mkspecs\features\qt_functions
 C:\Users\conta\AppData\Local\Qt\5.10.1\msvc2017_64\mkspecs\features\qt_config.prf:
 C:\Users\conta\AppData\Local\Qt\5.10.1\msvc2017_64\mkspecs\win32-msvc\qmake.conf:
 C:\Users\conta\AppData\Local\Qt\5.10.1\msvc2017_64\mkspecs\features\spec_post.prf:
-.qmake.stash:
 C:\Users\conta\AppData\Local\Qt\5.10.1\msvc2017_64\mkspecs\features\exclusive_builds.prf:
 C:\Users\conta\AppData\Local\Qt\5.10.1\msvc2017_64\mkspecs\common\msvc-version.conf:
 C:\Users\conta\AppData\Local\Qt\5.10.1\msvc2017_64\mkspecs\features\toolchain.prf:
