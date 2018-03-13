@@ -23,7 +23,6 @@ Currently uses ffmpeg binaries to process files, make sure that ffmpeg.exe and f
 1. [Visual Studio Build Tools](http://landinghub.visualstudio.com/visual-cpp-build-tools)<br/>
 2. [qmake](https://www.qt.io/download)<br/>
 3. [jom](https://wiki.qt.io/Jom)<br/>
-<br/>
 ### Building
 Basic:
 ```
