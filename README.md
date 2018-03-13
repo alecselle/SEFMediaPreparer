@@ -8,9 +8,13 @@ Currently uses ffmpeg binaries to process files, make sure that ffmpeg.exe and f
 *Files tagged with 'NF' do not include ffmpeg.*<br/>
 **Initial Release. Basic features are working.**
 
-## Branches [![Build Status](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer/job/SEF%20Media%20Preparer%20(Development)/badge/icon)](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer/job/SEF%20Media%20Preparer%20(Development)/)
-[master](https://github.com/alecselle/sefmediapreparer/tree/master) - Current Release<br/>
-[development](https://github.com/alecselle/sefmediapreparer/tree/development) - **Live** Development
+## Branches
+[master](https://github.com/alecselle/sefmediapreparer/tree/master)<br/>
+- [![](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer/job/SEF%20Media%20Preparer%20(Release)/badge/icon)](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer/job/SEF%20Media%20Preparer%20(Release)/)<br/>
+- Current Release<br/><br/>
+[development](https://github.com/alecselle/sefmediapreparer/tree/development)<br/>
+- [![](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer/job/SEF%20Media%20Preparer%20(Development)/badge/icon)](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer/job/SEF%20Media%20Preparer%20(Development)/)<br/>
+- **Live** Development <br/><br/>
 
 ## Build Instructions
 ### Requirements
