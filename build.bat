@@ -9,8 +9,7 @@ set buildDir=%~dp0
 set vcvarsall=%PROGRAMFILES(x86)%/Microsoft Visual Studio/2017/Community/VC/Auxiliary/Build/vcvarsall.bat
 set qmake=%LOCALAPPDATA%/Qt/5.10.1/msvc2017_64/bin/qmake.exe
 set jom=%LOCALAPPDATA%/Qt/Tools/QtCreator/bin/jom.exe
-set Makefile=Makefile.release
-set project=SEFMediaPreparer
+set project=SEFMediaPreparer.pro
 set force=0
 goto params
 
@@ -107,10 +106,6 @@ if not exist "%project%" (
 	echo."%project%" not found...
 	exit /b 1
 )
-if not exist "%Makefile%" (
-	echo.Makefile not found...
-	exit /b 1
-)
 if not exist "%vcvarsall%" (
 	echo."%vcvarsall%" not found...
 	exit /b 1
@@ -159,8 +154,8 @@ goto eof
 
 :jom
 echo.    Runing jom...
-echo.    ^> jom.exe -f %Makefile%
-call "%jom%" -f %Makefile% 2> nul
+echo.    ^> jom.exe -f Makefile
+call "%jom%" -f Makefile 2> nul
 if %errorlevel% NEQ 0 (
 	echo.jom failed...
 	exit /b 1
