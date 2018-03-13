@@ -12,8 +12,8 @@ Currently uses ffmpeg binaries to process files, make sure that ffmpeg.exe and f
 <br/>
 
 ## Branches
-### [master (Releases)](https://github.com/alecselle/sefmediapreparer/tree/master) - [![](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer/job/SEF%20Media%20Preparer%20(Release)/badge/icon)](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer/job/SEF%20Media%20Preparer%20(Release)/)<br/>
-### [development (Live)](https://github.com/alecselle/sefmediapreparer/tree/development) - [![](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer/job/SEF%20Media%20Preparer%20(Development)/badge/icon)](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer/job/SEF%20Media%20Preparer%20(Development)/)<br/>
+### [Releases (master)](https://github.com/alecselle/sefmediapreparer/tree/master) [![](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer/job/SEF%20Media%20Preparer%20(Release)/badge/icon)](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer/job/SEF%20Media%20Preparer%20(Release)/)<br/>
+### [Unstable (development)](https://github.com/alecselle/sefmediapreparer/tree/development) [![](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer/job/SEF%20Media%20Preparer%20(Development)/badge/icon)](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer/job/SEF%20Media%20Preparer%20(Development)/)<br/>
 
 <br/>
 
