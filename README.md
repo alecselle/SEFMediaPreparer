@@ -4,7 +4,7 @@ Graphical program that processes video files to determine whether they match spe
 Currently uses ffmpeg binaries to process files, make sure that ffmpeg.exe and ffprobe.exe are either in the same directory as the executable or are included in your environment's path variable (this will be changed later).
 
 
-## Current Release: [1.0.0-alpha](https://github.com/alecselle/sefmediapreparer/releases)
+## Current Release: [1.1.0-alpha](https://github.com/alecselle/sefmediapreparer/releases)
 *Files tagged with 'NF' do not include ffmpeg.*<br/>
 **Initial Release. Basic features are working.**
 
