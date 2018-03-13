@@ -1,4 +1,4 @@
-# SEF Media Preparer
+# SEF Media Preparer [![](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer/job/SEF%20Media%20Preparer%20(Release)/badge/icon)](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer/job/SEF%20Media%20Preparer%20(Release)/)
 Author: Alec Selle ([*SuperEpicFuntime*](https://superepicfuntime.com), Owner/Lead Developer)<br/><br/>
 Graphical program that processes video files to determine whether they match specified formats and can convert them if necessary.<br/>
 Currently uses ffmpeg binaries to process files, make sure that ffmpeg.exe and ffprobe.exe are either in the same directory as the executable or are included in your environment's path variable (this will be changed later).
@@ -8,12 +8,6 @@ Currently uses ffmpeg binaries to process files, make sure that ffmpeg.exe and f
 ## Current Release: [1.1.0-alpha](https://github.com/alecselle/sefmediapreparer/releases)
 *Files tagged with 'NF' do not include ffmpeg.*<br/>
 **Initial Release. Basic features are working.**
-
-<br/>
-
-## Branches
-### [![](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer/job/SEF%20Media%20Preparer%20(Release)/badge/icon)](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer/job/SEF%20Media%20Preparer%20(Release)/) [Releases (master)](https://github.com/alecselle/sefmediapreparer/tree/master)<br/>
-### [![](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer/job/SEF%20Media%20Preparer%20(Unstable)/badge/icon)](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer/job/SEF%20Media%20Preparer%20(Unstable)/) [Unstable (development)](https://github.com/alecselle/sefmediapreparer/tree/development)<br/>
 
 <br/>
 
