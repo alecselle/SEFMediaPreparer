@@ -4,7 +4,6 @@
 #include <QTime>
 #include <QWidget>
 #include <boost/algorithm/string.hpp>
-#include <boost/exception/all.hpp>
 #include <boost/filesystem.hpp>
 #include <nlohmann/json.hpp>
 #include <string>

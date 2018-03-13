@@ -1,21 +1,31 @@
 # SEF Media Preparer
-**Author:** Alec Selle ([*SuperEpicFuntime*](https://superepicfuntime.com), Owner/Lead Developer)<br/>
-GUI for ffmpeg that allows processes and converts an entire library, adhering to specified standards.
+Author: Alec Selle ([*SuperEpicFuntime*](https://superepicfuntime.com), Owner/Lead Developer)<br/><br/>
+Graphical program that processes video files to determine whether they match specified formats and can convert them if necessary.<br/>
+Currently uses ffmpeg binaries to process files, make sure that ffmpeg.exe and ffprobe.exe are either in the same directory as the executable or are included in your environment's path variable (this will be changed later).
 
-## Current Release: [1.0.0-alpha](https://github.com/alecselle/sefmediapreparer/releases)
+
+## Current Release: [1.1.0-alpha](https://github.com/alecselle/sefmediapreparer/releases)
 *Files tagged with 'NF' do not include ffmpeg.*<br/>
 **Initial Release. Basic features are working.**
 
-## Branches
-- [sefmediapreparer/master](https://github.com/alecselle/sefmediapreparer/tree/master)
-    - Current Full Release
-- [sefmediapreparer/beta](https://github.com/alecselle/sefmediapreparer/tree/beta)
-    - Current Beta Release
-- [sefmediapreparer/alpha](https://github.com/alecselle/sefmediapreparer/tree/alpha)
-    - Current Alpha Release
-- [sefmediapreparer/development](https://github.com/alecselle/sefmediapreparer/tree/development)
-	- **NOT SUPPORTED**
-	- Live Development Updates
+## Branches [![Build Status](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer/job/SEF%20Media%20Preparer%20(Development)/badge/icon)](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer/job/SEF%20Media%20Preparer%20(Development)/)
+[master](https://github.com/alecselle/sefmediapreparer/tree/master) - Current Release<br/>
+[development](https://github.com/alecselle/sefmediapreparer/tree/development) - **Live** Development
+
+## Build Instructions
+### Requirements
+*(Most can be filled by downloading [Qt](https://www.qt.io/download) and selecting MSVC packages)*
+1. [Visual Studio Build Tools](http://landinghub.visualstudio.com/visual-cpp-build-tools)<br/>
+2. [qmake](https://www.qt.io/download)<br/>
+3. [jom](https://wiki.qt.io/Jom)<br/>
+### Building
+`build.bat [-vcvarsall <path to vcvarsall.bat>] [-qmake <path to qmake>] [-jom <path to jom>]`
+<br/>or<br/>
+```
+vcvarsall.bat amd64 *(Setup Environment)*
+qmake.exe <project file (.pro)> -spec win32-msvc *(Create Makefile)*
+jom.exe *(Build Project)*
+```
 
 ## Coming Soon...
 1. Use of ffmpeg libraries instead of executables

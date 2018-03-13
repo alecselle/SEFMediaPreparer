@@ -8,7 +8,7 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = "SEF Media Preparer"
+TARGET = "SEFMediaPreparer"
 TEMPLATE = app
 RC_ICONS = seflogo.ico
 
@@ -36,7 +36,8 @@ HEADERS += \
         MediaPreparer.h \
     VideoLibrary.h \
     File.h \
-    Settings.h
+    Settings.h \
+    SEFMediaPreparer_resource.rc
 
 FORMS += \
         MediaPreparer.ui
@@ -48,12 +49,14 @@ DISTFILES += \
     Qt5Core.dll \
     Qt5Gui.dll \
     Qt5Widgets.dll \
-    seflogo.png
+    seflogo.png \
+    README.md \
+    LICENSE \
+    .clang-format \
+    .gitignore \
+    deploy.bat
 
 INCLUDEPATH += \
-    ../Lib/boost \
-    ../Lib/json/include \
-    ../Lib/ffmpeg \
+    ./include
 
-LIBS += -L../Lib/boost/stage/lib \
-        -LC:/Users/conta/AppData/Local/Qt/5.10.1/msvc2017_64/lib
+LIBS += -L./include/libs
