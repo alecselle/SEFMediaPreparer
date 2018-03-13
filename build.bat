@@ -92,6 +92,10 @@ goto eof
 
 :info
 call :branding
+echo.  vcvarsall.bat:    "%vcvarsall%"
+echo.  qmake.exe:        "%qmake%"
+echo.  jom.exe:          "%jom%"
+echo.
 echo.  Building Project: "%project%"
 echo.
 echo.  Source Directory: "%sourceDir%"
@@ -113,13 +117,13 @@ if exist "%vcvarsall%" (
 	exit /b 0
 	goto eof
 )
+echo.Cannot Find "%vcvarsall%"
 if not exist "%PROGRAMFILES(x86)%/Microsoft Visual Studio" (
 	echo.Cannot Find Visual Studio Installation...
 	exit /b 1
 	goto eof
 )
-cd "%PROGRAMFILES(x86)%/Microsoft Visual Studio"
-for /D %%i in (*) do if exist "%%~fi/Community/VC/Auxiliary/Build/vcvarsall.bat" set vcvarsall=%%~fi/Community/VC/Auxiliary/Build/vcvarsall.bat
+for /D %%i in ("%PROGRAMFILES(x86)%/Microsoft Visual Studio/*") do if exist "%PROGRAMFILES(x86)%/Microsoft Visual Studio/%%~nxi/Community/VC/Auxiliary/Build/vcvarsall.bat" set vcvarsall=%PROGRAMFILES(x86)%/Microsoft Visual Studio/%%~nxi/Community/VC/Auxiliary/Build/vcvarsall.bat
 exit /b 0
 goto eof
 
@@ -129,21 +133,25 @@ if exist "%qmake%" (
 		exit /b 0
 		goto eof
 	)
+	echo.Cannot Find "%jom%"
 )
-if not exist "C:/Qt" (
-	if not exist "%LOCALAPPDATA%/Qt" (
-		cd "C:/Users"
-		for /D %%i in (*) do (
-			if exist "%%~fi/AppData/Local/Qt" (
-				cd "%%~fi/AppData/Local/Qt"
-				for /D %%j in (*) do (
-					if exist "%%~fj/msvc2017_64/bin/qmake.exe" set qmake=%%~fj/msvc2017_64/bin/qmake.exe
-					if exist "%%~fj/Tools/QtCreator/bin/jom.exe" set jom=%%~fj/Tools/QtCreator/bin/jom.exe
-				)
-			)
-		)
+echo.Cannot Find "%qmake%"
+for /D %%j in ("C:/Qt/*") do (
+	if exist "C:/Qt/%%~nxj/msvc2017_64/bin/qmake.exe" set qmake=C:/Qt/%%~nxj/msvc2017_64/bin/qmake.exe
+	if exist "C:/Qt/%%~nxj/QtCreator/bin/jom.exe" set jom=C:/Qt/%%~nxj/QtCreator/bin/jom.exe
+)
+for /D %%j in (%LOCALAPPDATA%/Qt/*) do (
+	if exist "%LOCALAPPDATA%/Qt/%%~nxj/msvc2017_64/bin/qmake.exe" set qmake=%LOCALAPPDATA%/Qt/%%~nxj/msvc2017_64/bin/qmake.exe
+	if exist "%LOCALAPPDATA%/Qt/%%~nxj/QtCreator/bin/jom.exe" set jom=%LOCALAPPDATA%/Qt/%%~nxj/QtCreator/bin/jom.exe
+)
+for /D %%i in (C:/Users/*) do (
+	for /D %%j in (C:/Users/%%~nxi/AppData/Local/Qt/*) do (
+		if exist "C:/Users/%%~nxi/AppData/Local/Qt/%%~nxj/msvc2017_64/bin/qmake.exe" set qmake=C:/Users/%%~nxi/AppData/Local/Qt/%%~nxj/msvc2017_64/bin/qmake.exe
+		if exist "C:/Users/%%~nxi/AppData/Local/Qt/%%~nxj/QtCreator/bin/jom.exe" set jom=C:/Users/%%~nxi/AppData/Local/Qt/%%~nxj/QtCreator/bin/jom.exe
 	)
 )
+echo."%qmake%"
+echo."%jom%"
 if not exist "%jom%" (
 	echo.Cannot Find QtCreator Installation...
 	exit /b 1
