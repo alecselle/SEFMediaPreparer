@@ -1,7 +1,8 @@
 SEFMediaPreparer.pro.user
 .clang-format
 .qmake.stash
-
+mocinclude.opt
+Makefile*
 debug/
 release/
 deploy.bat
