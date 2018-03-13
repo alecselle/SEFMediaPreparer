@@ -12,10 +12,8 @@ Currently uses ffmpeg binaries to process files, make sure that ffmpeg.exe and f
 <br/>
 
 ## Branches
-### [master](https://github.com/alecselle/sefmediapreparer/tree/master) - [![](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer/job/SEF%20Media%20Preparer%20(Release)/badge/icon)](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer/job/SEF%20Media%20Preparer%20(Release)/)<br/>
-- Current Release<br/>
-### [development](https://github.com/alecselle/sefmediapreparer/tree/development) - [![](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer/job/SEF%20Media%20Preparer%20(Development)/badge/icon)](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer/job/SEF%20Media%20Preparer%20(Development)/)<br/>
-- **Live** Development <br/>
+### [master (Releases)](https://github.com/alecselle/sefmediapreparer/tree/master) - [![](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer/job/SEF%20Media%20Preparer%20(Release)/badge/icon)](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer/job/SEF%20Media%20Preparer%20(Release)/)<br/>
+### [development (Live)](https://github.com/alecselle/sefmediapreparer/tree/development) - [![](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer/job/SEF%20Media%20Preparer%20(Development)/badge/icon)](http://dev.alecselle.com:8080/job/SEF%20Media%20Preparer/job/SEF%20Media%20Preparer%20(Development)/)<br/>
 
 <br/>
 
@@ -25,6 +23,7 @@ Currently uses ffmpeg binaries to process files, make sure that ffmpeg.exe and f
 1. [Visual Studio Build Tools](http://landinghub.visualstudio.com/visual-cpp-build-tools)<br/>
 2. [qmake](https://www.qt.io/download)<br/>
 3. [jom](https://wiki.qt.io/Jom)<br/>
+<br/>
 ### Building
 Basic:
 ```
