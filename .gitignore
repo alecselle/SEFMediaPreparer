@@ -3,10 +3,10 @@ SEFMediaPreparer.pro.user
 .qmake.stash
 mocinclude.opt
 Makefile*
-debug/
-release/
-deploy.bat
-commit.bat
+/debug/
+/release/
+/deploy.bat
+/commit.bat
 
-Releases/
+/Releases/
 
