@@ -36,11 +36,6 @@ call "%qmake%" "%project%" -spec win32-g++ "CONFIG+=release" -Wnone
 if %errorlevel% NEQ 0 echo.An error occurred while running `qmake SEFMediaPreparer.pro -spec win32-g++ "CONFIG+=release"`
 echo.
 
-echo.Running `mingw32-make qmake_all`
-call "%mingw%" qmake_all -B
-if %errorlevel% NEQ 0 echo.An error occurred while running `mingw32-make qmake_all`
-echo.
-
 echo.Running `mingw32-make`
 call "%mingw%" -B
 if %errorlevel% NEQ 0 echo.An error occurred while running `mingw32-make`
