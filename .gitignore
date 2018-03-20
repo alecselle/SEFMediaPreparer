@@ -4,6 +4,8 @@ Makefile*
 .qmake.stash
 mocinclude.opt
 ui_MediaPreparer.h
+sefmediapreparer_plugin_import.cpp
+SEFMediaPreparer_resource.rc
 
 /debug/
 /release/

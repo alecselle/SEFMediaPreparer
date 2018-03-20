@@ -66,7 +66,9 @@ void MediaPreparer::scanLibrary(bf::path dir) {
 				scanIndex = i;
 
 				QProcess process;
-				if (bf::exists("../tools/ffprobe.exe")) {
+				if (bf::exists("./tools/ffprobe.exe")) {
+					process.setProgram(QString("./tools/ffprobe"));
+				} else if (bf::exists("../tools/ffprobe.exe")) {
 					process.setProgram(QString("../tools/ffprobe"));
 				} else {
 					process.setProgram(QString("ffprobe"));
@@ -180,7 +182,9 @@ void MediaPreparer::encodeLibrary() {
 			QString((settings->tempDir.string() + "\\" + file.nameStr() + "." + settings->container).c_str()));
 
 		QProcess process;
-		if (bf::exists("../tools/ffmpeg.exe")) {
+		if (bf::exists("./tools/ffmpeg.exe")) {
+			process.setProgram(QString("./tools/ffmpeg"));
+		} else if (bf::exists("../tools/ffmpeg.exe")) {
 			process.setProgram(QString("../tools/ffmpeg"));
 		} else {
 			process.setProgram(QString("ffmpeg"));

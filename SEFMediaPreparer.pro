@@ -10,6 +10,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = SEFMediaPreparer
 TEMPLATE = app
+ICON = seflogo.png
+RC_ICONS = seflogo.ico
 
 DEFINES += QT_DEPRECATED_WARNINGS
 
@@ -25,8 +27,9 @@ FORMS += \
     ./src/*.ui
 
 DISTFILES += \
-    ./tools/* \
     ./seflogo.png \
+    ./seflogo.ico \
+    ./tools/* \
     ./README.md \
     ./.gitignore
 
