@@ -18,18 +18,26 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += static
 
 SOURCES += \
-    ./src/*.cpp
+    ./src/main.cpp \
+    ./src/Settings.cpp \
+    ./src/File.cpp \
+    ./src/Library.cpp \
+    ./src/MediaPreparer.cpp
 
 HEADERS += \
-    ./src/*.hpp
+    ./src/Settings.hpp \
+    ./src/File.hpp \
+    ./src/Library.hpp \
+    ./src/MediaPreparer.hpp
 
 FORMS += \
-    ./src/*.ui
+    ./src/MediaPreparer.ui
 
 DISTFILES += \
     ./seflogo.png \
     ./seflogo.ico \
-    ./tools/* \
+    ./tools/ffmpeg.exe \
+    ./tools/ffprobe.exe \
     ./README.md \
     ./.gitignore
 
