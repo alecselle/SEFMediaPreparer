@@ -12,40 +12,40 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += static
 
 SOURCES += \
-    ./src/main.cpp \
-    ./src/Settings.cpp \
-    ./src/File.cpp \
-    ./src/Library.cpp \
-    ./src/MediaPreparer.cpp
+    $$PWD/src/main.cpp \
+    $$PWD/src/Settings.cpp \
+    $$PWD/src/File.cpp \
+    $$PWD/src/Library.cpp \
+    $$PWD/src/MediaPreparer.cpp
 
 HEADERS += \
-    ./src/Settings.hpp \
-    ./src/File.hpp \
-    ./src/Library.hpp \
-    ./src/MediaPreparer.hpp
+    $$PWD/src/Settings.hpp \
+    $$PWD/src/File.hpp \
+    $$PWD/src/Library.hpp \
+    $$PWD/src/MediaPreparer.hpp
 
 FORMS += \
-    ./src/MediaPreparer.ui
+    $$PWD/src/MediaPreparer.ui
 
 DISTFILES += \
-    ./seflogo.png \
-    ./seflogo.ico \
-    ./tools/ffmpeg.exe \
-    ./tools/ffprobe.exe \
-    ./README.md \
-    ./.gitignore
+    $$PWD/seflogo.png \
+    $$PWD/seflogo.ico \
+    $$PWD/tools/ffmpeg.exe \
+    $$PWD/tools/ffprobe.exe \
+    $$PWD/README.md \
+    $$PWD/.gitignore
 
 unix:!macx|win32: LIBS += \
-    -L./lib/ -llibboost_filesystem-mgw53-mt-s-x32-1_66 \
-    -L./lib/ -llibboost_container-mgw53-mt-s-x32-1_66 \
-    -L./lib/ -llibboost_system-mgw53-mt-s-x32-1_66
+    -L$$PWD/lib/ -llibboost_filesystem-mgw53-mt-s-x32-1_66 \
+    -L$$PWD/lib/ -llibboost_container-mgw53-mt-s-x32-1_66 \
+    -L$$PWD/lib/ -llibboost_system-mgw53-mt-s-x32-1_66
 
 INCLUDEPATH += \
-    ./include
+    $$PWD/include
 DEPENDPATH += \
-    ./include
+    $$PWD/include
 
 win32:!win32-g++: PRE_TARGETDEPS += \
-    ./lib/libboost_filesystem-mgw53-mt-s-x32-1_66.a \
-    ./lib/libboost_container-mgw53-mt-s-x32-1_66.a \
-    ./lib/libboost_system-mgw53-mt-s-x32-1_66.a
+    $$PWD/lib/libboost_filesystem-mgw53-mt-s-x32-1_66.a \
+    $$PWD/lib/libboost_container-mgw53-mt-s-x32-1_66.a \
+    $$PWD/lib/libboost_system-mgw53-mt-s-x32-1_66.a
