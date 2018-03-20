@@ -5,32 +5,11 @@ Currently uses ffmpeg binaries to process files, make sure that ffmpeg.exe and f
 
 <br/>
 
-## Current Release: [1.1.2-alpha](https://github.com/alecselle/sefmediapreparer/releases)
+## Current Release: [2.0.0-alpha](https://github.com/alecselle/sefmediapreparer/releases)
 *Files tagged with 'NF' do not include ffmpeg.*<br/>
-**Support update. Dependency hotfix 2.**
-
-<br/>
-
-## Build Instructions
-### Requirements
-*(Most can be filled by downloading [Qt](https://www.qt.io/download) and selecting MSVC packages)*
-1. [Visual Studio Build Tools](http://landinghub.visualstudio.com/visual-cpp-build-tools)<br/>
-2. [qmake](https://www.qt.io/download)<br/>
-3. [jom](https://wiki.qt.io/Jom)<br/>
-### Building
-Basic:
-```
-build.bat *(Automatically locates build requirements)*
-```
-Advanced:
-```
-vcvarsall.bat amd64 *(Setup Environment)*
-qmake.exe <project file (.pro)> -spec win32-msvc *(Create Makefile)*
-jom.exe *(Build Project)*
-```
+**Static update.**
 
 <br/>
 
 ## Coming Soon...
 1. Use of ffmpeg libraries instead of executables
-2. Static Version that doesn't require dlls or executables
