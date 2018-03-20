@@ -1,9 +1,3 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2018-03-15T13:19:37
-#
-#-------------------------------------------------
-
 QT += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -52,6 +46,6 @@ DEPENDPATH += \
     ./include
 
 win32:!win32-g++: PRE_TARGETDEPS += \
-   ./ lib/libboost_filesystem-mgw53-mt-s-x32-1_66.a \
+    ./lib/libboost_filesystem-mgw53-mt-s-x32-1_66.a \
     ./lib/libboost_container-mgw53-mt-s-x32-1_66.a \
     ./lib/libboost_system-mgw53-mt-s-x32-1_66.a
