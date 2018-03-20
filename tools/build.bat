@@ -16,6 +16,7 @@ echo.Project : %project%
 echo.Source  : %source%
 echo.Output  : %output%
 echo.
+echo.vars    : %varbat%
 echo.qmake   : %qmake%
 echo.mingw   : %mingw%
 echo.
@@ -23,10 +24,11 @@ echo.
 if not exist "%output%" mkdir "%output%"
 cd "%output%"
 
-echo.Running `vcvarsall amd64`
-call "%varbat%" amd64
+echo.Running `vcvarsall x86_amd64`
+call "%varbat%" x86_amd64
 if %errorlevel% NEQ 0 echo.An error occurred while running `vcvarsall amd64`
-cd %output%
+call cd "%output%"
+cd "%output%"
 echo.
 
 echo.Running `qmake SEFMediaPreparer.pro -spec win32-g++ "CONFIG+=release"`
