@@ -33,7 +33,8 @@ DISTFILES += \
     $$PWD/tools/ffmpeg.exe \
     $$PWD/tools/ffprobe.exe \
     $$PWD/README.md \
-    $$PWD/.gitignore
+    $$PWD/.gitignore \
+    version.txt
 
 unix:!macx|win32: LIBS += \
     -L$$PWD/lib/ -llibboost_filesystem-mgw53-mt-s-x32-1_66 \
