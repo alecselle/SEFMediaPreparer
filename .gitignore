@@ -7,9 +7,10 @@ ui_MediaPreparer.h
 sefmediapreparer_plugin_import.cpp
 SEFMediaPreparer_resource.rc
 
-/debug/
-/release/
-/Releases/
+.jenkins/
+release/
+build/
+bin/
 
-/tools/deploy.bat
-/tools/commit.bat
+tools/deploy.bat
+tools/commit.bat

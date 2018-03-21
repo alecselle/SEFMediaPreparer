@@ -1,9 +1,3 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2018-03-15T13:19:37
-#
-#-------------------------------------------------
-
 QT += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -18,32 +12,41 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += static
 
 SOURCES += \
-    ./src/*.cpp
+    $$PWD/src/main.cpp \
+    $$PWD/src/Settings.cpp \
+    $$PWD/src/File.cpp \
+    $$PWD/src/Library.cpp \
+    $$PWD/src/MediaPreparer.cpp
 
 HEADERS += \
-    ./src/*.hpp
+    $$PWD/src/Settings.hpp \
+    $$PWD/src/File.hpp \
+    $$PWD/src/Library.hpp \
+    $$PWD/src/MediaPreparer.hpp
 
 FORMS += \
-    ./src/*.ui
+    $$PWD/src/MediaPreparer.ui
 
 DISTFILES += \
-    ./seflogo.png \
-    ./seflogo.ico \
-    ./tools/* \
-    ./README.md \
-    ./.gitignore
+    $$PWD/seflogo.png \
+    $$PWD/seflogo.ico \
+    $$PWD/tools/ffmpeg.exe \
+    $$PWD/tools/ffprobe.exe \
+    $$PWD/README.md \
+    $$PWD/.gitignore \
+    version.txt
 
 unix:!macx|win32: LIBS += \
-    -L./lib/ -llibboost_filesystem-mgw53-mt-s-x32-1_66 \
-    -L./lib/ -llibboost_container-mgw53-mt-s-x32-1_66 \
-    -L./lib/ -llibboost_system-mgw53-mt-s-x32-1_66
+    -L$$PWD/lib/ -llibboost_filesystem-mgw53-mt-s-x32-1_66 \
+    -L$$PWD/lib/ -llibboost_container-mgw53-mt-s-x32-1_66 \
+    -L$$PWD/lib/ -llibboost_system-mgw53-mt-s-x32-1_66
 
 INCLUDEPATH += \
-    ./include
+    $$PWD/include
 DEPENDPATH += \
-    ./include
+    $$PWD/include
 
 win32:!win32-g++: PRE_TARGETDEPS += \
-   ./ lib/libboost_filesystem-mgw53-mt-s-x32-1_66.a \
-    ./lib/libboost_container-mgw53-mt-s-x32-1_66.a \
-    ./lib/libboost_system-mgw53-mt-s-x32-1_66.a
+    $$PWD/lib/libboost_filesystem-mgw53-mt-s-x32-1_66.a \
+    $$PWD/lib/libboost_container-mgw53-mt-s-x32-1_66.a \
+    $$PWD/lib/libboost_system-mgw53-mt-s-x32-1_66.a
