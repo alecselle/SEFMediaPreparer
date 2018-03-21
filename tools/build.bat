@@ -3,43 +3,41 @@
 cd "%~dp0"/..
 
 set project=%CD%/SEFMediaPreparer.pro
-set source=%CD%
-set output=%CD%/build
+set sourceDir=%CD%
+set buildDir=%CD%/build
 set varbat=C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/VC/Auxiliary/Build/vcvarsall.bat
 set qmake=C:/Dev/Qt/Static/5.10.1/bin/qmake.exe
 set mingw=C:/Dev/Qt/Tools/mingw530_32/bin/mingw32-make.exe
 
-cd "%source%"
+cd "%sourceDir%"
 
 echo.
-echo.Project : %project%
-echo.Source  : %source%
-echo.Output  : %output%
+echo.Project Path: %project%
+echo.Source Dir  : %sourceDir%
+echo.Output Dir  : %buildDir%
 echo.
-echo.vars    : %varbat%
-echo.qmake   : %qmake%
-echo.mingw   : %mingw%
+echo.qmake Path  : %qmake%
+echo.mingw Path  : %mingw%
 echo.
 
-if not exist "%output%" mkdir "%output%"
-cd "%output%"
-
-echo.Running `vcvarsall x86_amd64`
-call "%varbat%" x86_amd64
-if %errorlevel% NEQ 0 echo.An error occurred while running `vcvarsall amd64`
-call cd "%output%"
-cd "%output%"
-echo.
+if not exist "%buildDir%" mkdir "%buildDir%"
+cd "%buildDir%"
 
 echo.Running `qmake SEFMediaPreparer.pro -spec win32-g++ "CONFIG+=release"`
 call "%qmake%" "%project%" -spec win32-g++ "CONFIG+=release" -Wnone
-if %errorlevel% NEQ 0 echo.An error occurred while running `qmake SEFMediaPreparer.pro -spec win32-g++ "CONFIG+=release"`
 echo.
 
 echo.Running `mingw32-make`
 call "%mingw%" -B
-if %errorlevel% NEQ 0 echo.An error occurred while running `mingw32-make`
 echo.
 
-cd "%source%"
+if not exist "%sourceDir%/bin" mkdir "%sourceDir%/bin"
+
+echo.Copying build artifacts...
+copy "%buildDir%\release\SEFMediaPreparer.exe" "%sourceDir%\bin\"
+copy "%sourceDir%\tools\ffmpeg.exe" "%sourceDir%\bin\"
+copy "%sourceDir%\tools\ffprobe.exe" "%sourceDir%\bin\"
+echo.
+
+cd "%sourceDir%"
 echo.Finished...
