@@ -10,6 +10,7 @@ SEFMediaPreparer_resource.rc
 .jenkins/
 release/
 build/
+bin/
 
 tools/deploy.bat
 tools/commit.bat
