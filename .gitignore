@@ -7,6 +7,7 @@ ui_MediaPreparer.h
 sefmediapreparer_plugin_import.cpp
 SEFMediaPreparer_resource.rc
 
+.jenkins/
 release/
 build/
 
