@@ -3,7 +3,8 @@ compiler: gcc
 
 branches:
   only:
-  - /.*/
+  - Unstable
+  - Release
 
 before_install:
 - sudo apt-get update -qq
