@@ -12,4 +12,4 @@ before_install:
 script: 
 - mkdir build && cd build
 - qmake ../SEFMediaPreparer.pro -spec linux-g++ "CONFIG+=release"
-- i686-w64-mingw32-gcc Makefile.Release
+- i686-w64-mingw32-gcc Makefile
