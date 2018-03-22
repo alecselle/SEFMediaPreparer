@@ -8,8 +8,8 @@ branches:
 
 before_install:
 - sudo apt-get update -qq
-- sudo apt-get install -qq build-essential qt5-default mingw-w64
+- sudo apt-get install -qq build-essential qt5-default
 script: 
 - mkdir build && cd build
 - qmake ../SEFMediaPreparer.pro -spec linux-g++ "CONFIG+=release"
-- i686-w64-mingw32-gcc Makefile
+- make -f Makefile
