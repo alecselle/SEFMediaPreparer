@@ -37,9 +37,9 @@ DISTFILES += \
     version.txt
 
 unix:!macx|win32: LIBS += \
-    -L$$PWD/lib/ -llibboost_filesystem-mgw53-mt-s-x32-1_66 \
-    -L$$PWD/lib/ -llibboost_container-mgw53-mt-s-x32-1_66 \
-    -L$$PWD/lib/ -llibboost_system-mgw53-mt-s-x32-1_66
+    -L$$PWD/lib/ -lboost_filesystem-mgw53-mt-s-x32-1_66 \
+    -L$$PWD/lib/ -lboost_container-mgw53-mt-s-x32-1_66 \
+    -L$$PWD/lib/ -lboost_system-mgw53-mt-s-x32-1_66
 
 INCLUDEPATH += \
     $$PWD/include
