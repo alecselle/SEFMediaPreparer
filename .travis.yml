@@ -1,0 +1,11 @@
+language: cpp
+compiler: gcc
+
+branches:
+  only:
+  - /.*/
+
+before_install:
+- sudo apt-get update -qq
+- sudo apt-get install -qq build-essential qt5-default
+script: ./configure && make && make test
