@@ -5,6 +5,11 @@ branches:
   only:
   - Unstable
   - Release
+  
+notifications:
+  email:
+    on_success: change
+    on_failure: change
 
 before_install:
 - sudo apt-get update -qq
@@ -12,4 +17,4 @@ before_install:
 script: 
 - mkdir build && cd build
 - qmake ../SEFMediaPreparer.pro -spec linux-g++ "CONFIG+=release"
-- make -f Makefile
+- make -j -f Makefile

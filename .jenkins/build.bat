@@ -7,6 +7,6 @@ call "%QMAKE%" "%WORKSPACE%/SEFMediaPreparer.pro" -spec win32-g++ "CONFIG+=relea
 echo.
 echo.Running mingw32-make...
 cd "%WORKSPACE%/build"
-call "%MINGW%" -s -i -B
+call "%MINGW%" -s -i -j 4 -B
 echo.
 endlocal
