@@ -21,7 +21,33 @@ if exist "%WORKSPACE%/version.txt" (
 		set SOURCE_PATCH=%%c
 	)
 	set SOURCE_VERSION=!SOURCE_MAJOR!.!SOURCE_MINOR!.!SOURCE_PATCH!
-
+	
+	if !SOURCE_PATCH! GTR !BUILD_PATCH! set PATCH=1
+	else if !SOURCE_PATCH! EQU !BUILD_PATCH! set PATCH=0
+	else if !SOURCE_PATCH! LES !BUILD_PATCH! set PATCH=-1
+	
+	if !SOURCE_MINOR! GTR !BUILD_MINOR! set MINOR=1
+	else if !SOURCE_MINOR! EQU !BUILD_MINOR! set MINOR=0
+	else if !SOURCE_MINOR! LES !BUILD_MINOR! set MINOR=-1
+	
+	if !SOURCE_MAJOR! GTR !BUILD_MAJOR! set MAJOR=1
+	else if !SOURCE_MAJOR! EQU !BUILD_MAJOR! set MAJOR=0
+	else if !SOURCE_MAJOR! LES !BUILD_MAJOR! set MAJOR=-1
+	
+	if !PATCH! EQU 1 ( if !MINOR! GEQ 0 if !MAJOR! GEQ 0 
+		echo.Upgrading to %SOURCE_VERSION% from %BUILD_VERSION%
+	) else if !PATCH! GEQ 0 if !MINOR! EQU 1 ( if !MAJOR! GEQ 1
+		echo.Upgrading to %SOURCE_VERSION% from %BUILD_VERSION%
+	) else if !PATCH! GEQ 0 if !MINOR! GEQ 0 if !MAJOR! EQU 1 (
+		echo.Upgrading to %SOURCE_VERSION% from %BUILD_VERSION%
+	) else if !PATCH! EQU -1 (
+		echo.Downgrading to %SOURCE_VERSION% from %BUILD_VERSION%
+	) else if !MINOR! EQU -1 (
+		echo.Downgrading to %SOURCE_VERSION% from %BUILD_VERSION%
+	) else if !MAJOR! EQU -1 (
+		echo.Downgrading to %SOURCE_VERSION% from %BUILD_VERSION%
+	)
+	
 	if "!BUILD_VERSION!" NEQ "!SOURCE_VERSION!" (
 		set BUILD_VERSION=!SOURCE_VERSION!
 		set BUILD_NUMBER=1
