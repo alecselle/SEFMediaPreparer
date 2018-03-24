@@ -1,7 +1,7 @@
 @echo off
 setlocal EnableDelayedExpansion
 set ERROR_LEVEL=0
-set DEBUG=0
+set DEBUG=1
 ::=============================================================================
 :: ~~ FUNCTION CALLS
 :RUN
@@ -15,6 +15,7 @@ set DEBUG=0
 	call :COPY_ARTIFACTS
 	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
 	
+	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:RUN] packArtifacts=!packArtifacts!
 	if "!packArtifacts!" EQU "1" (
 		echo.[Archive] Packing Artifacts (3/3)
 		call :PACK_ARTIFACTS
@@ -44,7 +45,7 @@ set DEBUG=0
 	goto EOF
 :COPY_ARTIFACTS
 	copy /Y "!WORKSPACE!\build\release\SEFMediaPreparer.exe"+"!WORKSPACE!\tools\ffmpeg.exe"+"!WORKSPACE!\tools\ffprobe.exe" "!WORKSPACE!\bin\"
-	if %errorlevel% NEQ 0 call :ERROR_COPY_FAILED "BIN_DIR"
+	if %errorlevel% NEQ 0 call :ERROR_COPY_FAILED "COPY_ARTIFACTS"
 	exit /b !ERROR_LEVEL!
 	goto EOF
 :PACK_ARTIFACTS
