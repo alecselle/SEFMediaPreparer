@@ -7,7 +7,7 @@ TEMPLATE = app
 ICON = seflogo.png
 RC_ICONS = seflogo.ico
 
-CONFIG += staticlib
+CONFIG += static staticlib
 
 SOURCES += \
     $$PWD/src/main.cpp \
