@@ -111,20 +111,6 @@ F:\Workspace\SEFMediaPreparer\src\Library.cpp: In member function 'bool Library:
 F:\Workspace\SEFMediaPreparer\src\Library.cpp:297:65: warning: NULL used in arithmetic [-Wpointer-arith]
   if (isValid(true, true, true) && (i = findFileEncode(file)) != NULL) {
                                                                  ^
-F:\Workspace\SEFMediaPreparer\src\Settings.cpp: In member function 'void Settings::saveConfig()':
-F:\Workspace\SEFMediaPreparer\src\Settings.cpp:41:20: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
-  for (int i = 0; i < vCodecList.size(); i++) {
-                    ^
-In file included from F:\Workspace\SEFMediaPreparer\src\File.cpp:1:0:
-F:\Workspace\SEFMediaPreparer/src/File.hpp:19:18: warning: converting to non-pointer type 'int' from NULL [-Wconversion-null]
-  int _duration = NULL;
-                  ^
-F:\Workspace\SEFMediaPreparer/src/File.hpp:21:19: warning: converting to non-pointer type 'int' from NULL [-Wconversion-null]
-  int _subtitles = NULL;
-                   ^
-F:\Workspace\SEFMediaPreparer\src\Settings.cpp:44:20: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
-  for (int i = 0; i < aCodecList.size(); i++) {
-                    ^
 F:\Workspace\SEFMediaPreparer\src\Library.cpp: In member function 'boost::container::vector<File>& Library::getFiles()':
 F:\Workspace\SEFMediaPreparer\src\Library.cpp:124:1: warning: control reaches end of non-void function [-Wreturn-type]
  }
@@ -169,6 +155,20 @@ F:\Workspace\SEFMediaPreparer\src\Library.cpp: In member function 'bool Library:
 F:\Workspace\SEFMediaPreparer\src\Library.cpp:307:1: warning: control reaches end of non-void function [-Wreturn-type]
  }
  ^
+In file included from F:\Workspace\SEFMediaPreparer\src\File.cpp:1:0:
+F:\Workspace\SEFMediaPreparer/src/File.hpp:19:18: warning: converting to non-pointer type 'int' from NULL [-Wconversion-null]
+  int _duration = NULL;
+                  ^
+F:\Workspace\SEFMediaPreparer/src/File.hpp:21:19: warning: converting to non-pointer type 'int' from NULL [-Wconversion-null]
+  int _subtitles = NULL;
+                   ^
+F:\Workspace\SEFMediaPreparer\src\Settings.cpp: In member function 'void Settings::saveConfig()':
+F:\Workspace\SEFMediaPreparer\src\Settings.cpp:41:20: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+  for (int i = 0; i < vCodecList.size(); i++) {
+                    ^
+F:\Workspace\SEFMediaPreparer\src\Settings.cpp:44:20: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+  for (int i = 0; i < aCodecList.size(); i++) {
+                    ^
 F:\Workspace\SEFMediaPreparer\src\Settings.cpp: In member function 'void Settings::loadConfig()':
 F:\Workspace\SEFMediaPreparer\src\Settings.cpp:121:21: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
    for (int i = 0; i < j.find("vCodecs").value().size(); i++) {
@@ -256,6 +256,10 @@ F:\Workspace\SEFMediaPreparer\src\MediaPreparer.cpp:532:20: warning: comparison 
 F:\Workspace\SEFMediaPreparer\src\MediaPreparer.cpp:535:20: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
   for (int i = 0; i < settings->presetPathList.size(); i++) {
                     ^
+F:\Workspace\SEFMediaPreparer\src\MediaPreparer.cpp: In member function 'bool MediaPreparer::cancel()':
+F:\Workspace\SEFMediaPreparer\src\MediaPreparer.cpp:689:1: warning: control reaches end of non-void function [-Wreturn-type]
+ }
+ ^
 In file included from F:/Workspace/SEFMediaPreparer/src/MediaPreparer.hpp:5:0,
                  from release\moc_MediaPreparer.cpp:9:
 F:\Workspace\SEFMediaPreparer/src/File.hpp:19:18: warning: converting to non-pointer type 'int' from NULL [-Wconversion-null]
@@ -264,10 +268,6 @@ F:\Workspace\SEFMediaPreparer/src/File.hpp:19:18: warning: converting to non-poi
 F:\Workspace\SEFMediaPreparer/src/File.hpp:21:19: warning: converting to non-pointer type 'int' from NULL [-Wconversion-null]
   int _subtitles = NULL;
                    ^
-F:\Workspace\SEFMediaPreparer\src\MediaPreparer.cpp: In member function 'bool MediaPreparer::cancel()':
-F:\Workspace\SEFMediaPreparer\src\MediaPreparer.cpp:689:1: warning: control reaches end of non-void function [-Wreturn-type]
- }
- ^
 In file included from F:/Workspace/SEFMediaPreparer/src/MediaPreparer.hpp:6:0,
                  from release\moc_MediaPreparer.cpp:9:
 F:\Workspace\SEFMediaPreparer/src/Library.hpp:24:18: warning: converting to non-pointer type 'int' from NULL [-Wconversion-null]

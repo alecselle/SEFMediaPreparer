@@ -5,26 +5,18 @@ set DEBUG=0
 ::=============================================================================
 :: ~~ FUNCTION CALLS
 :RUN
-	echo.[Archive] Running Script (0/3?)
+	echo.[Archive] Running Script (0/2?)
 	
-	echo.[Archive] Checking Variables (1/3?)
+	echo.[Archive] Checking Variables (1/2?)
 	call :CHECK_VARIABLES
 	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
 	
-	echo.[Archive] Verifying Directory (2/3?)
-	call :BIN_DIR
-	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
-	
-	echo.[Archive] Copying Artifacts (3/3?)
+	echo.[Archive] Copying Artifacts (2/2?)
 	call :COPY_ARTIFACTS
 	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
 	
-	if "!packArtifacts!"=="true" (
-		echo.[Archive] Verifying Directory (4/5)
-		call :RELEASE_DIR
-		if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
-		
-		echo.[Archive] Packing Artifacts (5/5)
+	if !packArtifacts! EQU 1 (
+		echo.[Archive] Packing Artifacts (3/3)
 		call :PACK_ARTIFACTS
 		if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
 	)
@@ -41,19 +33,13 @@ set DEBUG=0
 		if %errorlevel% NEQ 0 call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "7z.exe"
 		for /f %%i in ('where 7z') do set ZIP=%%i
 	)
+	if not exist "!WORKSPACE!/bin" mkdir "!WORKSPACE!/bin"
+	if not exist "!WORKSPACE!/release" mkdir "!WORKSPACE!/release"
+	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "RELEASE_DIR" "release"
+	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "BIN_DIR" "bin"
 	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:CHECK_VARIABLES] WORKSPACE=!WORKSPACE!
 	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:CHECK_VARIABLES] ZIP=!ZIP!
 	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:CHECK_VARIABLES] ERROR_LEVEL=!ERROR_LEVEL!
-	exit /b !ERROR_LEVEL!
-	goto EOF
-:BIN_DIR
-	if not exist "!WORKSPACE!/bin" mkdir "!WORKSPACE!/bin"
-	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "BIN_DIR" "bin"
-	exit /b !ERROR_LEVEL!
-	goto EOF
-:RELEASE_DIR
-	if not exist "!WORKSPACE!/release" mkdir "!WORKSPACE!/release"
-	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "RELEASE_DIR" "release"
 	exit /b !ERROR_LEVEL!
 	goto EOF
 :COPY_ARTIFACTS
