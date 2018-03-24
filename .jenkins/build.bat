@@ -69,12 +69,14 @@ setlocal EnableDelayedExpansion
 	goto EOF
 :QMAKE
 	call :BUILD_DIR
+	echo.[Build] "!QMAKE!" !WORKSPACE!/!PROJECT! -spec win32-g++ "CONFIG+=release" -Wnone
 	call "!QMAKE!" !WORKSPACE!/!PROJECT! -spec win32-g++ "CONFIG+=release" -Wnone
 	if !errorlevel! NEQ 0 call :ERROR_BUILD_FAILED "QMAKE" "Qmake returned an error" "Check output for details" && exit /b 1\
 	exit /b 0
 	goto EOF
 :MINGW
 	call :BUILD_DIR
+	echo.[Build] "!MINGW!" -s -i -j 4 -B
 	call "!MINGW!" -s -i -j 4 -B
 	if %errorlevel% NEQ 0 call :ERROR_BUILD_FAILED "MINGW" "MinGW returned an error" "Check output for details" && exit /b 1
 	exit /b 0
