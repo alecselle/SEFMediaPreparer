@@ -103,21 +103,22 @@ setlocal EnableDelayedExpansion
 	exit /b 0
 	goto EOF
 :DISPLAY_VERSION_DIFF
-	if !PATCH_DIFF! EQU 1 if !MINOR_DIFF! GEQ 0 if !MAJOR_DIFF! GEQ 0 echo.Upgrading to !VERSION_NEW! from !VERSION_OLD! && exit /b 0
-	if !PATCH_DIFF! GEQ 0 if !MINOR_DIFF! EQU 1 if !MAJOR_DIFF! GEQ 0 echo.Upgrading to !VERSION_NEW! from !VERSION_OLD! && exit /b 0
-	if !PATCH_DIFF! GEQ 0 if !MINOR_DIFF! GEQ 0 if !MAJOR_DIFF! EQU 1 echo.Upgrading to !VERSION_NEW! from !VERSION_OLD! && exit /b 0
-	if !PATCH_DIFF! EQU 0 if !MINOR_DIFF! EQU 0 if !MAJOR_DIFF! EQU 0 echo.Rebuilding !VERSION_OLD! && exit /b 0
-	if !PATCH_DIFF! EQU -1 echo.Downgrading to !VERSION_NEW! from !VERSION_OLD! && exit /b 0
-	if !MINOR_DIFF! EQU -1 echo.Downgrading to !VERSION_NEW! from !VERSION_OLD! && exit /b 0
-	if !MAJOR_DIFF! EQU -1 echo.Downgrading to !VERSION_NEW! from !VERSION_OLD! && exit /b 0
+	echo.
+	if !PATCH_DIFF! EQU 1 if !MINOR_DIFF! GEQ 0 if !MAJOR_DIFF! GEQ 0 echo.[Version] Upgrading to !VERSION_NEW! from !VERSION_OLD! && exit /b 0
+	if !PATCH_DIFF! GEQ 0 if !MINOR_DIFF! EQU 1 if !MAJOR_DIFF! GEQ 0 echo.[Version] Upgrading to !VERSION_NEW! from !VERSION_OLD! && exit /b 0
+	if !PATCH_DIFF! GEQ 0 if !MINOR_DIFF! GEQ 0 if !MAJOR_DIFF! EQU 1 echo.[Version] Upgrading to !VERSION_NEW! from !VERSION_OLD! && exit /b 0
+	if !PATCH_DIFF! EQU 0 if !MINOR_DIFF! EQU 0 if !MAJOR_DIFF! EQU 0 echo.[Version] Rebuilding !VERSION_OLD! && exit /b 0
+	if !PATCH_DIFF! EQU -1 echo.[Version] Downgrading to !VERSION_NEW! from !VERSION_OLD! && exit /b 0
+	if !MINOR_DIFF! EQU -1 echo.[Version] Downgrading to !VERSION_NEW! from !VERSION_OLD! && exit /b 0
+	if !MAJOR_DIFF! EQU -1 echo.[Version] Downgrading to !VERSION_NEW! from !VERSION_OLD! && exit /b 0
 	call :ERROR_PARSE_FAILED "DISPLAY_VERSION_DIFF"
 	exit /b 1
 	goto EOF
 :DISPLAY_SUMMARY
 	echo.
-	echo.Previous Version : !VERSION_OLD!
-	echo.Current Version  : !VERSION!
-	echo.Build Number     : !BUILD!
+	echo.[Version] Previous Version : !VERSION_OLD!
+	echo.[Version] Current Version  : !VERSION!
+	echo.[Version] Build Number     : !BUILD!
 	echo.
 	exit /b 0
 	goto EOF
