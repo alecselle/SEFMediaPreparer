@@ -11,14 +11,15 @@ setlocal EnableDelayedExpansion
 :: ~~ FUNCTION DECLARATIONS
 :CHECK_VARIABLES
 	if "!WORKSPACE!"=="" (
-		echo.[WARNING] Variable not initialized. 'WORKSPACE'
+		echo.[Build][WARNING] Variable not initialized. 'WORKSPACE'
+		cd "%~dp0/.."
 		set WORKSPACE=%CD%
 		if not exist "!WORKSPACE!/!PROJECT!" (
 			call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "!PROJECT!"
 			exit /b 1
 			goto EOF
 		) else (
-			echo.[WARNING] Using current directory. '%CD%'
+			echo.[Build][WARNING] Using directory. '%WORKSPACE%'
 		)
 	)
 	if not exist "!WORKSPACE!/!PROJECT!" (
@@ -27,14 +28,14 @@ setlocal EnableDelayedExpansion
 			exit /b 1
 			goto EOF
 		) else (
-			echo.[WARNING] Project '!PROJECT!' does not exist
-			echo.[WARNING] Project '!PROJECT_DEFAULT!' does
+			echo.[Build][WARNING] Project '!PROJECT!' does not exist
+			echo.[Build][WARNING] Project '!PROJECT_DEFAULT!' does
 			set PROJECT=!PROJECT_DEFAULT!
-			echo.[WARNING] Using '!PROJECT!'
+			echo.[Build][WARNING] Using '!PROJECT!'
 		)
 	)
 	if "!QMAKE!"=="" (
-		echo.[WARNING] Variable not initialized. 'QMAKE'
+		echo.[Build][WARNING] Variable not initialized. 'QMAKE'
 		call where /q qmake.exe
 		if %errorlevel% NEQ 0 (
 			call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "qmake.exe"
@@ -42,11 +43,11 @@ setlocal EnableDelayedExpansion
 			goto EOF
 		) else (
 			for /f %%i in ('where qmake.exe') do set QMAKE=%%i
-			echo.[WARNING] Using '!QMAKE!' from PATH
+			echo.[Build][WARNING] Using '!QMAKE!' from PATH
 		)
 	)
 	if "!MINGW!"=="" (
-		echo.[WARNING] Variable not initialized. 'MINGW'
+		echo.[Build][WARNING] Variable not initialized. 'MINGW'
 		call where /q mingw32-make.exe
 		if %errorlevel% NEQ 0 (
 			call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "mingw32-make.exe"
@@ -54,9 +55,10 @@ setlocal EnableDelayedExpansion
 			goto EOF
 		) else (
 			for /f %%i in ('where mingw32-make.exe') do set MINGW=%%i
-			echo.[WARNING] Using '!MINGW!' from PATH
+			echo.[Build][WARNING] Using '!MINGW!' from PATH
 		)
 	)
+	echo %errorlevel%
 	exit /b 0
 	goto EOF
 :BUILD_DIR
@@ -67,13 +69,13 @@ setlocal EnableDelayedExpansion
 	goto EOF
 :QMAKE
 	call :BUILD_DIR
-	call "!QMAKE!" "!WORKSPACE!/%PROJECT%" -spec win32-g++ "CONFIG+=release" -Wnone
+	call "!QMAKE!" !WORKSPACE!/!PROJECT! -spec win32-g++ "CONFIG+=release" -Wnone
 	if !errorlevel! NEQ 0 call :ERROR_BUILD_FAILED "QMAKE" "Qmake returned an error" "Check output for details" && exit /b 1\
 	exit /b 0
 	goto EOF
 :MINGW
 	call :BUILD_DIR
-	call "!MINGW!" -std=c++11 -s -i -j 4 -B
+	call "!MINGW!" -s -i -j 4 -B
 	if %errorlevel% NEQ 0 call :ERROR_BUILD_FAILED "MINGW" "MinGW returned an error" "Check output for details" && exit /b 1
 	exit /b 0
 	goto EOF
@@ -93,6 +95,18 @@ setlocal EnableDelayedExpansion
 	if %errorlevel% NEQ 0 goto END_FAILURE
 	echo.[Build] Completed Successfully
 	goto END_SUCCESS
+	goto EOF
+:: ~~
+::=============================================================================
+:: ~~ UTILITY FUNCTIONS
+:TRIM
+	for /f "tokens=* delims= " %%a in ("%~2") do set "%~1=%%a"
+	echo.[Build][DEBUG] TRIM : %~1
+	echo.[Build][DEBUG] TRIM : %~2
+	for /l %%a in (1,1,100) do if "!~1:~-1!"==" " set "%~1=!~1:~0,-1!"
+	echo.[Build][DEBUG] TRIM : %~1
+	echo.[Build][DEBUG] TRIM : %~2
+	exit /b 0
 	goto EOF
 :: ~~
 ::=============================================================================
@@ -132,20 +146,16 @@ setlocal EnableDelayedExpansion
 	exit /b 1
 	goto EOF
 :ERROR_ERROR
-	if !DEBUG! GEQ 1 echo.[DEBUG] ':ERROR' calls take at least 2 parameters
-	if !DEBUG! EQU 0 echo.Unknown Error
+	if !DEBUG! GEQ 1 echo.[Build][DEBUG] ':ERROR' calls take at least 2 parameters
+	if !DEBUG! EQU 0 echo.[Build][WARNING]Unknown Error
 	goto END_FAILURE
 	goto EOF
 ::=============================================================================
-:CLEANUP
+:END_SUCCESS
 	endlocal
 	exit /b 0
 	goto EOF
-:END_SUCCESS
-	call :CLEANUP
-	exit /b 0
-	goto EOF
 :END_FAILURE
-	call :CLEANUP
+	endlocal
 	exit /b 1
 	goto EOF

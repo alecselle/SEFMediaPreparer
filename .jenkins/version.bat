@@ -192,16 +192,17 @@ setlocal EnableDelayedExpansion
 	echo.
 	exit /b 1
 	goto EOF
+	:ERROR_ERROR
+	if !DEBUG! GEQ 1 echo.[Version][DEBUG] ':ERROR' calls take at least 2 parameters
+	if !DEBUG! EQU 0 echo.[Version][WARNING] Unknown Error
+	goto END_FAILURE
+	goto EOF
 ::=============================================================================
-:CLEANUP
+:END_SUCCESS
 	endlocal
 	exit /b 0
 	goto EOF
-:END_SUCCESS
-	call :CLEANUP
-	exit /b 0
-	goto EOF
 :END_FAILURE
-	call :CLEANUP
+	endlocal
 	exit /b 1
 	goto EOF
