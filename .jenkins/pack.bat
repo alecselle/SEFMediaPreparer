@@ -5,13 +5,13 @@ set DEBUG=1
 ::=============================================================================
 :: ~~ FUNCTION CALLS
 :RUN
-	echo.[Archive] Running Script (0/2)
+	echo.[Pack] Running Script (0/2)
 	
-	echo.[Archive] Checking Variables (1/2)
+	echo.[Pack] Checking Variables (1/2)
 	call :CHECK_VARIABLES
 	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
 	
-	echo.[Archive] Packing Artifacts (3/3)
+	echo.[Pack] Packing Artifacts (2/2)
 	call :PACK_ARTIFACTS
 	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
 
@@ -30,17 +30,19 @@ set DEBUG=1
 	if not exist "!WORKSPACE!/bin/SEFMediaPreparer.exe" call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "SEFMediaPreparer.exe"
 	if not exist "!WORKSPACE!/tools/ffmpeg.exe" call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "ffmpeg.exe"
 	if not exist "!WORKSPACE!/tools/ffprobe.exe" call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "ffprobe.exe"
+	if !ERROR_LEVEL! NEQ 0 exit /b !ERROR_LEVEL! && goto EOF
 	if not exist "!WORKSPACE!/release" mkdir "!WORKSPACE!/release"
 	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "CHECK_VARIABLES" "release"
-	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:CHECK_VARIABLES] WORKSPACE=!WORKSPACE!
-	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:CHECK_VARIABLES] ZIP=!ZIP!
-	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:CHECK_VARIABLES] ERROR_LEVEL=!ERROR_LEVEL!
+	if !DEBUG! GEQ 1 echo.[Pack][DEBUG][:CHECK_VARIABLES] WORKSPACE=!WORKSPACE!
+	if !DEBUG! GEQ 1 echo.[Pack][DEBUG][:CHECK_VARIABLES] ZIP=!ZIP!
+	if !DEBUG! GEQ 1 echo.[Pack][DEBUG][:CHECK_VARIABLES] ERROR_LEVEL=!ERROR_LEVEL!
 	exit /b !ERROR_LEVEL!
 	goto EOF
 
 :PACK_ARTIFACTS
 	call "!ZIP!" a -mx9 -mmt8 "!WORKSPACE!/release/SEF.Media.Preparer.!BUILD_DISPLAY_NAME!.7z" "!WORKSPACE!/bin/SEFMediaPreparer.exe" "!WORKSPACE!/tools/ffmpeg.exe" "!WORKSPACE!/tools/ffprobe.exe"
 	if %errorlevel% NEQ 0 call :ERROR_ARCHIVE_FAILED "PACK_ARTIFACTS" "SEF.Media.Preparer.!BUILD_DISPLAY_NAME!"
+	if !ERROR_LEVEL! NEQ 0 exit /b !ERROR_LEVEL! && goto EOF
 	call "!ZIP!" a -mx9 -mmt8 "!WORKSPACE!/release/SEF.Media.Preparer.!BUILD_DISPLAY_NAME!.NF.7z" "!WORKSPACE!/bin/SEFMediaPreparer.exe"
 	if %errorlevel% NEQ 0 call :ERROR_ARCHIVE_FAILED "PACK_ARTIFACTS"
 	exit /b !ERROR_LEVEL!
@@ -93,12 +95,12 @@ set DEBUG=1
 :: ~~
 ::=============================================================================
 :END_SUCCESS
-	echo.[Version] Completed Successfully
+	echo.[Pack] Completed Successfully
 	endlocal
 	exit /b 0
 	goto EOF
 :END_FAILURE
-	echo.[Version][WARNING] Completed Unsuccessfully
+	echo.[Pack][WARNING] Completed Unsuccessfully
 	endlocal
 	exit /b 1
 	goto EOF

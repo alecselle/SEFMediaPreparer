@@ -14,14 +14,7 @@ set DEBUG=1
 	echo.[Archive] Copying Artifacts (2/2?)
 	call :COPY_ARTIFACTS
 	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
-	
-	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:RUN] packArtifacts=!packArtifacts!
-	if !packArtifacts! EQU 1 (
-		echo.[Archive] Packing Artifacts (3/3)
-		call :PACK_ARTIFACTS
-		if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
-	)
-	
+
 	goto END_SUCCESS
 	goto EOF
 :: ~~
@@ -29,30 +22,16 @@ set DEBUG=1
 :: ~~ FUNCTION DECLARATIONS
 :CHECK_VARIABLES
 	if "!WORKSPACE!"=="" cd "%~dp0"& cd ..& set WORKSPACE=!CD!
-	if "!ZIP!"=="" (
-		call where /q 7z.exe
-		if %errorlevel% NEQ 0 call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "7z.exe"
-		for /f %%i in ('where 7z') do set ZIP=%%i
-	)
 	if not exist "!WORKSPACE!/bin" mkdir "!WORKSPACE!/bin"
-	if not exist "!WORKSPACE!/release" mkdir "!WORKSPACE!/release"
-	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "RELEASE_DIR" "release"
 	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "BIN_DIR" "bin"
-	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:CHECK_VARIABLES] WORKSPACE=!WORKSPACE!
-	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:CHECK_VARIABLES] ZIP=!ZIP!
-	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:CHECK_VARIABLES] ERROR_LEVEL=!ERROR_LEVEL!
+	if !DEBUG! GEQ 1 echo.[Archive][DEBUG][:CHECK_VARIABLES] WORKSPACE=!WORKSPACE!
+	if !DEBUG! GEQ 1 echo.[Archive][DEBUG][:CHECK_VARIABLES] ZIP=!ZIP!
+	if !DEBUG! GEQ 1 echo.[Archive][DEBUG][:CHECK_VARIABLES] ERROR_LEVEL=!ERROR_LEVEL!
 	exit /b !ERROR_LEVEL!
 	goto EOF
 :COPY_ARTIFACTS
 	copy /Y "!WORKSPACE!\build\release\SEFMediaPreparer.exe"+"!WORKSPACE!\tools\ffmpeg.exe"+"!WORKSPACE!\tools\ffprobe.exe" "!WORKSPACE!\bin\"
 	if %errorlevel% NEQ 0 call :ERROR_COPY_FAILED "COPY_ARTIFACTS"
-	exit /b !ERROR_LEVEL!
-	goto EOF
-:PACK_ARTIFACTS
-	call "!ZIP!" a -mx9 -mmt8 "!WORKSPACE!/release/SEF.Media.Preparer.!BUILD_DISPLAY_NAME!.7z" "!WORKSPACE!/bin/SEFMediaPreparer.exe" "!WORKSPACE!/tools/ffmpeg.exe" "!WORKSPACE!/tools/ffprobe.exe"
-	if %errorlevel% NEQ 0 call :ERROR_ARCHIVE_FAILED "PACK_ARTIFACTS" "SEF.Media.Preparer.!BUILD_DISPLAY_NAME!"
-	call "!ZIP!" a -mx9 -mmt8 "!WORKSPACE!/release/SEF.Media.Preparer.!BUILD_DISPLAY_NAME!.NF.7z" "!WORKSPACE!/bin/SEFMediaPreparer.exe"
-	if %errorlevel% NEQ 0 call :ERROR_ARCHIVE_FAILED "PACK_ARTIFACTS"
 	exit /b !ERROR_LEVEL!
 	goto EOF
 :: ~~
@@ -72,10 +51,6 @@ set DEBUG=1
 	call :ERROR "ERROR_COPY_FAILED" %~1 "Could not copy files"
 	exit /b 1
 	goto EOF
-:ERROR_ARCHIVE_FAILED
-	call :ERROR "ERROR_ARCHIVE_FAILED" %~1 "Could not create archive '%~2'"
-	exit /b 1
-	got EOF
 :: ~~
 ::=============================================================================
 :: ~~ ERROR FRAMEWORK
@@ -103,12 +78,12 @@ set DEBUG=1
 :: ~~
 ::=============================================================================
 :END_SUCCESS
-	echo.[Version] Completed Successfully
+	echo.[Archive] Completed Successfully
 	endlocal
 	exit /b 0
 	goto EOF
 :END_FAILURE
-	echo.[Version][WARNING] Completed Unsuccessfully
+	echo.[Archive][WARNING] Completed Unsuccessfully
 	endlocal
 	exit /b 1
 	goto EOF
