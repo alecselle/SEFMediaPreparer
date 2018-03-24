@@ -28,108 +28,49 @@ set DEBUG=0
 :: ~~
 ::=============================================================================
 :: ~~ FUNCTION DECLARATIONS
-:CHECK_WORKSPACE
-	if "!WORKSPACE!"=="" (
-		echo.[Build][WARNING] Variable not initialized. 'WORKSPACE'
-		set WORKSPACE=%~dp0/..
-		echo.[Build][DEBUG] Using directory. '!WORKSPACE!'
-		if not exist "!WORKSPACE!/!PROJECT!" (
-			call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "!PROJECT!"
-			exit /b 1
-			goto EOF
-		) else (
-			echo.[Build][WARNING] Using directory. '%WORKSPACE%'
-		)
-	)
-	exit /b 0
-	goto EOF
-:CHECK_PROJECT
-	if not exist "!WORKSPACE!/!PROJECT!" (
-		if not exist "!WORKSPACE!/!PROJECT_DEFAULT!" (
-			call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "!PROJECT!"
-			exit /b 1
-			goto EOF
-		) else (
-			echo.[Build][WARNING] Project '!PROJECT!' does not exist
-			echo.[Build][WARNING] Project '!PROJECT_DEFAULT!' does
-			set PROJECT=!PROJECT_DEFAULT!
-			echo.[Build][WARNING] Using '!PROJECT!'
-		)
-	)
-	exit /b 0
-	goto EOF
-:CHECK_QMAKE
-	if "!QMAKE!"=="" (
-		echo.[Build][WARNING] Variable not initialized. 'QMAKE'
-		call where /q qmake.exe
-		if %errorlevel% NEQ 0 (
-			call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "qmake.exe"
-			exit /b 1
-			goto EOF
-		) else (
-			for /f %%i in ('where qmake.exe') do set QMAKE=%%i
-			echo.[Build][WARNING] Using '!QMAKE!' from PATH
-		)
-	)
-	exit /b 0
-	goto EOF
-:CHECK_MINGW
-	if "!MINGW!"=="" (
-		echo.[Build][WARNING] Variable not initialized. 'MINGW'
-		call where /q mingw32-make.exe
-		if %errorlevel% NEQ 0 (
-			call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "mingw32-make.exe"
-			exit /b 1
-			goto EOF
-		) else (
-			for /f %%i in ('where mingw32-make.exe') do set MINGW=%%i
-			echo.[Build][WARNING] Using '!MINGW!' from PATH
-		)
-	)
-	exit /b 0
-	goto EOF
 :CHECK_VARIABLES
-	call :CHECK_WORKSPACE
-	if %errorlevel% NEQ 0 exit /b 1 && goto EOF
-	call :CHECK_PROJECT
-	if %errorlevel% NEQ 0 exit /b 1 && goto EOF
-	call :CHECK_QMAKE
-	if %errorlevel% NEQ 0 exit /b 1 && goto EOF
-	call :CHECK_MINGW
-	if %errorlevel% NEQ 0 exit /b 1 && goto EOF
-	exit /b 0
+	if "!WORKSPACE!"=="" cd "%~dp0"& cd ..& set WORKSPACE=!CD!
+	if not exist "!WORKSPACE!/!PROJECT!" call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "!PROJECT!"
+	if not exist "!WORKSPACE!/!PROJECT!" (
+		if not exist "!WORKSPACE!/!PROJECT_DEFAULT!" call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "!PROJECT!"
+		set PROJECT=!PROJECT_DEFAULT!
+	)
+	if "!QMAKE!"=="" (
+		call where /q qmake.exe 2>&1nul
+		if %errorlevel% NEQ 0 call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "qmake.exe"
+		for /f %%i in ('where qmake.exe') do set QMAKE=%%i
+	)
+	if "!MINGW!"=="" (
+		call where /q mingw32-make.exe 2>&1nul
+		if %errorlevel% NEQ 0 call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "mingw32-make.exe"
+		for /f %%i in ('where mingw32-make.exe') do set MINGW=%%i
+	)
+	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:CHECK_VARIABLES] WORKSPACE=!WORKSPACE!
+	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:CHECK_VARIABLES] PROJECT=!PROJECT!
+	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:CHECK_VARIABLES] QMAKE=!QMAKE!
+	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:CHECK_VARIABLES] MINGW=!MINGW!
+	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:CHECK_VARIABLES] ERROR_LEVEL=!ERROR_LEVEL!
+	exit /b !ERROR_LEVEL!
 	goto EOF
 :BUILD_DIR
 	if not exist "!WORKSPACE!/build" mkdir "!WORKSPACE!/build"
 	cd "!WORKSPACE!/build"
-	if %errorlevel% NEQ 0 (
-		call :ERROR_CREATE_DIR_FAILED "BUILD_DIR" "!WORKSPACE!/build"
-		exit /b 1
-		goto EOF
-	)
-	exit /b 0
+	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "BUILD_DIR" "!WORKSPACE!/build"
+	exit /b !ERROR_LEVEL!
 	goto EOF
 :QMAKE
 	call :BUILD_DIR
-	echo.[Build] "!QMAKE!" -spec win32-g++ "CONFIG+=release" -Wnone !WORKSPACE!/!PROJECT!
-	call "!QMAKE!" -spec win32-g++ "CONFIG+=release" -Wnone !WORKSPACE!/!PROJECT!
-	if !errorlevel! NEQ 0 (
-		call :ERROR_BUILD_FAILED "QMAKE" "Qmake returned an error" "Check output for details"
-		exit /b 1
-		goto EOF
-	)
-	exit /b 0
+	echo.[Build] "!QMAKE!" -spec win32-g++ "CONFIG+=release"
+	call "!QMAKE!" -spec win32-g++ "CONFIG+=release" "!WORKSPACE!/!PROJECT!"
+	if !errorlevel! NEQ 0 call :ERROR_BUILD_FAILED "QMAKE" "Qmake returned an error" "Check output for details"
+	exit /b !ERROR_LEVEL!
 	goto EOF
 :MINGW
 	call :BUILD_DIR
-	echo.[Build] "!MINGW!" -s -i -j 4 -B
-	call "!MINGW!" -Wnone -s -j 4 -B
-	if %errorlevel% NEQ 0 (
-		call :ERROR_BUILD_FAILED "MINGW" "MinGW returned an error" "Check output for details" 
-		exit /b 1
-		goto EOF
-	)
-	exit /b 0
+	echo.[Build] "!MINGW!" -B
+	call "!MINGW!" -w -s -j 4 -B> "%~dp0/mingw.log" 2>&1
+	if %errorlevel% NEQ 0 call :ERROR_BUILD_FAILED "MINGW" "MinGW returned an error" "Check output for details" 
+	exit /b !ERROR_LEVEL!
 	goto EOF
 :: ~~
 ::=============================================================================

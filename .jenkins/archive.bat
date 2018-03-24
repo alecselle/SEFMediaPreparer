@@ -20,7 +20,6 @@ set DEBUG=0
 	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
 	
 	if "!packArtifacts!"=="true" (
-	
 		echo.[Archive] Verifying Directory (4/5)
 		call :RELEASE_DIR
 		if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
@@ -28,7 +27,6 @@ set DEBUG=0
 		echo.[Archive] Packing Artifacts (5/5)
 		call :PACK_ARTIFACTS
 		if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
-		
 	)
 	
 	goto END_SUCCESS
@@ -37,52 +35,38 @@ set DEBUG=0
 ::=============================================================================
 :: ~~ FUNCTION DECLARATIONS
 :CHECK_VARIABLES
-	if "!WORKSPACE!"=="" (
-		echo.[WARNING] Variable not initialized. 'WORKSPACE'
-		set WORKSPACE=%CD%
-		if not exist "!WORKSPACE!/!PROJECT!" (
-			call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "!PROJECT!"
-			exit /b 1
-			goto EOF
-		) else (
-			echo.[WARNING] Using current directory. '%CD%'
-		)
-	)
+	if "!WORKSPACE!"=="" cd "%~dp0"& cd ..& set WORKSPACE=!CD!
 	if "!ZIP!"=="" (
-		echo.[WARNING] Variable not initialized. 'ZIP'
 		call where /q 7z.exe
-		if %errorlevel% NEQ 0 (
-			call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "7z.exe"
-			exit /b 1
-			goto EOF
-		) else (
-			for /f %%i in ('where 7z') do set ZIP=%%i
-			echo.[WARNING] Using '!ZIP!' from PATH
-		)
+		if %errorlevel% NEQ 0 call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "7z.exe"
+		for /f %%i in ('where 7z') do set ZIP=%%i
 	)
-	exit /b 0
+	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:CHECK_VARIABLES] WORKSPACE=!WORKSPACE!
+	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:CHECK_VARIABLES] ZIP=!ZIP!
+	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:CHECK_VARIABLES] ERROR_LEVEL=!ERROR_LEVEL!
+	exit /b !ERROR_LEVEL!
 	goto EOF
 :BIN_DIR
 	if not exist "!WORKSPACE!/bin" mkdir "!WORKSPACE!/bin"
-	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "BIN_DIR" "bin" && exit /b 1
-	exit /b 0
+	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "BIN_DIR" "bin"
+	exit /b !ERROR_LEVEL!
 	goto EOF
 :RELEASE_DIR
 	if not exist "!WORKSPACE!/release" mkdir "!WORKSPACE!/release"
-	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "RELEASE_DIR" "release" && exit /b 1
-	exit /b 0
+	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "RELEASE_DIR" "release"
+	exit /b !ERROR_LEVEL!
 	goto EOF
 :COPY_ARTIFACTS
 	copy /Y "!WORKSPACE!\build\release\SEFMediaPreparer.exe" "!WORKSPACE!\bin\"
-	if %errorlevel% NEQ 0 call :ERROR_COPY_FAILED "BIN_DIR" && exit /b 1
-	exit /b 0
+	if %errorlevel% NEQ 0 call :ERROR_COPY_FAILED "BIN_DIR"
+	exit /b !ERROR_LEVEL!
 	goto EOF
 :PACK_ARTIFACTS
 	call "!ZIP!" a -mx9 -mmt8 "!WORKSPACE!/release/SEF.Media.Preparer.!BUILD_DISPLAY_NAME!.7z" "!WORKSPACE!/bin/SEFMediaPreparer.exe" "!WORKSPACE!/tools/ffmpeg.exe" "!WORKSPACE!/tools/ffprobe.exe"
-	if %errorlevel% NEQ 0 call :ERROR_ARCHIVE_FAILED "PACK_ARTIFACTS" "SEF.Media.Preparer.!BUILD_DISPLAY_NAME!" && exit /b 1
-	call "!ZIP!" a -mx9 -mmt8 "!WORKSPACE!/release/SEF.Media.Preparer.!BUILD_DISPLAY_NAME%.NF.7z" "!WORKSPACE!/bin/SEFMediaPreparer.exe"
-	if %errorlevel% NEQ 0 call :ERROR_ARCHIVE_FAILED "PACK_ARTIFACTS" && exit /b 1
-	exit /b 0
+	if %errorlevel% NEQ 0 call :ERROR_ARCHIVE_FAILED "PACK_ARTIFACTS" "SEF.Media.Preparer.!BUILD_DISPLAY_NAME!"
+	call "!ZIP!" a -mx9 -mmt8 "!WORKSPACE!/release/SEF.Media.Preparer.!BUILD_DISPLAY_NAME!.NF.7z" "!WORKSPACE!/bin/SEFMediaPreparer.exe"
+	if %errorlevel% NEQ 0 call :ERROR_ARCHIVE_FAILED "PACK_ARTIFACTS"
+	exit /b !ERROR_LEVEL!
 	goto EOF
 :: ~~
 ::=============================================================================

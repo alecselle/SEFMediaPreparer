@@ -38,13 +38,8 @@ set DEBUG=0
 ::=============================================================================
 :: ~~ FUNCTION DECLARATIONS
 :CHECK_VARIABLES
-	if "!WORKSPACE!"=="" (
-		echo.[Build][WARNING] Variable not initialized. 'WORKSPACE'
-		set WORKSPACE=%~dp0/..
-	)
-	if not exist "!WORKSPACE!/version.txt" (
-		call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "version.txt"
-	)
+	if "!WORKSPACE!"=="" cd "%~dp0"& cd ..& set WORKSPACE=!CD!
+	if not exist "!WORKSPACE!/version.txt" call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "version.txt"
 	if not exist "%WORKSPACE%/.jenkins" mkdir "%WORKSPACE%/.jenkins" & attrib +h "%WORKSPACE%/.jenkins" /s /d
 	if not exist "%WORKSPACE%/.jenkins/build.txt" echo|set /p="0">"%WORKSPACE%/.jenkins/build.txt"
 	if not exist "%WORKSPACE%/.jenkins/version.txt" copy "%WORKSPACE%/version.txt" "%WORKSPACE%/.jenkins/"
@@ -53,15 +48,9 @@ set DEBUG=0
 	exit /b !ERROR_LEVEL!
 	goto EOF
 :LOAD_SETTINGS
-	if not exist "%WORKSPACE%/.jenkins/build.txt" (
-		call :ERROR_FILE_NOT_FOUND "LOAD_SETTINGS" ".jenkins/build.txt"
-	)
-	if not exist "%WORKSPACE%/.jenkins/version.txt" (
-		call :ERROR_FILE_NOT_FOUND "LOAD_SETTINGS" ".jenkins/version.txt"
-	)
-	if not exist "%WORKSPACE%/version.txt" (
-		call :ERROR_FILE_NOT_FOUND "LOAD_SETTINGS" "version.txt"
-	)
+	if not exist "%WORKSPACE%/.jenkins/build.txt" call :ERROR_FILE_NOT_FOUND "LOAD_SETTINGS" ".jenkins/build.txt"
+	if not exist "%WORKSPACE%/.jenkins/version.txt" call :ERROR_FILE_NOT_FOUND "LOAD_SETTINGS" ".jenkins/version.txt"
+	if not exist "%WORKSPACE%/version.txt" call :ERROR_FILE_NOT_FOUND "LOAD_SETTINGS" "version.txt"
 	set /p BUILD_OLD=<"%WORKSPACE%/.jenkins/build.txt"
 	set /p VERSION_OLD=<"%WORKSPACE%/.jenkins/version.txt"
 	set /p VERSION_NEW=<"%WORKSPACE%/version.txt"
@@ -84,12 +73,8 @@ set DEBUG=0
 	echo|set /p="!VERSION_NEW!" >"!WORKSPACE!/.jenkins/version.txt"
 	set /p BUILD_TEMP=<"%WORKSPACE%/.jenkins/build.txt"
 	set /p VERSION_TEMP=<"%WORKSPACE%/.jenkins/version.txt"
-	if !BUILD_TEMP! NEQ !BUILD_NEW! (
-		call :ERROR_SAVE_FAILED "SAVE_SETTINGS" 
-	)
-	if !VERSION_TEMP! NEQ !VERSION_NEW! (
-		call :ERROR_SAVE_FAILED "SAVE_SETTINGS" 
-	)
+	if !BUILD_TEMP! NEQ !BUILD_NEW! call :ERROR_SAVE_FAILED "SAVE_SETTINGS" 
+	if !VERSION_TEMP! NEQ !VERSION_NEW! call :ERROR_SAVE_FAILED "SAVE_SETTINGS"
 	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:SAVE_SETTINGS] BUILD_TEMP=!BUILD_TEMP!
 	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:SAVE_SETTINGS] BUILD_NEW=!BUILD_NEW!
 	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:SAVE_SETTINGS] VERSION_TEMP=!VERSION_TEMP!
@@ -103,18 +88,14 @@ set DEBUG=0
 		set MINOR_OLD=%%b
 		set PATCH_OLD=%%c
 	)
-	if %errorlevel% NEQ 0 (
-		call :ERROR_PARSE_FAILED "PARSE_VERSION_OLD"
-	)
+	if %errorlevel% NEQ 0 call :ERROR_PARSE_FAILED "PARSE_VERSION_OLD"
 	set VERSION_OLD=!MAJOR_OLD!.!MINOR_OLD!.!PATCH_OLD!
 	for /F "tokens=1,2,3 delims=." %%a in ("!VERSION_NEW!") do (
 		set MAJOR_NEW=%%a
 		set MINOR_NEW=%%b
 		set PATCH_NEW=%%c
 	)
-	if %errorlevel% NEQ 0 (
-		call :ERROR_PARSE_FAILED "PARSE_VERSION_NEW" 
-	)
+	if %errorlevel% NEQ 0 call :ERROR_PARSE_FAILED "PARSE_VERSION_NEW"
 	set VERSION_NEW=!MAJOR_NEW!.!MINOR_NEW!.!PATCH_NEW!
 	if !MAJOR_NEW! GTR !MAJOR_OLD! set MAJOR_DIFF=1
 	if !MAJOR_NEW! EQU !MAJOR_OLD! set MAJOR_DIFF=0
@@ -125,15 +106,9 @@ set DEBUG=0
 	if !PATCH_NEW! GTR !PATCH_OLD! set PATCH_DIFF=1
 	if !PATCH_NEW! EQU !PATCH_OLD! set PATCH_DIFF=0
 	if !PATCH_NEW! LSS !PATCH_OLD! set PATCH_DIFF=-1
-	if "!MAJOR_DIFF!"=="" (
-		call :ERROR_PARSE_FAILED "PARSE_VERSION_DIFF"
-	)
-	if "!MINOR_DIFF!"=="" (
-		call :ERROR_PARSE_FAILED "PARSE_VERSION_DIFF"
-	)
-	if "!PATCH_DIFF!"=="" (
-		call :ERROR_PARSE_FAILED "PARSE_VERSION_DIFF"
-	)
+	if "!MAJOR_DIFF!"=="" call :ERROR_PARSE_FAILED "PARSE_VERSION_DIFF"
+	if "!MINOR_DIFF!"=="" call :ERROR_PARSE_FAILED "PARSE_VERSION_DIFF"
+	if "!PATCH_DIFF!"=="" call :ERROR_PARSE_FAILED "PARSE_VERSION_DIFF"
 	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:PARSE_VERSION] VERSION_OLD=!VERSION_OLD!
 	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:PARSE_VERSION] VERSION_NEW=!VERSION_NEW!
 	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:PARSE_VERSION] MAJOR_DIFF=!MAJOR_DIFF!
@@ -158,14 +133,13 @@ set DEBUG=0
 :RESET_SETTINGS
 	if not exist "%WORKSPACE%/version.txt" (
 		call :ERROR_FILE_NOT_FOUND "RESET_SETTINGS" "version.txt"
-		exit /b !ERROR_LEVEL!
-		goto EOF
+	) else (
+		set /p VERSION_NEW=<"%WORKSPACE%/version.txt"
+		set BUILD_NEW=0
+		echo|set /p="!BUILD_NEW!" >"!WORKSPACE!/.jenkins/build.txt"
+		echo|set /p="!VERSION_NEW!" >"!WORKSPACE!/.jenkins/version.txt"
 	)
-	set /p VERSION_NEW=<"%WORKSPACE%/version.txt"
-	set BUILD_NEW=0
-	echo|set /p="!BUILD_NEW!" >"!WORKSPACE!/.jenkins/build.txt"
-	echo|set /p="!VERSION_NEW!" >"!WORKSPACE!/.jenkins/version.txt"
-	exit /b 0
+	exit /b !ERROR_LEVEL!
 	goto EOF
 :: ~~
 ::=============================================================================
