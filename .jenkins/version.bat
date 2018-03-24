@@ -42,7 +42,7 @@ set DEBUG=0
 	if not exist "!WORKSPACE!/version.txt" call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "version.txt"
 	if not exist "%WORKSPACE%/.jenkins" mkdir "%WORKSPACE%/.jenkins" & attrib +h "%WORKSPACE%/.jenkins" /s /d
 	if not exist "%WORKSPACE%/.jenkins/build.txt" echo|set /p="0">"%WORKSPACE%/.jenkins/build.txt"
-	if not exist "%WORKSPACE%/.jenkins/version.txt" copy "%WORKSPACE%/version.txt" "%WORKSPACE%/.jenkins/"
+	if not exist "%WORKSPACE%/.jenkins/version.txt" copy "%WORKSPACE%\version.txt" "%WORKSPACE%\.jenkins/"
 	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:CHECK_VARIABLES] WORKSPACE=!WORKSPACE!
 	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:CHECK_VARIABLES] ERROR_LEVEL=!ERROR_LEVEL!
 	exit /b !ERROR_LEVEL!
