@@ -34,11 +34,16 @@ DISTFILES += \
     $$PWD/.gitignore \
     version.txt
 
-unix:!macx|win32: LIBS += \
-    -L$$PWD/lib/ -lboost_filesystem-mgw53-mt-s-x32-1_66 \
-    -L$$PWD/lib/ -lboost_container-mgw53-mt-s-x32-1_66 \
-    -L$$PWD/lib/ -lboost_system-mgw53-mt-s-x32-1_66 \
-    -L$$PWD/lib/ -lboost_program_options-mgw53-mt-s-x32-1_66
+win32: LIBS += \
+    -L$$PWD/lib/win32/ -lboost_filesystem-mgw53-mt-s-x32-1_66 \
+    -L$$PWD/lib/win32/ -lboost_container-mgw53-mt-s-x32-1_66 \
+    -L$$PWD/lib/win32/ -lboost_system-mgw53-mt-s-x32-1_66 \
+    -L$$PWD/lib/win32/ -lboost_program_options-mgw53-mt-s-x32-1_66
+unix: LIBS += \
+    -L$$PWD/lib/linux/ -lboost_filesystem-mgw53-mt-s-x32-1_66 \
+    -L$$PWD/lib/linux/ -lboost_container-mgw53-mt-s-x32-1_66 \
+    -L$$PWD/lib/linux/ -lboost_system-mgw53-mt-s-x32-1_66 \
+    -L$$PWD/lib/linux/ -lboost_program_options-mgw53-mt-s-x32-1_66
 
 INCLUDEPATH += \
     $$PWD/include
