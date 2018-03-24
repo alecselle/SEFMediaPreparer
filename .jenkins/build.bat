@@ -2,8 +2,8 @@
 setlocal EnableDelayedExpansion
 :PROJECT
 	set PROJECT_DEFAULT=SEFMediaPreparer.pro
-	if "%~1" NEQ "" ( set PROJECT=%~1 )
-	else ( set PROJECT=!PROJECT_DEFAULT! )
+	if "%~1" NEQ "" set PROJECT=%~1 && goto START
+	set PROJECT=!PROJECT_DEFAULT! && goto START
 :START
 	goto RUN
 	goto EOF
