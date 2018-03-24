@@ -35,18 +35,12 @@ DISTFILES += \
     version.txt
 
 unix:!macx|win32: LIBS += \
-    -L$$PWD/lib/ -lboost_filesystem-mgw53-mt-1_66 \
-    -L$$PWD/lib/ -lboost_container-mgw53-mt-1_66 \
-    -L$$PWD/lib/ -lboost_system-mgw53-mt-1_66 \
-    -L$$PWD/lib/ -lboost_program_options-mgw53-mt-1_66
+    -L$$PWD/lib/ -lboost_filesystem-mgw53-mt-x32-1_66 \
+    -L$$PWD/lib/ -lboost_container-mgw53-mt-x32-1_66 \
+    -L$$PWD/lib/ -lboost_system-mgw53-mt-x32-1_66 \
+    -L$$PWD/lib/ -lboost_program_options-mgw53-mt-x32-1_66
 
 INCLUDEPATH += \
     $$PWD/include
 DEPENDPATH += \
     $$PWD/include
-
-win32:!win32-g++: PRE_TARGETDEPS += \
-    $$PWD/lib/libboost_filesystem-mgw53-mt-1_66.a \
-    $$PWD/lib/libboost_container-mgw53-mt-1_66.a \
-    $$PWD/lib/libboost_system-mgw53-mt-1_66.a \
-    $$PWD/lib/libboost_program_options-mgw53-mt-1_66.a
