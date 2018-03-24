@@ -16,6 +16,7 @@ setlocal EnableDelayedExpansion
 		if not exist "!WORKSPACE!/!PROJECT!" (
 			call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "!PROJECT!"
 			exit /b 1
+			goto EOF
 		) else (
 			echo.[WARNING] Using current directory. '%CD%'
 		)
@@ -24,6 +25,7 @@ setlocal EnableDelayedExpansion
 		if not exist "!WORKSPACE!/!PROJECT_DEFAULT!" (
 			call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "!PROJECT!"
 			exit /b 1
+			goto EOF
 		) else (
 			echo.[WARNING] Project '!PROJECT!' does not exist
 			echo.[WARNING] Project '!PROJECT_DEFAULT!' does
@@ -37,6 +39,7 @@ setlocal EnableDelayedExpansion
 		if %errorlevel% NEQ 0 (
 			call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "qmake.exe"
 			exit /b 1
+			goto EOF
 		) else (
 			for /f %%i in ('where qmake.exe') do set QMAKE=%%i
 			echo.[WARNING] Using '!QMAKE!' from PATH
@@ -48,6 +51,7 @@ setlocal EnableDelayedExpansion
 		if %errorlevel% NEQ 0 (
 			call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "mingw32-make.exe"
 			exit /b 1
+			goto EOF
 		) else (
 			for /f %%i in ('where mingw32-make.exe') do set MINGW=%%i
 			echo.[WARNING] Using '!MINGW!' from PATH

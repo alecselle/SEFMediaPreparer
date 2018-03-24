@@ -12,6 +12,7 @@ setlocal EnableDelayedExpansion
 		if not exist "!WORKSPACE!/!PROJECT!" (
 			call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "!PROJECT!"
 			exit /b 1
+			goto EOF
 		) else (
 			echo.[WARNING] Using current directory. '%CD%'
 		)
@@ -22,6 +23,7 @@ setlocal EnableDelayedExpansion
 		if %errorlevel% NEQ 0 (
 			call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "7z.exe"
 			exit /b 1
+			goto EOF
 		) else (
 			for /f %%i in ('where 7z') do set ZIP=%%i
 			echo.[WARNING] Using '!ZIP!' from PATH
