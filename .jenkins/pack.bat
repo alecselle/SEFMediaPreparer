@@ -1,18 +1,18 @@
 @echo off
 setlocal EnableDelayedExpansion
 set ERROR_LEVEL=0
-set DEBUG=0
+set DEBUG=1
 ::=============================================================================
 :: ~~ FUNCTION CALLS
 :RUN
-	echo.[Archive] Running Script (0/2?)
+	echo.[Pack] Running Script (0/2)
 	
-	echo.[Archive] Checking Variables (1/2?)
+	echo.[Pack] Checking Variables (1/2)
 	call :CHECK_VARIABLES
 	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
 	
-	echo.[Archive] Copying Artifacts (2/2?)
-	call :COPY_ARTIFACTS
+	echo.[Pack] Packing Artifacts (2/2)
+	call :PACK_ARTIFACTS
 	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
 
 	goto END_SUCCESS
@@ -22,20 +22,29 @@ set DEBUG=0
 :: ~~ FUNCTION DECLARATIONS
 :CHECK_VARIABLES
 	if "!WORKSPACE!"=="" cd "%~dp0"& cd ..& set WORKSPACE=!CD!
-	if not exist "!WORKSPACE!/bin" mkdir "!WORKSPACE!/bin"
-	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "BIN_DIR" "bin"
-	if !DEBUG! GEQ 1 echo.[Archive][DEBUG][:CHECK_VARIABLES] WORKSPACE=!WORKSPACE!
-	if !DEBUG! GEQ 1 echo.[Archive][DEBUG][:CHECK_VARIABLES] ZIP=!ZIP!
-	if !DEBUG! GEQ 1 echo.[Archive][DEBUG][:CHECK_VARIABLES] ERROR_LEVEL=!ERROR_LEVEL!
+	if "!ZIP!"=="" (
+		call where /q 7z.exe
+		if %errorlevel% NEQ 0 call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "7z.exe"
+		for /f %%i in ('where 7z') do set ZIP=%%i
+	)
+	if not exist "!WORKSPACE!/bin/SEFMediaPreparer.exe" call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "SEFMediaPreparer.exe"
+	if not exist "!WORKSPACE!/tools/ffmpeg.exe" call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "ffmpeg.exe"
+	if not exist "!WORKSPACE!/tools/ffprobe.exe" call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "ffprobe.exe"
+	if !ERROR_LEVEL! NEQ 0 exit /b !ERROR_LEVEL! && goto EOF
+	if not exist "!WORKSPACE!/release" mkdir "!WORKSPACE!/release"
+	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "CHECK_VARIABLES" "release"
+	if !DEBUG! GEQ 1 echo.[Pack][DEBUG][:CHECK_VARIABLES] WORKSPACE=!WORKSPACE!
+	if !DEBUG! GEQ 1 echo.[Pack][DEBUG][:CHECK_VARIABLES] ZIP=!ZIP!
+	if !DEBUG! GEQ 1 echo.[Pack][DEBUG][:CHECK_VARIABLES] ERROR_LEVEL=!ERROR_LEVEL!
 	exit /b !ERROR_LEVEL!
 	goto EOF
-:COPY_ARTIFACTS
-	call xcopy /Y "!WORKSPACE!\build\release\SEFMediaPreparer.exe" "!WORKSPACE!\bin\"
-	if %errorlevel% NEQ 0 call :ERROR_COPY_FAILED "COPY_ARTIFACTS"
-	call xcopy /Y "!WORKSPACE!\tools\ffmpeg.exe" "!WORKSPACE!\bin\"
-	if %errorlevel% NEQ 0 call :ERROR_COPY_FAILED "COPY_ARTIFACTS"
-	call xcopy /Y "!WORKSPACE!\tools\ffprobe.exe" "!WORKSPACE!\bin\"
-	if %errorlevel% NEQ 0 call :ERROR_COPY_FAILED "COPY_ARTIFACTS"
+
+:PACK_ARTIFACTS
+	call "!ZIP!" a -mx9 -mmt8 "!WORKSPACE!/release/SEF.Media.Preparer.!BUILD_DISPLAY_NAME!.7z" "!WORKSPACE!/bin/SEFMediaPreparer.exe" "!WORKSPACE!/tools/ffmpeg.exe" "!WORKSPACE!/tools/ffprobe.exe"
+	if %errorlevel% NEQ 0 call :ERROR_ARCHIVE_FAILED "PACK_ARTIFACTS" "SEF.Media.Preparer.!BUILD_DISPLAY_NAME!"
+	if !ERROR_LEVEL! NEQ 0 exit /b !ERROR_LEVEL! && goto EOF
+	call "!ZIP!" a -mx9 -mmt8 "!WORKSPACE!/release/SEF.Media.Preparer.!BUILD_DISPLAY_NAME!.NF.7z" "!WORKSPACE!/bin/SEFMediaPreparer.exe"
+	if %errorlevel% NEQ 0 call :ERROR_ARCHIVE_FAILED "PACK_ARTIFACTS"
 	exit /b !ERROR_LEVEL!
 	goto EOF
 :: ~~
@@ -55,6 +64,10 @@ set DEBUG=0
 	call :ERROR "ERROR_COPY_FAILED" %~1 "Could not copy files"
 	exit /b 1
 	goto EOF
+:ERROR_ARCHIVE_FAILED
+	call :ERROR "ERROR_ARCHIVE_FAILED" %~1 "Could not create archive '%~2'"
+	exit /b 1
+	got EOF
 :: ~~
 ::=============================================================================
 :: ~~ ERROR FRAMEWORK
@@ -82,12 +95,12 @@ set DEBUG=0
 :: ~~
 ::=============================================================================
 :END_SUCCESS
-	echo.[Archive] Completed Successfully
+	echo.[Pack] Completed Successfully
 	endlocal
 	exit /b 0
 	goto EOF
 :END_FAILURE
-	echo.[Archive][WARNING] Completed Unsuccessfully
+	echo.[Pack][WARNING] Completed Unsuccessfully
 	endlocal
 	exit /b 1
 	goto EOF

@@ -42,7 +42,7 @@ set DEBUG=0
 	if not exist "!WORKSPACE!/version.txt" call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "version.txt"
 	if not exist "%WORKSPACE%/.jenkins" mkdir "%WORKSPACE%/.jenkins" & attrib +h "%WORKSPACE%/.jenkins" /s /d
 	if not exist "%WORKSPACE%/.jenkins/build.txt" echo|set /p="0">"%WORKSPACE%/.jenkins/build.txt"
-	if not exist "%WORKSPACE%/.jenkins/version.txt" copy "%WORKSPACE%/version.txt" "%WORKSPACE%/.jenkins/"
+	if not exist "%WORKSPACE%/.jenkins/version.txt" call xcopy "%WORKSPACE%\version.txt" "%WORKSPACE%\.jenkins\"
 	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:CHECK_VARIABLES] WORKSPACE=!WORKSPACE!
 	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:CHECK_VARIABLES] ERROR_LEVEL=!ERROR_LEVEL!
 	exit /b !ERROR_LEVEL!
@@ -89,6 +89,7 @@ set DEBUG=0
 		set PATCH_OLD=%%c
 	)
 	if %errorlevel% NEQ 0 call :ERROR_PARSE_FAILED "PARSE_VERSION_OLD"
+	if !ERROR_LEVEL! NEQ 0 exit /b !ERROR_LEVEL! && goto EOF
 	set VERSION_OLD=!MAJOR_OLD!.!MINOR_OLD!.!PATCH_OLD!
 	for /F "tokens=1,2,3 delims=." %%a in ("!VERSION_NEW!") do (
 		set MAJOR_NEW=%%a
@@ -96,6 +97,7 @@ set DEBUG=0
 		set PATCH_NEW=%%c
 	)
 	if %errorlevel% NEQ 0 call :ERROR_PARSE_FAILED "PARSE_VERSION_NEW"
+	if !ERROR_LEVEL! NEQ 0 exit /b !ERROR_LEVEL! && goto EOF
 	set VERSION_NEW=!MAJOR_NEW!.!MINOR_NEW!.!PATCH_NEW!
 	if !MAJOR_NEW! GTR !MAJOR_OLD! set MAJOR_DIFF=1
 	if !MAJOR_NEW! EQU !MAJOR_OLD! set MAJOR_DIFF=0
