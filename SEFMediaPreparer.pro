@@ -7,9 +7,7 @@ TEMPLATE = app
 ICON = seflogo.png
 RC_ICONS = seflogo.ico
 
-DEFINES += QT_DEPRECATED_WARNINGS
-
-CONFIG += static
+CONFIG += static staticlib
 
 SOURCES += \
     $$PWD/src/main.cpp \
@@ -36,17 +34,13 @@ DISTFILES += \
     $$PWD/.gitignore \
     version.txt
 
-unix:!macx|win32: LIBS += \
-    -L$$PWD/lib/ -llibboost_filesystem-mgw53-mt-s-x32-1_66 \
-    -L$$PWD/lib/ -llibboost_container-mgw53-mt-s-x32-1_66 \
-    -L$$PWD/lib/ -llibboost_system-mgw53-mt-s-x32-1_66
+win32: LIBS += \
+    -L$$PWD/lib/ -lboost_filesystem-mgw53-mt-s-x32-1_66 \
+    -L$$PWD/lib/ -lboost_container-mgw53-mt-s-x32-1_66 \
+    -L$$PWD/lib/ -lboost_system-mgw53-mt-s-x32-1_66 \
+    -L$$PWD/lib/ -lboost_program_options-mgw53-mt-s-x32-1_66
 
 INCLUDEPATH += \
     $$PWD/include
 DEPENDPATH += \
     $$PWD/include
-
-win32:!win32-g++: PRE_TARGETDEPS += \
-    $$PWD/lib/libboost_filesystem-mgw53-mt-s-x32-1_66.a \
-    $$PWD/lib/libboost_container-mgw53-mt-s-x32-1_66.a \
-    $$PWD/lib/libboost_system-mgw53-mt-s-x32-1_66.a
