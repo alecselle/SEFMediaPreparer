@@ -7,7 +7,7 @@ setlocal EnableDelayedExpansion
 	goto EOF
 ::=============================================================================
 :: ~~ FUNCTION DECLARATIONS
-:SETUP
+:VERIFY_DIR
 	if not exist "%WORKSPACE%/.jenkins" mkdir "%WORKSPACE%/.jenkins" & attrib +h "%WORKSPACE%/.jenkins" /s /d
 	if not exist "%WORKSPACE%/.jenkins/build.txt" echo|set /p="0">"%WORKSPACE%/.jenkins/build.txt"
 	if not exist "%WORKSPACE%/.jenkins/version.txt" copy "%WORKSPACE%/version.txt" "%WORKSPACE%/.jenkins/"
@@ -125,20 +125,28 @@ setlocal EnableDelayedExpansion
 ::=============================================================================
 :RUN
 :: ~~ FUNCTION CALLS
+	echo.[Version] Running Script (0/6)
 	if not exist "%WORKSPACE%/version.txt" call :ERROR_FILE_NOT_FOUND "RUN" "version.txt"
 	if %errorlevel% NEQ 0 goto END_FAILURE
-	call :SETUP
+	echo.[Version] Verifying Directory (1/6)
+	call :VERIFY_DIR
 	if %errorlevel% NEQ 0 goto END_FAILURE
+	echo.[Version] Loading Data (2/6)
 	call :LOAD_SETTINGS
 	if %errorlevel% NEQ 0 goto END_FAILURE
+	echo.[Version] Parsing Data (3/6)
 	call :PARSE_VERSION
 	if %errorlevel% NEQ 0 goto END_FAILURE
+	echo.[Version] Checking Versions (4/6)
 	call :UPDATE_SETTINGS
 	if %errorlevel% NEQ 0 goto END_FAILURE
+	echo.[Version] Saving Data (5/6)
 	call :SAVE_SETTINGS
 	if %errorlevel% NEQ 0 goto END_FAILURE
+	echo.[Version] Displaying Summary (6/6)
 	call :DISPLAY
 	if %errorlevel% NEQ 0 goto END_FAILURE
+	echo.[Version] Completed Successfully
 	goto END_SUCCESS
 	goto EOF
 :: ~~

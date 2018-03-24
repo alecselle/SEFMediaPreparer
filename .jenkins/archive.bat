@@ -57,18 +57,25 @@ setlocal EnableDelayedExpansion
 ::=============================================================================
 :RUN
 :: ~~ FUNCTION CALLS
+	echo.[Archive] Running Script (0/3?)
+	echo.[Archive] Checking Variables (1/3?)
 	call :CHECK_VARIABLES
 	if %errorlevel% NEQ 0 goto END_FAILURE
+	echo.[Archive] Verifying Directory (2/3?)
 	call :BIN_DIR
 	if %errorlevel% NEQ 0 goto END_FAILURE
+	echo.[Archive] Copying Artifacts (3/3?)
 	call :COPY_ARTIFACTS
 	if %errorlevel% NEQ 0 goto END_FAILURE
 	if "!packArtifacts!"=="true" (
+		echo.[Archive] Verifying Directory (4/5)
 		call :RELEASE_DIR
 		if %errorlevel% NEQ 0 goto END_FAILURE
+		echo.[Archive] Packing Artifacts (5/5)
 		call :PACK_ARTIFACTS
 		if %errorlevel% NEQ 0 goto END_FAILURE
 	)
+	echo.[Archive] Completed Successfully
 	goto END_SUCCESS
 	goto EOF
 :: ~~

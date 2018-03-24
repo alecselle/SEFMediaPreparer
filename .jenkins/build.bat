@@ -67,14 +67,12 @@ setlocal EnableDelayedExpansion
 	goto EOF
 :QMAKE
 	call :BUILD_DIR
-	echo.Running qmake...
 	call "!QMAKE!" "!WORKSPACE!/%PROJECT%" -spec win32-g++ "CONFIG+=release" -Wnone
 	if !errorlevel! NEQ 0 call :ERROR_BUILD_FAILED "QMAKE" "Qmake returned an error" "Check output for details" && exit /b 1\
 	exit /b 0
 	goto EOF
 :MINGW
 	call :BUILD_DIR
-	echo.Running mingw32-make...
 	call "!MINGW!" -std=c++11 -s -i -j 4 -B
 	if %errorlevel% NEQ 0 call :ERROR_BUILD_FAILED "MINGW" "MinGW returned an error" "Check output for details" && exit /b 1
 	exit /b 0
@@ -83,10 +81,17 @@ setlocal EnableDelayedExpansion
 ::=============================================================================
 :RUN
 :: ~~ FUNCTION CALLS
+	echo.[Build] Running Script (0/3)
+	echo.[Build] Checking Variables (1/3) 
 	call :CHECK_VARIABLES
 	if %errorlevel% NEQ 0 goto END_FAILURE
+	echo.[Build] Running qmake (2/3)
 	call :QMAKE
 	if %errorlevel% NEQ 0 goto END_FAILURE
+	echo.[Build] Running mingw32-make (3/3)
+	call :MINGW
+	if %errorlevel% NEQ 0 goto END_FAILURE
+	echo.[Build] Completed Successfully
 	goto END_SUCCESS
 	goto EOF
 :: ~~
