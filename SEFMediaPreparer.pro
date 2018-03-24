@@ -7,8 +7,6 @@ TEMPLATE = app
 ICON = seflogo.png
 RC_ICONS = seflogo.ico
 
-DEFINES += QT_DEPRECATED_WARNINGS
-
 CONFIG += staticlib
 
 SOURCES += \

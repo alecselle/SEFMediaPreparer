@@ -1,5 +1,7 @@
 @echo off
 setlocal EnableDelayedExpansion
+set ERROR_LEVEL=0
+set DEBUG=0
 :PROJECT
 	set PROJECT_DEFAULT=SEFMediaPreparer.pro
 	if "%~1" NEQ "" set PROJECT=%~1
@@ -121,7 +123,7 @@ setlocal EnableDelayedExpansion
 :MINGW
 	call :BUILD_DIR
 	echo.[Build] "!MINGW!" -s -i -j 4 -B
-	call "!MINGW!" -s -i -j 4 -B
+	call "!MINGW!" -Wnone -s -j 4 -B
 	if %errorlevel% NEQ 0 (
 		call :ERROR_BUILD_FAILED "MINGW" "MinGW returned an error" "Check output for details" 
 		exit /b 1
