@@ -89,6 +89,7 @@ set DEBUG=0
 		set PATCH_OLD=%%c
 	)
 	if %errorlevel% NEQ 0 call :ERROR_PARSE_FAILED "PARSE_VERSION_OLD"
+	if !ERROR_LEVEL! NEQ 0 exit /b !ERROR_LEVEL! && goto EOF
 	set VERSION_OLD=!MAJOR_OLD!.!MINOR_OLD!.!PATCH_OLD!
 	for /F "tokens=1,2,3 delims=." %%a in ("!VERSION_NEW!") do (
 		set MAJOR_NEW=%%a
@@ -96,6 +97,7 @@ set DEBUG=0
 		set PATCH_NEW=%%c
 	)
 	if %errorlevel% NEQ 0 call :ERROR_PARSE_FAILED "PARSE_VERSION_NEW"
+	if !ERROR_LEVEL! NEQ 0 exit /b !ERROR_LEVEL! && goto EOF
 	set VERSION_NEW=!MAJOR_NEW!.!MINOR_NEW!.!PATCH_NEW!
 	if !MAJOR_NEW! GTR !MAJOR_OLD! set MAJOR_DIFF=1
 	if !MAJOR_NEW! EQU !MAJOR_OLD! set MAJOR_DIFF=0
