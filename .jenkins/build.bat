@@ -69,7 +69,7 @@ setlocal EnableDelayedExpansion
 	goto EOF
 :QMAKE
 	call :BUILD_DIR
-	echo.[Build] "!QMAKE!" !WORKSPACE!/!PROJECT! -spec win32-g++ "CONFIG+=release" -Wnone
+	echo.[Build] "!QMAKE!" -spec win32-g++ "CONFIG+=release" -Wnone !WORKSPACE!/!PROJECT!
 	call "!QMAKE!" -spec win32-g++ "CONFIG+=release" -Wnone !WORKSPACE!/!PROJECT!
 	if !errorlevel! NEQ 0 call :ERROR_BUILD_FAILED "QMAKE" "Qmake returned an error" "Check output for details" && exit /b 1\
 	exit /b 0
