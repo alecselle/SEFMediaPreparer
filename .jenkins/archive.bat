@@ -16,7 +16,7 @@ set DEBUG=1
 	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
 	
 	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:RUN] packArtifacts=!packArtifacts!
-	if "!packArtifacts!" EQU "1" (
+	if !packArtifacts! EQU 1 (
 		echo.[Archive] Packing Artifacts (3/3)
 		call :PACK_ARTIFACTS
 		if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
