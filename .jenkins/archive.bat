@@ -15,7 +15,7 @@ set DEBUG=0
 	call :COPY_ARTIFACTS
 	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
 	
-	if !packArtifacts! EQU 1 (
+	if "!packArtifacts!" EQU "1" (
 		echo.[Archive] Packing Artifacts (3/3)
 		call :PACK_ARTIFACTS
 		if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
@@ -43,7 +43,7 @@ set DEBUG=0
 	exit /b !ERROR_LEVEL!
 	goto EOF
 :COPY_ARTIFACTS
-	copy /Y "!WORKSPACE!\build\release\SEFMediaPreparer.exe" "!WORKSPACE!\bin\"
+	copy /Y "!WORKSPACE!\build\release\SEFMediaPreparer.exe" "!WORKSPACE!\tools\ffmpeg.exe" "!WORKSPACE!\tools\ffprobe.exe" "!WORKSPACE!\bin\"
 	if %errorlevel% NEQ 0 call :ERROR_COPY_FAILED "BIN_DIR"
 	exit /b !ERROR_LEVEL!
 	goto EOF
