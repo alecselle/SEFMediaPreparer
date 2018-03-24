@@ -1,8 +1,30 @@
 @echo off
 setlocal EnableDelayedExpansion
-:START
-	goto RUN
+::=============================================================================
+:RUN
+:: ~~ FUNCTION CALLS
+	echo.[Archive] Running Script (0/3?)
+	echo.[Archive] Checking Variables (1/3?)
+	call :CHECK_VARIABLES
+	if %errorlevel% NEQ 0 goto END_FAILURE
+	echo.[Archive] Verifying Directory (2/3?)
+	call :BIN_DIR
+	if %errorlevel% NEQ 0 goto END_FAILURE
+	echo.[Archive] Copying Artifacts (3/3?)
+	call :COPY_ARTIFACTS
+	if %errorlevel% NEQ 0 goto END_FAILURE
+	if "!packArtifacts!"=="true" (
+		echo.[Archive] Verifying Directory (4/5)
+		call :RELEASE_DIR
+		if %errorlevel% NEQ 0 goto END_FAILURE
+		echo.[Archive] Packing Artifacts (5/5)
+		call :PACK_ARTIFACTS
+		if %errorlevel% NEQ 0 goto END_FAILURE
+	)
+	echo.[Archive] Completed Successfully
+	goto END_SUCCESS
 	goto EOF
+:: ~~
 ::=============================================================================
 :: ~~ FUNCTION DECLARATIONS
 :CHECK_VARIABLES
@@ -55,81 +77,58 @@ setlocal EnableDelayedExpansion
 	goto EOF
 :: ~~
 ::=============================================================================
-:RUN
-:: ~~ FUNCTION CALLS
-	echo.[Archive] Running Script (0/3?)
-	echo.[Archive] Checking Variables (1/3?)
-	call :CHECK_VARIABLES
-	if %errorlevel% NEQ 0 goto END_FAILURE
-	echo.[Archive] Verifying Directory (2/3?)
-	call :BIN_DIR
-	if %errorlevel% NEQ 0 goto END_FAILURE
-	echo.[Archive] Copying Artifacts (3/3?)
-	call :COPY_ARTIFACTS
-	if %errorlevel% NEQ 0 goto END_FAILURE
-	if "!packArtifacts!"=="true" (
-		echo.[Archive] Verifying Directory (4/5)
-		call :RELEASE_DIR
-		if %errorlevel% NEQ 0 goto END_FAILURE
-		echo.[Archive] Packing Artifacts (5/5)
-		call :PACK_ARTIFACTS
-		if %errorlevel% NEQ 0 goto END_FAILURE
-	)
-	echo.[Archive] Completed Successfully
-	goto END_SUCCESS
-	goto EOF
-:: ~~
-::=============================================================================
 :: ~~ ERROR DECLARATIONS
 :ERROR_FILE_NOT_FOUND
 :: call :ERROR_FILE_NOT_FOUND "<IDENTIFIER>" "<FILE>"
 	call :ERROR "ERROR_FILE_NOT_FOUND" %~1 "File not found '%~2'"
-	goto END_FAILURE
+	exit /b 1
 	goto EOF
 :ERROR_CREATE_DIR_FAILED
 :: call :ERROR_CREATE_DIR_FAILED "<IDENTIFIER>" "<DIRECTORY>"
 	call :ERROR "ERROR_CREATE_DIR_FAILED" %~1 "Could not create directory '%~2'"
-	goto END_FAILURE
+	exit /b 1
 	goto EOF
 :ERROR_COPY_FAILED
 	call :ERROR "ERROR_COPY_FAILED" %~1 "Could not copy files"
-	goto END_FAILURE
+	exit /b 1
 	goto EOF
 :ERROR_ARCHIVE_FAILED
 	call :ERROR "ERROR_ARCHIVE_FAILED" %~1 "Could not create archive '%~2'"
-	goto END_FAILURE
+	exit /b 1
 	got EOF
 :: ~~
 ::=============================================================================
+:: ~~ ERROR FRAMEWORK
 :ERROR
 :: call :ERROR "<ERROR_CODE>" "<IDENTIFIER>" "[<MESSAGES>]"
-	if "%~1"=="" goto ERROR_ERROR
-	if "%~2"=="" goto ERROR_ERROR
-	for /f "tokens=1,2,* delims= " %%a in ("%*") do set ERROR_MSG=%%c
-	echo.=================================================================
-	echo.  %~1 [ %~nx0 :%~2 ] 
-	echo.
-	if !ERROR_MSG!=="" (
-		echo.    No message provided
-	) else for %%x in (!ERROR_MSG!) do (
-		echo.    %%~x
+	set ERROR_LEVEL=1
+	if "%~2"=="" (
+		set ERROR_CODE=ERROR_CRITICAL_INVALID
+		set ERROR_IDENTIFIER=INVALID
+	) else (
+		set ERROR_CODE=%~1
+		set ERROR_IDENTIFIER=%~2
 	)
-	echo.
+	for /f "tokens=1,2,* delims= " %%a in ("%*") do set ERROR_MESSAGE=%%c
 	echo.=================================================================
+	echo.  !ERROR_CODE! [ %~nx0 :!ERROR_IDENTIFIER! ] 
 	echo.
+	if !ERROR_MESSAGE! NEQ "" (
+		for %%x in (!ERROR_MESSAGE!) do echo.    %%~x
+		echo.
+	)
+	echo.=================================================================
 	exit /b 1
 	goto EOF
-	:ERROR_ERROR
-	if !DEBUG! GEQ 1 echo.[Archive][DEBUG] ':ERROR' calls take at least 2 parameters
-	if !DEBUG! EQU 0 echo.[Archive][WARNING] Unknown Error
-	goto END_FAILURE
-	goto EOF
+:: ~~
 ::=============================================================================
 :END_SUCCESS
+	echo.[Version] Completed Successfully
 	endlocal
 	exit /b 0
 	goto EOF
 :END_FAILURE
+	echo.[Version][WARNING] Completed Unsuccessfully
 	endlocal
 	exit /b 1
 	goto EOF
