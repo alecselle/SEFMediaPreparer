@@ -43,7 +43,7 @@ set DEBUG=0
 	exit /b !ERROR_LEVEL!
 	goto EOF
 :COPY_ARTIFACTS
-	copy /Y "!WORKSPACE!\build\release\SEFMediaPreparer.exe" "!WORKSPACE!\tools\ffmpeg.exe" "!WORKSPACE!\tools\ffprobe.exe" "!WORKSPACE!\bin\"
+	copy /Y "!WORKSPACE!\build\release\SEFMediaPreparer.exe"+"!WORKSPACE!\tools\ffmpeg.exe"+"!WORKSPACE!\tools\ffprobe.exe" "!WORKSPACE!\bin\"
 	if %errorlevel% NEQ 0 call :ERROR_COPY_FAILED "BIN_DIR"
 	exit /b !ERROR_LEVEL!
 	goto EOF
