@@ -48,6 +48,8 @@ class Settings {
 	boost::container::vector<std::string> presetNameList;
 	bool preserveLog;
 
+	boost::program_options::options_description config;
+
 	Settings();
 
 	void saveConfig();
