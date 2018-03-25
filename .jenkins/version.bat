@@ -62,6 +62,7 @@ set DEBUG=0
 :SAVE_SETTINGS
 	echo|set /p="!BUILD_NEW!" >"!WORKSPACE!/.jenkins/build.txt"
 	echo|set /p="!VERSION_NEW!" >"!WORKSPACE!/.jenkins/version.txt"
+	echo|set /p="!VERSION_OLD!" >"!WORKSPACE!/.jenkins/version.old.txt"
 	set /p BUILD_TEMP=<"%WORKSPACE%/.jenkins/build.txt"
 	set /p VERSION_TEMP=<"%WORKSPACE%/.jenkins/version.txt"
 	if !BUILD_TEMP! NEQ !BUILD_NEW! call :ERROR_SAVE_FAILED "SAVE_SETTINGS" 
