@@ -24,9 +24,6 @@ set DEBUG=0
 	if "!WORKSPACE!"=="" cd "%~dp0"& cd ..& set WORKSPACE=!CD!
 	if not exist "!WORKSPACE!/bin" mkdir "!WORKSPACE!/bin"
 	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "BIN_DIR" "bin"
-	if !DEBUG! GEQ 1 echo.[Archive][DEBUG][:CHECK_VARIABLES] WORKSPACE=!WORKSPACE!
-	if !DEBUG! GEQ 1 echo.[Archive][DEBUG][:CHECK_VARIABLES] ZIP=!ZIP!
-	if !DEBUG! GEQ 1 echo.[Archive][DEBUG][:CHECK_VARIABLES] ERROR_LEVEL=!ERROR_LEVEL!
 	exit /b !ERROR_LEVEL!
 	goto EOF
 :COPY_ARTIFACTS

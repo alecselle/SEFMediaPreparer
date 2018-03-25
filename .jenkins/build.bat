@@ -45,11 +45,6 @@ set DEBUG=0
 		if %errorlevel% NEQ 0 call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "mingw32-make.exe"
 		for /f %%i in ('where mingw32-make.exe') do set MINGW=%%i
 	)
-	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:CHECK_VARIABLES] WORKSPACE=!WORKSPACE!
-	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:CHECK_VARIABLES] PROJECT=!PROJECT!
-	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:CHECK_VARIABLES] QMAKE=!QMAKE!
-	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:CHECK_VARIABLES] MINGW=!MINGW!
-	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:CHECK_VARIABLES] ERROR_LEVEL=!ERROR_LEVEL!
 	exit /b !ERROR_LEVEL!
 	goto EOF
 :BUILD_DIR
