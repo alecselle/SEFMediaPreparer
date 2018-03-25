@@ -43,8 +43,6 @@ set DEBUG=0
 	if not exist "%WORKSPACE%/.jenkins" mkdir "%WORKSPACE%/.jenkins" & attrib +h "%WORKSPACE%/.jenkins" /s /d
 	if not exist "%WORKSPACE%/.jenkins/build.txt" echo|set /p="0">"%WORKSPACE%/.jenkins/build.txt"
 	if not exist "%WORKSPACE%/.jenkins/version.txt" call xcopy "%WORKSPACE%\version.txt" "%WORKSPACE%\.jenkins\"
-	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:CHECK_VARIABLES] WORKSPACE=!WORKSPACE!
-	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:CHECK_VARIABLES] ERROR_LEVEL=!ERROR_LEVEL!
 	exit /b !ERROR_LEVEL!
 	goto EOF
 :LOAD_SETTINGS
@@ -54,32 +52,21 @@ set DEBUG=0
 	set /p BUILD_OLD=<"%WORKSPACE%/.jenkins/build.txt"
 	set /p VERSION_OLD=<"%WORKSPACE%/.jenkins/version.txt"
 	set /p VERSION_NEW=<"%WORKSPACE%/version.txt"
-	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:LOAD_SETTINGS] BUILD_OLD=!BUILD_OLD!
-	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:LOAD_SETTINGS] VERSION_OLD=!VERSION_OLD!
-	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:LOAD_SETTINGS] VERSION_NEW=!VERSION_NEW!
-	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:LOAD_SETTINGS] ERROR_LEVEL=!ERROR_LEVEL!
 	exit /b !ERROR_LEVEL!
 	goto EOF
 :UPDATE_SETTINGS
 	if "!VERSION_NEW!" EQU "!VERSION_OLD!" set /a BUILD_NEW=!BUILD_OLD! + 1
 	if "!VERSION_NEW!" NEQ "!VERSION_OLD!" set BUILD_NEW=1
-	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:UPDATE_SETTINGS] VERSION_NEW=!VERSION_NEW!
-	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:UPDATE_SETTINGS] BUILD_NEW=!BUILD_NEW!
-	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:UPDATE_SETTINGS] ERROR_LEVEL=!ERROR_LEVEL!
 	exit /b !ERROR_LEVEL!
 	goto EOF
 :SAVE_SETTINGS
 	echo|set /p="!BUILD_NEW!" >"!WORKSPACE!/.jenkins/build.txt"
 	echo|set /p="!VERSION_NEW!" >"!WORKSPACE!/.jenkins/version.txt"
+	echo|set /p="!VERSION_OLD!" >"!WORKSPACE!/.jenkins/version.old.txt"
 	set /p BUILD_TEMP=<"%WORKSPACE%/.jenkins/build.txt"
 	set /p VERSION_TEMP=<"%WORKSPACE%/.jenkins/version.txt"
 	if !BUILD_TEMP! NEQ !BUILD_NEW! call :ERROR_SAVE_FAILED "SAVE_SETTINGS" 
 	if !VERSION_TEMP! NEQ !VERSION_NEW! call :ERROR_SAVE_FAILED "SAVE_SETTINGS"
-	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:SAVE_SETTINGS] BUILD_TEMP=!BUILD_TEMP!
-	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:SAVE_SETTINGS] BUILD_NEW=!BUILD_NEW!
-	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:SAVE_SETTINGS] VERSION_TEMP=!VERSION_TEMP!
-	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:SAVE_SETTINGS] VERSION_NEW=!VERSION_NEW!
-	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:SAVE_SETTINGS] ERROR_LEVEL=!ERROR_LEVEL!
 	exit /b !ERROR_LEVEL!
 	goto EOF
 :PARSE_VERSION
@@ -111,12 +98,6 @@ set DEBUG=0
 	if "!MAJOR_DIFF!"=="" call :ERROR_PARSE_FAILED "PARSE_VERSION_DIFF"
 	if "!MINOR_DIFF!"=="" call :ERROR_PARSE_FAILED "PARSE_VERSION_DIFF"
 	if "!PATCH_DIFF!"=="" call :ERROR_PARSE_FAILED "PARSE_VERSION_DIFF"
-	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:PARSE_VERSION] VERSION_OLD=!VERSION_OLD!
-	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:PARSE_VERSION] VERSION_NEW=!VERSION_NEW!
-	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:PARSE_VERSION] MAJOR_DIFF=!MAJOR_DIFF!
-	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:PARSE_VERSION] MINOR_DIFF=!MINOR_DIFF!
-	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:PARSE_VERSION] PATCH_DIFF=!PATCH_DIFF!
-	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:PARSE_VERSION] ERROR_LEVEL=!ERROR_LEVEL!
 	exit /b !ERROR_LEVEL!
 	goto EOF
 :DISPLAY
@@ -128,7 +109,6 @@ set DEBUG=0
 	if !PATCH_DIFF! EQU -1 echo.[Version] Downgrading to !VERSION_NEW!-!BUILD_NEW! from !VERSION_OLD!-!BUILD_OLD!
 	if !MINOR_DIFF! EQU -1 echo.[Version] Downgrading to !VERSION_NEW!-!BUILD_NEW! from !VERSION_OLD!-!BUILD_OLD!
 	if !MAJOR_DIFF! EQU -1 echo.[Version] Downgrading to !VERSION_NEW!-!BUILD_NEW! from !VERSION_OLD!-!BUILD_OLD!
-	if !DEBUG! GEQ 1 echo.[Version][DEBUG][:DISPLAY] ERROR_LEVEL=!ERROR_LEVEL!
 	echo.
 	exit /b !ERROR_LEVEL!
 	goto EOF

@@ -33,9 +33,6 @@ set DEBUG=0
 	if !ERROR_LEVEL! NEQ 0 exit /b !ERROR_LEVEL! && goto EOF
 	if not exist "!WORKSPACE!/release" mkdir "!WORKSPACE!/release"
 	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "CHECK_VARIABLES" "release"
-	if !DEBUG! GEQ 1 echo.[Pack][DEBUG][:CHECK_VARIABLES] WORKSPACE=!WORKSPACE!
-	if !DEBUG! GEQ 1 echo.[Pack][DEBUG][:CHECK_VARIABLES] ZIP=!ZIP!
-	if !DEBUG! GEQ 1 echo.[Pack][DEBUG][:CHECK_VARIABLES] ERROR_LEVEL=!ERROR_LEVEL!
 	exit /b !ERROR_LEVEL!
 	goto EOF
 

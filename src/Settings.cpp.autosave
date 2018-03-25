@@ -77,6 +77,10 @@ void Settings::savePresetAs(string name) {
 	presetName = name;
 }
 
+void Settings::loadCfg() {
+	
+}
+
 void Settings::loadConfig() {
 	auto j = json::parse(ifstream(CONFIG_FILE.string().c_str()));
 	if (j.find("preset") != j.end()) {

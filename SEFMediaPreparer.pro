@@ -1,4 +1,4 @@
-QT += core gui
+QT += core gui webchannel
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -7,7 +7,9 @@ TEMPLATE = app
 ICON = seflogo.png
 RC_ICONS = seflogo.ico
 
-CONFIG += static staticlib
+CONFIG += static staticlib embed_manifest_dll embed_manifest_exe
+
+QMAKE_LFLAGS += -static -static-libgcc -static-libstdc++
 
 SOURCES += \
     $$PWD/src/main.cpp \

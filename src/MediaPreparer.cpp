@@ -20,6 +20,7 @@
 #include <boost/filesystem.hpp>
 #include <nlohmann/json.hpp>
 #include <string>
+#include <QtWebChannel/QtWebChannel>
 
 namespace bf = boost::filesystem;
 namespace bc = boost::container;

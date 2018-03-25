@@ -4,6 +4,7 @@
 
 #include <boost/container/vector.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/program_options.hpp>
 #include <nlohmann/json.hpp>
 #include <string>
 
@@ -46,6 +47,8 @@ class Settings {
 	boost::container::vector<boost::filesystem::path> presetPathList;
 	boost::container::vector<std::string> presetNameList;
 	bool preserveLog;
+
+	boost::program_options::options_description config;
 
 	Settings();
 
