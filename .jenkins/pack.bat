@@ -1,7 +1,7 @@
 @echo off
 setlocal EnableDelayedExpansion
 set ERROR_LEVEL=0
-set DEBUG=1
+set DEBUG=0
 ::=============================================================================
 :: ~~ FUNCTION CALLS
 :RUN
