@@ -49,6 +49,11 @@ set DEBUG=0
 		if %errorlevel% NEQ 0 call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "mingw32-make.exe"
 		for /f %%i in ('where mingw32-make.exe') do set MINGW=%%i
 	)
+	if "!WINDEPLOY!"=="" (
+		call where /q windeployqt 2>&1nul
+		if %errorlevel% NEQ 0 call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "windeployqt.exe"
+		for /f %%i in ('where windeployqt.exe') do set WINDEPLOY=%%i
+	)
 	exit /b !ERROR_LEVEL!
 	goto EOF
 :BUILD_DIR
