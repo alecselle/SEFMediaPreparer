@@ -39,6 +39,14 @@ set DEBUG=0
 		if %errorlevel% NEQ 0 call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "binarycreator.exe"
 		for /f %%i in ('where binarycreator.exe') do set BINARYCREATOR=%%i
 	)
+	set /p VERSION=<"%WORKSPACE%/version.txt"
+	for /f "tokens=1-4 delims=/ " %%i in ("%date%") do (
+		set dow=%%i
+		set month=%%j
+		set day=%%k
+		set year=%%l
+	)
+	set DATESTR=!year!-!month!-!day!
 	exit /b !ERROR_LEVEL!
 	goto EOF
 
@@ -60,7 +68,7 @@ set DEBUG=0
 :INSTALLER_PREPARE
 	echo.^<?xml version="1.0" encoding="UTF-8"?^>^<Installer^>^<Name^>SEFMediaPreparer^</Name^>^<Version^>1.0.0^</Version^>^<Title^>SEFMediaPreparer Installer^</Title^>^<Publisher^>SuperEpicFuntime^</Publisher^>^<StartMenuDir^>SuperEpicFuntime^</StartMenuDir^>^<TargetDir^>@HomeDir@/AppData/Roaming/SuperEpicFuntime/SEFMediaPreparer/bin^</TargetDir^>^</Installer^>> "!WORKSPACE!/installer/config/config.xml" 2>&1
 	if not exist "!WORKSPACE!/installer/config/config.xml" call :ERROR_FILE_NOT_FOUND "INSTALLER_PREPARE" "config.xml"
-	echo.^<?xml version="1.0" encoding="UTF-8"?^>^<Package^>^<DisplayName^>SEFMediaPreparer^</DisplayName^>^<Description^>Core^</Description^>^<Version^>2.4.0^</Version^>^<ReleaseDate^>2018-04-03^</ReleaseDate^>^</Package^>> "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer/meta/package.xml" 2>&1
+	echo.^<?xml version="1.0" encoding="UTF-8"?^>^<Package^>^<DisplayName^>SEFMediaPreparer^</DisplayName^>^<Description^>Core^</Description^>^<Version^>!VERSION!^</Version^>^<ReleaseDate^>!DATESTR!^</ReleaseDate^>^</Package^>> "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer/meta/package.xml" 2>&1
 	if not exist "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer/meta/package.xml" call :ERROR_FILE_NOT_FOUND "INSTALLER_PREPARE" "package.xml"
 	if exist "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer/data" rmdir /S /Q "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer/data"
 	call mklink /J "!WORKSPACE!\installer\packages\com.superepicfuntime.sefmediapreparer\data\" "!WORKSPACE!\bin\" 
