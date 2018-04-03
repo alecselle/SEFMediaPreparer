@@ -9,18 +9,22 @@ set DEBUG=0
 ::=============================================================================
 :: ~~ FUNCTION CALLS
 :RUN
-	echo.[Build] Running Script (0/3)
+	echo.[Build] Running Script (0/4)
 	
-	echo.[Build] Checking Variables (1/3) 
+	echo.[Build] Checking Variables (1/4) 
 	call :CHECK_VARIABLES
 	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
 	
-	echo.[Build] Running qmake (2/3)
+	echo.[Build] Running qmake (2/4)
 	call :QMAKE
 	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
 	
-	echo.[Build] Running mingw32-make (3/3)
+	echo.[Build] Running mingw32-make (3/4)
 	call :MINGW
+	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
+	
+	echo.[Build] Running windeployqt (4/4)
+	call :WINDEPLOY
 	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
 	
 	goto END_SUCCESS
@@ -65,6 +69,13 @@ set DEBUG=0
 	echo.[Build] "!MINGW!" -B
 	call "!MINGW!" -w -s -j 2 -B> "%~dp0/mingw.log" 2>&1
 	if %errorlevel% NEQ 0 call :ERROR_BUILD_FAILED "MINGW" "MinGW returned an error" "Check output for details" 
+	exit /b !ERROR_LEVEL!
+	goto EOF
+:WINDEPLOY
+	call :BUILD_DIR
+	echo.[Build] "!WINDEPLOY!" "SEFMediaPreparer.exe"
+	call "!WINDEPLOY!" "!WORKSPACE!/build/release/SEFMediaPreparer.exe" --release --dir "!WORKSPACE!/bin"> "%~dp0/windeploy.log" 2>&1
+	if %errorlevel% NEQ 0 call :ERROR_BUILD_FAILED "WINDEPLOY" "WinDeployQt returned an error" "Check output for details" 
 	exit /b !ERROR_LEVEL!
 	goto EOF
 :: ~~

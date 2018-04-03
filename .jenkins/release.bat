@@ -2,36 +2,28 @@
 setlocal EnableDelayedExpansion
 set ERROR_LEVEL=0
 set DEBUG=0
-:PROJECT
-	set PROJECT_DEFAULT=SEFMediaPreparer.pro
-	if "%~1" NEQ "" set PROJECT=%~1
-	if "%~1" EQU "" set PROJECT=!PROJECT_DEFAULT!
 ::=============================================================================
 :: ~~ FUNCTION CALLS
 :RUN
-	echo.[Release] Running Script (0/6)
+	echo.[Release] Running Script (0/5)
 	
-	echo.[Release] Checking Variables (1/6) 
+	echo.[Release] Checking Variables (1/5) 
 	call :CHECK_VARIABLES
 	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
-	
-	echo.[Release] Running qmake (2/6)
-	call :QMAKE
-	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
-	
-	echo.[Release] Running mingw32-make (3/6)
-	call :MINGW
-	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
-	
-	echo.[Release] Running windeployqt (4/6)
-	call :WINDEPLOY
-	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
-	
-	echo.[Release] Copying Artifacts (5/6)
+
+	echo.[Release] Copying Artifacts (2/5)
 	call :COPY_ARTIFACTS
 	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
 	
-	echo.[Release] Creating Installer (6/6)
+	echo.[Release] Creating Installer Directories (2/5)
+	call :INSTALLER_DIRS
+	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
+	
+	echo.[Release] Preparing Installer Files (5/5)
+	call :INSTALLER_PREPARE
+	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
+	
+	echo.[Release] Creating Installer (5/5)
 	call :BINARYCREATOR
 	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
 	
@@ -42,68 +34,11 @@ set DEBUG=0
 :: ~~ FUNCTION DECLARATIONS
 :CHECK_VARIABLES
 	if "!WORKSPACE!"=="" cd "%~dp0"& cd ..& set WORKSPACE=!CD!
-	if not exist "!WORKSPACE!/!PROJECT!" call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "!PROJECT!"
-	if not exist "!WORKSPACE!/!PROJECT!" (
-		if not exist "!WORKSPACE!/!PROJECT_DEFAULT!" call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "!PROJECT!"
-		set PROJECT=!PROJECT_DEFAULT!
-	)
-	if "!QMAKE!"=="" (
-		call where /q qmake.exe 2>&1nul
-		if %errorlevel% NEQ 0 call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "qmake.exe"
-		for /f %%i in ('where qmake.exe') do set QMAKE=%%i
-	)
-	if "!MINGW!"=="" (
-		call where /q mingw32-make.exe 2>&1nul
-		if %errorlevel% NEQ 0 call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "mingw32-make.exe"
-		for /f %%i in ('where mingw32-make.exe') do set MINGW=%%i
-	)
-	if "!WINDEPLOY!"=="" (
-		call where /q windeployqt.exe 2>&1nul
-		if %errorlevel% NEQ 0 call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "windeployqt.exe"
-		for /f %%i in ('where windeployqt.exe') do set WINDEPLOY=%%i
-	)
 	if "!BINARYCREATOR!"=="" (
 		call where /q binarycreator.exe 2>&1nul
 		if %errorlevel% NEQ 0 call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "binarycreator.exe"
 		for /f %%i in ('where binarycreator.exe') do set BINARYCREATOR=%%i
 	)
-	exit /b !ERROR_LEVEL!
-	goto EOF
-:BUILD_DIR
-	if not exist "!WORKSPACE!/bin" mkdir "!WORKSPACE!/bin"
-	cd "!WORKSPACE!/bin"
-	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "BUILD_DIR" "!WORKSPACE!/bin"
-	if not exist "!WORKSPACE!/build" mkdir "!WORKSPACE!/build"
-	cd "!WORKSPACE!/build"
-	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "BUILD_DIR" "!WORKSPACE!/build"
-	exit /b !ERROR_LEVEL!
-	goto EOF
-:QMAKE
-	call :BUILD_DIR
-	echo.[Release] "!QMAKE!" -spec win32-g++ "CONFIG+=release"
-	call "!QMAKE!" -spec win32-g++ "CONFIG+=release" "!WORKSPACE!/!PROJECT!"
-	if !errorlevel! NEQ 0 call :ERROR_BUILD_FAILED "QMAKE" "Qmake returned an error" "Check output for details"
-	exit /b !ERROR_LEVEL!
-	goto EOF
-:MINGW
-	call :BUILD_DIR
-	echo.[Release] "!MINGW!" -B
-	call "!MINGW!" -w -s -j 2 -B> "%~dp0/mingw.log" 2>&1
-	if %errorlevel% NEQ 0 call :ERROR_BUILD_FAILED "MINGW" "MinGW returned an error" "Check output for details" 
-	exit /b !ERROR_LEVEL!
-	goto EOF
-:WINDEPLOY
-	call :BUILD_DIR
-	echo.[Release] "!WINDEPLOY!" "SEFMediaPreparer.exe" --release --dir "!WORKSPACE!/bin"
-	call "!WINDEPLOY!" "!WORKSPACE!/build/release/SEFMediaPreparer.exe" --release --dir "!WORKSPACE!/bin"> "%~dp0/windeploy.log" 2>&1
-	if %errorlevel% NEQ 0 call :ERROR_BUILD_FAILED "WINDEPLOY" "WinDeployQt returned an error" "Check output for details" 
-	exit /b !ERROR_LEVEL!
-	goto EOF
-:BINARYCREATOR
-	cd "!WORKSPACE!"
-	echo.[Release] "!BINARYCREATOR!" "SEFMediaPreparer.exe" -c config\config.xml -p packages SEFMediaPreparer-Setup.exe
-	call "!BINARYCREATOR!" -c "!WORKSPACE!\installer\config\config.xml" -p "!WORKSPACE!\installer\packages" SEFMediaPreparer-Setup.exe> "%~dp0/binarycreator.log" 2>&1
-	if %errorlevel% NEQ 0 call :ERROR_BUILD_FAILED "BINARYCREATOR" "BinaryCreator returned an error" "Check output for details" 
 	exit /b !ERROR_LEVEL!
 	goto EOF
 :COPY_ARTIFACTS
@@ -113,6 +48,38 @@ set DEBUG=0
 	if %errorlevel% NEQ 0 call :ERROR_COPY_FAILED "COPY_ARTIFACTS"
 	call xcopy /Y "!WORKSPACE!\tools\ffprobe.exe" "!WORKSPACE!\bin\"
 	if %errorlevel% NEQ 0 call :ERROR_COPY_FAILED "COPY_ARTIFACTS"
+	exit /b !ERROR_LEVEL!
+	goto EOF
+:INSTALLER_DIRS
+	if exist "!WORKSPACE!/installer" call rmdir /S /Q "!WORKSPACE!/installer"
+	if exist "!WORKSPACE!/SEFMediaPreparer-Setup.exe" call del "!WORKSPACE!/SEFMediaPreparer-Setup.exe"
+	if not exist "!WORKSPACE!/installer" mkdir "!WORKSPACE!/installer"
+	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "INSTALLER_PREPARE" "installer"
+	if not exist "!WORKSPACE!/installer/config" mkdir "!WORKSPACE!/installer/config"
+	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "INSTALLER_PREPARE" "installer/config"
+	if not exist "!WORKSPACE!/installer/packages" mkdir "!WORKSPACE!/installer/packages"
+	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "INSTALLER_PREPARE" "installer/packages"
+	if not exist "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer" mkdir "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer"
+	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "INSTALLER_PREPARE" "installer/packages/com.superepicfuntime.sefmediapreparer"
+	if not exist "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer/meta" mkdir "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer/meta"
+	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "INSTALLER_PREPARE" "installer/packages/com.superepicfuntime.sefmediapreparer/meta"
+	exit /b !ERROR_LEVEL!
+	goto EOF
+:INSTALLER_PREPARE
+	echo.^<?xml version="1.0" encoding="UTF-8"?^>^<Installer^>^<Name^>SEFMediaPreparer^</Name^>^<Version^>1.0.0^</Version^>^<Title^>SEFMediaPreparer Installer^</Title^>^<Publisher^>SuperEpicFuntime^</Publisher^>^<StartMenuDir^>SuperEpicFuntime^</StartMenuDir^>^<TargetDir^>@HomeDir@/AppData/Roaming/SuperEpicFuntime/SEFMediaPreparer/bin^</TargetDir^>^</Installer^>> "!WORKSPACE!/installer/config/config.xml" 2>&1
+	if not exist "!WORKSPACE!/installer/config/config.xml" call :ERROR_FILE_NOT_FOUND "INSTALLER_PREPARE" "config.xml"
+	echo.^<?xml version="1.0" encoding="UTF-8"?^>^<Package^>^<DisplayName^>SEFMediaPreparer^</DisplayName^>^<Description^>Core^</Description^>^<Version^>2.4.0^</Version^>^<ReleaseDate^>2018-04-03^</ReleaseDate^>^</Package^>> "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer/meta/package.xml" 2>&1
+	if not exist "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer/meta/package.xml" call :ERROR_FILE_NOT_FOUND "INSTALLER_PREPARE" "package.xml"
+	if exist "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer/data" rmdir /S /Q "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer/data"
+	call mklink /J "!WORKSPACE!\installer\packages\com.superepicfuntime.sefmediapreparer\data\" "!WORKSPACE!\bin\" 
+	if %errorlevel% NEQ 0 call :ERROR_SYMLINK_FAILED "INSTALLER_PREPARE"
+	exit /b !ERROR_LEVEL!
+	goto EOF
+:BINARYCREATOR
+	cd "!WORKSPACE!"
+	echo.[Release] "!BINARYCREATOR!" SEFMediaPreparer-Setup.exe
+	call "!BINARYCREATOR!" -c "!WORKSPACE!/installer/config/config.xml" -p "!WORKSPACE!/installer/packages" SEFMediaPreparer-Setup.exe> "%~dp0/binarycreator.log" 2>&1
+	if %errorlevel% NEQ 0 call :ERROR_BUILD_FAILED "BINARYCREATOR" "BinaryCreator returned an error" "Check output for details" 
 	exit /b !ERROR_LEVEL!
 	goto EOF
 :: ~~
@@ -129,12 +96,17 @@ set DEBUG=0
 	exit /b 1
 	goto EOF
 :ERROR_BUILD_FAILED
-:: call :ERROR_BUILD_FAILED "<IDENTIFIER>" "[<MESSAGES>]"
-	call :ERROR "ERROR_BUILD_FAILED" %*
+:: call :ERROR_BUILD_FAILED "<IDENTIFIER>" "<EXECUTABLE>"
+	call :ERROR "ERROR_BUILD_FAILED" "%~1" "%~2 returned an error" "Check log for details"
+	if exist "!WORKSPACE!/.jenkins/%~2.log" echo>"!WORKSPACE!/.jenkins/%~2.log"
 	exit /b 1
 	goto EOF
 :ERROR_COPY_FAILED
 	call :ERROR "ERROR_COPY_FAILED" %~1 "Could not copy files"
+	exit /b 1
+	goto EOF
+:ERROR_SYMLINK_FAILED
+	call :ERROR "ERROR_SYMLINK_FAILED" %~1 "Could create directory junction"
 	exit /b 1
 	goto EOF
 :: ~~

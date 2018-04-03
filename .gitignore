@@ -12,6 +12,7 @@ SEFMediaPreparer_resource.rc
 .project
 .settings/
 
+installer/
 release/
 build/
 bin/
