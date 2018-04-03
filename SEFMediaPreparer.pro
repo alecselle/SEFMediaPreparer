@@ -9,8 +9,6 @@ RC_ICONS = seflogo.ico
 
 CONFIG += embed_manifest_dll embed_manifest_exe
 
-QMAKE_LFLAGS += -static-libgcc -static-libstdc++
-
 SOURCES += \
     $$PWD/src/main.cpp \
     $$PWD/src/Settings.cpp \
