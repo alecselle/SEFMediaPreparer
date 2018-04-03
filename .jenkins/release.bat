@@ -15,12 +15,12 @@ set DEBUG=0
 	call :COPY_ARTIFACTS
 	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
 	
-	echo.[Release] Creating Installer Directories (2/5)
+	echo.[Release] Creating Installer Directories (3/5)
 	call :INSTALLER_DIRS
 	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
 	
-	echo.[Release] Preparing Installer Files (5/5)
-	call :INSTALLER_PREPARE
+	echo.[Release] Preparing Installer Files (4/5)
+	call :INSTALLER_SETUP
 	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
 	
 	echo.[Release] Creating Installer (5/5)
@@ -49,49 +49,55 @@ set DEBUG=0
 	set DATESTR=%year%-%month%-%day%
 	exit /b !ERROR_LEVEL!
 	goto EOF
-
+:COPY_ARTIFACTS
+	call xcopy /Y "!WORKSPACE!\build\release\SEFMediaPreparer.exe" "!WORKSPACE!\bin\"
+	if %errorlevel% NEQ 0 call :ERROR_COPY_FAILED "COPY_ARTIFACTS"
+	call xcopy /Y "!WORKSPACE!\lib\*" "!WORKSPACE!\bin\"
+	if %errorlevel% NEQ 0 call :ERROR_COPY_FAILED "COPY_ARTIFACTS"
+	exit /b !ERROR_LEVEL!
+	goto EOF
 :INSTALLER_DIRS
-	if exist "!WORKSPACE!/installer" rmdir /S /Q "!WORKSPACE!/installer"
-	if exist "!WORKSPACE!/SEFMediaPreparer-Setup.exe" del "!WORKSPACE!/SEFMediaPreparer-Setup.exe"
+	if exist "!WORKSPACE!/installer" call rmdir /S /Q "!WORKSPACE!/installer"
+	if exist "!WORKSPACE!/SEFMediaPreparer-Setup.exe" call del "!WORKSPACE!/SEFMediaPreparer-Setup.exe"
 	
 	if not exist "!WORKSPACE!/installer" mkdir "!WORKSPACE!/installer"
 	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "INSTALLER_DIRS" "installer"
-	if not exist "!WORKSPACE!/installer/config" mkdir "!WORKSPACE!/installer/config"
+	if not exist "!WORKSPACE!/installer/config" call mkdir "!WORKSPACE!/installer/config"
 	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "INSTALLER_DIRS" "installer/config"
-	if not exist "!WORKSPACE!/installer/packages" mkdir "!WORKSPACE!/installer/packages"
+	if not exist "!WORKSPACE!/installer/packages" call mkdir "!WORKSPACE!/installer/packages"
 	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "INSTALLER_DIRS" "installer/packages"
 	
-	if not exist "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer" mkdir "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer"
+	if not exist "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer" call mkdir "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer"
 	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "INSTALLER_DIRS" "installer/packages/com.superepicfuntime.sefmediapreparer"
-	if not exist "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer/meta" mkdir "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer/meta"
+	if not exist "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer/meta" call mkdir "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer/meta"
 	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "INSTALLER_DIRS" "installer/packages/com.superepicfuntime.sefmediapreparer/meta"
-	if not exist "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer/data" mkdir "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer/data"
+	if not exist "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer/data" call mkdir "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer/data"
 	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "INSTALLER_DIRS" "installer/packages/com.superepicfuntime.sefmediapreparer/data"
-	if not exist "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer/data/bin/" rmdir /S /Q "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer/data/bin/"
+	if not exist "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer/data/bin/" call rmdir /S /Q "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer/data/bin/"
 	call mklink /J "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer/data/bin/" "!WORKSPACE!/bin/" 
 	if %errorlevel% NEQ 0 call :ERROR_SYMLINK_FAILED "INSTALLER_DIRS"
 	
-	if not exist "!WORKSPACE!/installer/packages/org.ffmpeg" mkdir "!WORKSPACE!/installer/packages/org.ffmpeg"
+	if not exist "!WORKSPACE!/installer/packages/org.ffmpeg" call mkdir "!WORKSPACE!/installer/packages/org.ffmpeg"
 	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "INSTALLER_DIRS" "installer/packages/org.ffmpeg"
-	if not exist "!WORKSPACE!/installer/packages/org.ffmpeg/meta" mkdir "!WORKSPACE!/installer/packages/org.ffmpeg/meta"
+	if not exist "!WORKSPACE!/installer/packages/org.ffmpeg/meta" call mkdir "!WORKSPACE!/installer/packages/org.ffmpeg/meta"
 	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "INSTALLER_DIRS" "installer/packages/org.ffmpeg/meta"
-	if not exist "!WORKSPACE!/installer/packages/org.ffmpeg/data" mkdir "!WORKSPACE!/installer/packages/org.ffmpeg/data"
+	if not exist "!WORKSPACE!/installer/packages/org.ffmpeg/data" call mkdir "!WORKSPACE!/installer/packages/org.ffmpeg/data"
 	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "INSTALLER_DIRS" "installer/packages/org.ffmpeg/data"
-	if not exist "!WORKSPACE!/installer/packages/org.ffmpeg/data/bin/" rmdir /S /Q "!WORKSPACE!/installer/packages/org.ffmpeg/data/bin/"
+	if not exist "!WORKSPACE!/installer/packages/org.ffmpeg/data/bin/" call rmdir /S /Q "!WORKSPACE!/installer/packages/org.ffmpeg/data/bin/"
 	call mklink /J "!WORKSPACE!/installer/packages/org.ffmpeg/data/bin" "!WORKSPACE!/ffmpeg/" 
 	if %errorlevel% NEQ 0 call :ERROR_SYMLINK_FAILED "INSTALLER_DIRS"
 	exit /b !ERROR_LEVEL!
 	goto EOF
-:INSTALLER_PREPARE
+:INSTALLER_SETUP
 	cd "!WORKSPACE!"
 	echo.^<?xml version="1.0" encoding="UTF-8"?^>^<Installer^>^<Name^>SEFMediaPreparer^</Name^>^<Version^>1.0.0^</Version^>^<Title^>SEFMediaPreparer Installer^</Title^>^<Publisher^>SuperEpicFuntime^</Publisher^>^<ProductUrl^>https://superepicfuntime.com^</ProductUrl^>^<InstallerWindowIcon^>seflogo.ico^</InstallerWindowIcon^>^<InstallerApplicationIcon^>seflogo.ico^</InstallerApplicationIcon^>^<Logo^>seflogo.ico^</Logo^>^<RunProgram^>@TargetDir@/bin/SEFMediaPreparer.exe^</RunProgram^>^<StartMenuDir^>SuperEpicFuntime^</StartMenuDir^>^<TargetDir^>@HomeDir@/AppData/Roaming/SuperEpicFuntime/SEFMediaPreparer^</TargetDir^>^</Installer^>> "!WORKSPACE!/installer/config/config.xml" 2>&1
-	if not exist "!WORKSPACE!/installer/config/config.xml" call :ERROR_FILE_NOT_FOUND "INSTALLER_PREPARE" "config.xml"
+	if not exist "!WORKSPACE!/installer/config/config.xml" call :ERROR_FILE_NOT_FOUND "INSTALLER_SETUP" "config.xml"
 	
 	echo.^<?xml version="1.0" encoding="UTF-8"?^>^<Package^>^<DisplayName^>SEFMediaPreparer^</DisplayName^>^<Description^>SuperEpicFuntime MediaPreparer !VERSION!^</Description^>^<Version^>!VERSION!^</Version^>^<ReleaseDate^>%DATESTR%^</ReleaseDate^>^<Default^>true^</Default^>^<ForcedInstallation^>true^</ForcedInstallation^>^<SortingPriority^>100^</SortingPriority^>^</Package^>> "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer/meta/package.xml" 2>&1
-	if not exist "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer/meta/package.xml" call :ERROR_FILE_NOT_FOUND "INSTALLER_PREPARE" "package.xml"
+	if not exist "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer/meta/package.xml" call :ERROR_FILE_NOT_FOUND "INSTALLER_SETUP" "package.xml"
 	
 	echo.^<?xml version="1.0" encoding="UTF-8"?^>^<Package^>^<DisplayName^>FFmpeg^</DisplayName^>^<Description^>FFmpeg binaries^</Description^>^<Version^>1^</Version^>^<ReleaseDate^>%DATESTR%^</ReleaseDate^>^<Default^>true^</Default^>^<ForcedInstallation^>false^</ForcedInstallation^>^<SortingPriority^>0^</SortingPriority^>^</Package^>> "!WORKSPACE!/installer/packages/org.ffmpeg/meta/package.xml" 2>&1
-	if not exist "!WORKSPACE!/installer/packages/org.ffmpeg/meta/package.xml" call :ERROR_FILE_NOT_FOUND "INSTALLER_PREPARE" "package.xml"
+	if not exist "!WORKSPACE!/installer/packages/org.ffmpeg/meta/package.xml" call :ERROR_FILE_NOT_FOUND "INSTALLER_SETUP" "package.xml"
 	
 	exit /b !ERROR_LEVEL!
 	goto EOF
