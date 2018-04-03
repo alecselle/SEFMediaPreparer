@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Installer>
+    <Name>SEFMediaPreparer</Name>
+    <Version>1.0.0</Version>
+    <Title>SEFMediaPreparer Installer</Title>
+    <Publisher>SuperEpicFuntime</Publisher>
+    <StartMenuDir>SuperEpicFuntime</StartMenuDir>
+    <TargetDir>@HomeDir@/AppData/Roaming/SuperEpicFuntime/SEFMediaPreparer/bin</TargetDir>
+</Installer>

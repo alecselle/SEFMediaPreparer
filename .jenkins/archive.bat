@@ -5,13 +5,13 @@ set DEBUG=0
 ::=============================================================================
 :: ~~ FUNCTION CALLS
 :RUN
-	echo.[Archive] Running Script (0/2?)
+	echo.[Archive] Running Script (0/2)
 	
-	echo.[Archive] Checking Variables (1/2?)
+	echo.[Archive] Checking Variables (1/2)
 	call :CHECK_VARIABLES
 	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
 	
-	echo.[Archive] Copying Artifacts (2/2?)
+	echo.[Archive] Copying Artifacts (2/2)
 	call :COPY_ARTIFACTS
 	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
 
