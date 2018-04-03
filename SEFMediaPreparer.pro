@@ -7,8 +7,6 @@ TEMPLATE = app
 ICON = seflogo.png
 RC_ICONS = seflogo.ico
 
-CONFIG += embed_manifest_dll embed_manifest_exe
-
 SOURCES += \
     $$PWD/src/main.cpp \
     $$PWD/src/Settings.cpp \

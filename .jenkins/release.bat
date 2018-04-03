@@ -41,15 +41,7 @@ set DEBUG=0
 	)
 	exit /b !ERROR_LEVEL!
 	goto EOF
-:COPY_ARTIFACTS
-	call xcopy /Y "!WORKSPACE!\build\release\SEFMediaPreparer.exe" "!WORKSPACE!\bin\"
-	if %errorlevel% NEQ 0 call :ERROR_COPY_FAILED "COPY_ARTIFACTS"
-	call xcopy /Y "!WORKSPACE!\tools\ffmpeg.exe" "!WORKSPACE!\bin\"
-	if %errorlevel% NEQ 0 call :ERROR_COPY_FAILED "COPY_ARTIFACTS"
-	call xcopy /Y "!WORKSPACE!\tools\ffprobe.exe" "!WORKSPACE!\bin\"
-	if %errorlevel% NEQ 0 call :ERROR_COPY_FAILED "COPY_ARTIFACTS"
-	exit /b !ERROR_LEVEL!
-	goto EOF
+
 :INSTALLER_DIRS
 	if exist "!WORKSPACE!/installer" call rmdir /S /Q "!WORKSPACE!/installer"
 	if exist "!WORKSPACE!/SEFMediaPreparer-Setup.exe" call del "!WORKSPACE!/SEFMediaPreparer-Setup.exe"

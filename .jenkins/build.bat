@@ -9,22 +9,26 @@ set DEBUG=0
 ::=============================================================================
 :: ~~ FUNCTION CALLS
 :RUN
-	echo.[Build] Running Script (0/4)
+	echo.[Build] Running Script (0/5)
 	
-	echo.[Build] Checking Variables (1/4) 
+	echo.[Build] Checking Variables (1/5) 
 	call :CHECK_VARIABLES
 	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
 	
-	echo.[Build] Running qmake (2/4)
+	echo.[Build] Running qmake (2/5)
 	call :QMAKE
 	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
 	
-	echo.[Build] Running mingw32-make (3/4)
+	echo.[Build] Running mingw32-make (3/5)
 	call :MINGW
 	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
 	
-	echo.[Build] Running windeployqt (4/4)
+	echo.[Build] Running windeployqt (4/5)
 	call :WINDEPLOY
+	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
+	
+	echo.[Build] Copying Artifacts (5/5)
+	call :COPY_ARTIFACTS
 	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
 	
 	goto END_SUCCESS
@@ -64,14 +68,14 @@ set DEBUG=0
 	goto EOF
 :QMAKE
 	call :BUILD_DIR
-	echo.[Build] "!QMAKE!" -spec win32-g++ "CONFIG+=release"
+	echo.[Build] "!QMAKE!"
 	call "!QMAKE!" -spec win32-g++ "CONFIG+=release" "!WORKSPACE!/!PROJECT!"
 	if !errorlevel! NEQ 0 call :ERROR_BUILD_FAILED "QMAKE" "Qmake returned an error" "Check output for details"
 	exit /b !ERROR_LEVEL!
 	goto EOF
 :MINGW
 	call :BUILD_DIR
-	echo.[Build] "!MINGW!" -B
+	echo.[Build] "!MINGW!"
 	call "!MINGW!" -w -s -j 2 -B> "%~dp0/mingw.log" 2>&1
 	if %errorlevel% NEQ 0 call :ERROR_BUILD_FAILED "MINGW" "MinGW returned an error" "Check output for details" 
 	exit /b !ERROR_LEVEL!
@@ -79,8 +83,17 @@ set DEBUG=0
 :WINDEPLOY
 	call :BUILD_DIR
 	echo.[Build] "!WINDEPLOY!" "SEFMediaPreparer.exe"
-	call "!WINDEPLOY!" "!WORKSPACE!/build/release/SEFMediaPreparer.exe" --release --dir "!WORKSPACE!/bin"> "%~dp0/windeploy.log" 2>&1
+	call "!WINDEPLOY!" "!WORKSPACE!/build/release/SEFMediaPreparer.exe" --release --force --no-translations --dir "!WORKSPACE!/bin"> "%~dp0/windeploy.log" 2>&1
 	if %errorlevel% NEQ 0 call :ERROR_BUILD_FAILED "WINDEPLOY" "WinDeployQt returned an error" "Check output for details" 
+	exit /b !ERROR_LEVEL!
+	goto EOF
+:COPY_ARTIFACTS
+	call xcopy /Y "!WORKSPACE!\build\release\SEFMediaPreparer.exe" "!WORKSPACE!\bin\"
+	if %errorlevel% NEQ 0 call :ERROR_COPY_FAILED "COPY_ARTIFACTS"
+	call xcopy /Y "!WORKSPACE!\tools\ffmpeg.exe" "!WORKSPACE!\bin\"
+	if %errorlevel% NEQ 0 call :ERROR_COPY_FAILED "COPY_ARTIFACTS"
+	call xcopy /Y "!WORKSPACE!\tools\ffprobe.exe" "!WORKSPACE!\bin\"
+	if %errorlevel% NEQ 0 call :ERROR_COPY_FAILED "COPY_ARTIFACTS"
 	exit /b !ERROR_LEVEL!
 	goto EOF
 :: ~~
@@ -99,6 +112,10 @@ set DEBUG=0
 :ERROR_BUILD_FAILED
 :: call :ERROR_BUILD_FAILED "<IDENTIFIER>" "[<MESSAGES>]"
 	call :ERROR "ERROR_BUILD_FAILED" %*
+	exit /b 1
+	goto EOF
+:ERROR_COPY_FAILED
+	call :ERROR "ERROR_COPY_FAILED" %~1 "Could not copy files"
 	exit /b 1
 	goto EOF
 :: ~~
