@@ -102,13 +102,13 @@ set DEBUG=0
 	goto EOF
 :DISPLAY
 	echo.
-	if !PATCH_DIFF! EQU 1 if !MINOR_DIFF! GEQ 0 if !MAJOR_DIFF! GEQ 0 echo.[Version] Upgrading to !VERSION_NEW!-!BUILD_NEW! from !VERSION_OLD!-!BUILD_OLD!
-	if !PATCH_DIFF! GEQ 0 if !MINOR_DIFF! EQU 1 if !MAJOR_DIFF! GEQ 0 echo.[Version] Upgrading to !VERSION_NEW!-!BUILD_NEW! from !VERSION_OLD!-!BUILD_OLD!
-	if !PATCH_DIFF! GEQ 0 if !MINOR_DIFF! GEQ 0 if !MAJOR_DIFF! EQU 1 echo.[Version] Upgrading to !VERSION_NEW!-!BUILD_NEW! from !VERSION_OLD!-!BUILD_OLD!
+	if !PATCH_DIFF! EQU 1 if !MINOR_DIFF! GEQ 0 if !MAJOR_DIFF! GEQ 0 echo.[Version] Upgrading from !VERSION_OLD!-!BUILD_OLD! to !VERSION_NEW!-!BUILD_NEW!
+	if !PATCH_DIFF! GEQ 0 if !MINOR_DIFF! EQU 1 if !MAJOR_DIFF! GEQ 0 echo.[Version] Upgrading from !VERSION_OLD!-!BUILD_OLD! to !VERSION_NEW!-!BUILD_NEW!
+	if !PATCH_DIFF! GEQ 0 if !MINOR_DIFF! GEQ 0 if !MAJOR_DIFF! EQU 1 echo.[Version] Upgrading from !VERSION_OLD!-!BUILD_OLD! to !VERSION_NEW!-!BUILD_NEW!
 	if !PATCH_DIFF! EQU 0 if !MINOR_DIFF! EQU 0 if !MAJOR_DIFF! EQU 0 echo.[Version] Rebuilding !VERSION_NEW!-!BUILD_NEW!
-	if !PATCH_DIFF! EQU -1 echo.[Version] Downgrading to !VERSION_NEW!-!BUILD_NEW! from !VERSION_OLD!-!BUILD_OLD!
-	if !MINOR_DIFF! EQU -1 echo.[Version] Downgrading to !VERSION_NEW!-!BUILD_NEW! from !VERSION_OLD!-!BUILD_OLD!
-	if !MAJOR_DIFF! EQU -1 echo.[Version] Downgrading to !VERSION_NEW!-!BUILD_NEW! from !VERSION_OLD!-!BUILD_OLD!
+	if !PATCH_DIFF! EQU -1 echo.[Version] Downgrading from !VERSION_OLD!-!BUILD_OLD! to !VERSION_NEW!-!BUILD_NEW!
+	if !MINOR_DIFF! EQU -1 echo.[Version] Downgrading from !VERSION_OLD!-!BUILD_OLD! to !VERSION_NEW!-!BUILD_NEW!
+	if !MAJOR_DIFF! EQU -1 echo.[Version] Downgrading from !VERSION_OLD!-!BUILD_OLD! to !VERSION_NEW!-!BUILD_NEW!
 	echo.
 	exit /b !ERROR_LEVEL!
 	goto EOF
