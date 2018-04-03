@@ -17,7 +17,7 @@ release/
 build/
 bin/
 
-SEFMediaPreparer-Setup.exe
+SEFMediaPreparer-*-Setup.exe
 
 tools/deploy.bat
 tools/commit.bat

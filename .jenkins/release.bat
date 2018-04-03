@@ -5,26 +5,14 @@ set DEBUG=0
 ::=============================================================================
 :: ~~ FUNCTION CALLS
 :RUN
-	echo.[Release] Running Script (0/5)
+	echo.[Release] Running Script (0/2)
 	
-	echo.[Release] Checking Variables (1/5) 
+	echo.[Release] Checking Variables (1/2) 
 	call :CHECK_VARIABLES
 	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
 
-	echo.[Release] Copying Artifacts (2/5)
-	call :COPY_ARTIFACTS
-	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
-	
-	echo.[Release] Creating Installer Directories (3/5)
-	call :INSTALLER_DIRS
-	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
-	
-	echo.[Release] Preparing Installer Files (4/5)
-	call :INSTALLER_SETUP
-	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
-	
-	echo.[Release] Creating Installer (5/5)
-	call :BINARYCREATOR
+	echo.[Release] Creating Installer (2/2)
+	call :INNOSETUP
 	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
 	
 	goto END_SUCCESS
@@ -34,78 +22,19 @@ set DEBUG=0
 :: ~~ FUNCTION DECLARATIONS
 :CHECK_VARIABLES
 	if "!WORKSPACE!"=="" cd "%~dp0"& cd ..& set WORKSPACE=!CD!
-	if "!BINARYCREATOR!"=="" (
-		call where /q binarycreator.exe 2>&1nul
-		if %errorlevel% NEQ 0 call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "binarycreator.exe"
-		for /f %%i in ('where binarycreator.exe') do set BINARYCREATOR=%%i
+	if "!INNOSETUP!"=="" (
+		call where /q ISCC.exe 2>&1nul
+		if %errorlevel% NEQ 0 call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "ISCC.exe"
+		for /f "tokens=*" %%i in ('where ISCC.exe') do set INNOSETUP=%%i
 	)
-	set /p VERSION=<"%WORKSPACE%/version.txt"
-	for /f "tokens=1-4 delims=/ " %%i in ("%date%") do (
-		set dow=%%i
-		set month=%%j
-		set day=%%k
-		set year=%%l
-	)
-	set DATESTR=%year%-%month%-%day%
+	if not exist "!INNOSETUP!" call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "ISCC.exe"
 	exit /b !ERROR_LEVEL!
 	goto EOF
-:COPY_ARTIFACTS
-	call xcopy /Y "!WORKSPACE!\build\release\SEFMediaPreparer.exe" "!WORKSPACE!\bin\"
-	if %errorlevel% NEQ 0 call :ERROR_COPY_FAILED "COPY_ARTIFACTS"
-	call xcopy /Y "!WORKSPACE!\lib\*" "!WORKSPACE!\bin\"
-	if %errorlevel% NEQ 0 call :ERROR_COPY_FAILED "COPY_ARTIFACTS"
-	exit /b !ERROR_LEVEL!
-	goto EOF
-:INSTALLER_DIRS
-	if exist "!WORKSPACE!/installer" call rmdir /S /Q "!WORKSPACE!/installer"
-	if exist "!WORKSPACE!/SEFMediaPreparer-Setup.exe" call del "!WORKSPACE!/SEFMediaPreparer-Setup.exe"
-	
-	if not exist "!WORKSPACE!/installer" mkdir "!WORKSPACE!/installer"
-	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "INSTALLER_DIRS" "installer"
-	if not exist "!WORKSPACE!/installer/config" call mkdir "!WORKSPACE!/installer/config"
-	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "INSTALLER_DIRS" "installer/config"
-	if not exist "!WORKSPACE!/installer/packages" call mkdir "!WORKSPACE!/installer/packages"
-	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "INSTALLER_DIRS" "installer/packages"
-	
-	if not exist "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer" call mkdir "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer"
-	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "INSTALLER_DIRS" "installer/packages/com.superepicfuntime.sefmediapreparer"
-	if not exist "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer/meta" call mkdir "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer/meta"
-	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "INSTALLER_DIRS" "installer/packages/com.superepicfuntime.sefmediapreparer/meta"
-	if not exist "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer/data" call mkdir "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer/data"
-	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "INSTALLER_DIRS" "installer/packages/com.superepicfuntime.sefmediapreparer/data"
-	if not exist "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer/data/bin/" call rmdir /S /Q "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer/data/bin/"
-	call mklink /J "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer/data/bin/" "!WORKSPACE!/bin/" 
-	if %errorlevel% NEQ 0 call :ERROR_SYMLINK_FAILED "INSTALLER_DIRS"
-	
-	if not exist "!WORKSPACE!/installer/packages/org.ffmpeg" call mkdir "!WORKSPACE!/installer/packages/org.ffmpeg"
-	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "INSTALLER_DIRS" "installer/packages/org.ffmpeg"
-	if not exist "!WORKSPACE!/installer/packages/org.ffmpeg/meta" call mkdir "!WORKSPACE!/installer/packages/org.ffmpeg/meta"
-	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "INSTALLER_DIRS" "installer/packages/org.ffmpeg/meta"
-	if not exist "!WORKSPACE!/installer/packages/org.ffmpeg/data" call mkdir "!WORKSPACE!/installer/packages/org.ffmpeg/data"
-	if %errorlevel% NEQ 0 call :ERROR_CREATE_DIR_FAILED "INSTALLER_DIRS" "installer/packages/org.ffmpeg/data"
-	if not exist "!WORKSPACE!/installer/packages/org.ffmpeg/data/bin/" call rmdir /S /Q "!WORKSPACE!/installer/packages/org.ffmpeg/data/bin/"
-	call mklink /J "!WORKSPACE!/installer/packages/org.ffmpeg/data/bin" "!WORKSPACE!/ffmpeg/" 
-	if %errorlevel% NEQ 0 call :ERROR_SYMLINK_FAILED "INSTALLER_DIRS"
-	exit /b !ERROR_LEVEL!
-	goto EOF
-:INSTALLER_SETUP
+:INNOSETUP
 	cd "!WORKSPACE!"
-	echo.^<?xml version="1.0" encoding="UTF-8"?^>^<Installer^>^<Name^>SEFMediaPreparer^</Name^>^<Version^>1.0.0^</Version^>^<Title^>SEFMediaPreparer Installer^</Title^>^<Publisher^>SuperEpicFuntime^</Publisher^>^<ProductUrl^>https://superepicfuntime.com^</ProductUrl^>^<InstallerWindowIcon^>seflogo.ico^</InstallerWindowIcon^>^<InstallerApplicationIcon^>seflogo.ico^</InstallerApplicationIcon^>^<Logo^>seflogo.ico^</Logo^>^<RunProgram^>@TargetDir@/bin/SEFMediaPreparer.exe^</RunProgram^>^<StartMenuDir^>SuperEpicFuntime^</StartMenuDir^>^<TargetDir^>@HomeDir@/AppData/Roaming/SuperEpicFuntime/SEFMediaPreparer^</TargetDir^>^</Installer^>> "!WORKSPACE!/installer/config/config.xml" 2>&1
-	if not exist "!WORKSPACE!/installer/config/config.xml" call :ERROR_FILE_NOT_FOUND "INSTALLER_SETUP" "config.xml"
-	
-	echo.^<?xml version="1.0" encoding="UTF-8"?^>^<Package^>^<DisplayName^>SEFMediaPreparer^</DisplayName^>^<Description^>SuperEpicFuntime MediaPreparer !VERSION!^</Description^>^<Version^>!VERSION!^</Version^>^<ReleaseDate^>%DATESTR%^</ReleaseDate^>^<Default^>true^</Default^>^<ForcedInstallation^>true^</ForcedInstallation^>^<SortingPriority^>100^</SortingPriority^>^</Package^>> "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer/meta/package.xml" 2>&1
-	if not exist "!WORKSPACE!/installer/packages/com.superepicfuntime.sefmediapreparer/meta/package.xml" call :ERROR_FILE_NOT_FOUND "INSTALLER_SETUP" "package.xml"
-	
-	echo.^<?xml version="1.0" encoding="UTF-8"?^>^<Package^>^<DisplayName^>FFmpeg^</DisplayName^>^<Description^>FFmpeg binaries^</Description^>^<Version^>1^</Version^>^<ReleaseDate^>%DATESTR%^</ReleaseDate^>^<Default^>true^</Default^>^<ForcedInstallation^>false^</ForcedInstallation^>^<SortingPriority^>0^</SortingPriority^>^</Package^>> "!WORKSPACE!/installer/packages/org.ffmpeg/meta/package.xml" 2>&1
-	if not exist "!WORKSPACE!/installer/packages/org.ffmpeg/meta/package.xml" call :ERROR_FILE_NOT_FOUND "INSTALLER_SETUP" "package.xml"
-	
-	exit /b !ERROR_LEVEL!
-	goto EOF
-:BINARYCREATOR
-	cd "!WORKSPACE!"
-	echo.[Release] "!BINARYCREATOR!" SEFMediaPreparer-Setup.exe
-	call "!BINARYCREATOR!" -c "!WORKSPACE!/installer/config/config.xml" -p "!WORKSPACE!/installer/packages" SEFMediaPreparer-Setup.exe> "%~dp0/binarycreator.log" 2>&1
-	if %errorlevel% NEQ 0 call :ERROR_BUILD_FAILED "BINARYCREATOR" "BinaryCreator returned an error" "Check output for details" 
+	echo.[Release] "!INNOSETUP!"
+	call "!INNOSETUP!" "!WORKSPACE!/SEFMediaPreparer.iss"> "%~dp0/iscc.log" 2>&1
+	if %errorlevel% NEQ 0 call :ERROR_BUILD_FAILED "INNOSETUP" "ISCC returned an error" "Check output for details" 
 	exit /b !ERROR_LEVEL!
 	goto EOF
 :: ~~

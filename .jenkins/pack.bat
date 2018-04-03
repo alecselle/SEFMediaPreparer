@@ -25,8 +25,9 @@ set DEBUG=0
 	if "!ZIP!"=="" (
 		call where /q 7z.exe
 		if %errorlevel% NEQ 0 call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "7z.exe"
-		for /f %%i in ('where 7z') do set ZIP=%%i
+		for /f "tokens=*" %%i in ('where 7z') do set ZIP=%%i
 	)
+	if not exist "!ZIP!" call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "7z.exe"
 	if not exist "!WORKSPACE!/bin/SEFMediaPreparer.exe" call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "SEFMediaPreparer.exe"
 	if not exist "!WORKSPACE!/tools/ffmpeg.exe" call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "ffmpeg.exe"
 	if not exist "!WORKSPACE!/tools/ffprobe.exe" call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "ffprobe.exe"
