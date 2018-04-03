@@ -55,8 +55,14 @@ set DEBUG=0
 		for /f "tokens=*" %%i in ('where mingw32-make.exe') do set MINGW=%%i
 	)
 	if not exist "!MINGW!" call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "mingw32-make.exe"
+	if "!SIGNTOOL!"=="" (
+		call where /q signtool.exe 2>&1nul
+		if %errorlevel% NEQ 0 call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "signtool.exe"
+		for /f "tokens=*" %%i in ('where signtool.exe') do set SIGNTOOL=%%i
+	)
+	if not exist "!SIGNTOOL!" call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "signtool.exe"
 	if "!WINDEPLOY!"=="" (
-		call where /q windeployqt 2>&1nul
+		call where /q windeployqt.exe 2>&1nul
 		if %errorlevel% NEQ 0 call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "windeployqt.exe"
 		for /f "tokens=*" %%i in ('where windeployqt.exe') do set WINDEPLOY=%%i
 	)
