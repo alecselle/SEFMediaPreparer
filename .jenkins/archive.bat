@@ -86,5 +86,6 @@ set DEBUG=0
 :END_FAILURE
 	echo.[Archive][WARNING] Completed Unsuccessfully
 	endlocal
+	pause
 	exit /b 1
 	goto EOF

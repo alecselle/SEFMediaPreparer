@@ -99,5 +99,6 @@ set DEBUG=0
 :END_FAILURE
 	echo.[Pack][WARNING] Completed Unsuccessfully
 	endlocal
+	pause
 	exit /b 1
 	goto EOF

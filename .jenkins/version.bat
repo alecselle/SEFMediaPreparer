@@ -180,5 +180,6 @@ set DEBUG=0
 :END_FAILURE
 	echo.[Version][WARNING] Completed Unsuccessfully
 	endlocal
+	pause
 	exit /b 1
 	goto EOF

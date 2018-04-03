@@ -26,17 +26,17 @@ FORMS += \
 DISTFILES += \
     $$PWD/seflogo.png \
     $$PWD/seflogo.ico \
-    $$PWD/tools/ffmpeg.exe \
-    $$PWD/tools/ffprobe.exe \
+    $$PWD/ffmpeg/ffmpeg.exe \
+    $$PWD/ffmpeg/ffprobe.exe \
     $$PWD/README.md \
     $$PWD/.gitignore \
     version.txt
 
 win32: LIBS += \
-    -L$$PWD/lib/ -lboost_filesystem-mgw53-mt-s-x32-1_66 \
-    -L$$PWD/lib/ -lboost_container-mgw53-mt-s-x32-1_66 \
-    -L$$PWD/lib/ -lboost_system-mgw53-mt-s-x32-1_66 \
-    -L$$PWD/lib/ -lboost_program_options-mgw53-mt-s-x32-1_66
+    -L$$PWD/lib/ -lboost_filesystem-mgw53-mt-x32-1_66 \
+    -L$$PWD/lib/ -lboost_container-mgw53-mt-x32-1_66 \
+    -L$$PWD/lib/ -lboost_system-mgw53-mt-x32-1_66 \
+    -L$$PWD/lib/ -lboost_program_options-mgw53-mt-x32-1_66
 
 INCLUDEPATH += \
     $$PWD/include

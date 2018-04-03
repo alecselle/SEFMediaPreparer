@@ -90,6 +90,8 @@ set DEBUG=0
 :COPY_ARTIFACTS
 	call xcopy /Y "!WORKSPACE!\build\release\SEFMediaPreparer.exe" "!WORKSPACE!\bin\"
 	if %errorlevel% NEQ 0 call :ERROR_COPY_FAILED "COPY_ARTIFACTS"
+	call xcopy /Y "!WORKSPACE!\lib\*.dll" "!WORKSPACE!\bin\"
+	if %errorlevel% NEQ 0 call :ERROR_COPY_FAILED "COPY_ARTIFACTS"
 	exit /b !ERROR_LEVEL!
 	goto EOF
 :: ~~
@@ -148,5 +150,6 @@ set DEBUG=0
 :END_FAILURE
 	echo.[Version][WARNING] Completed Unsuccessfully
 	endlocal
+	pause
 	exit /b 1
 	goto EOF
