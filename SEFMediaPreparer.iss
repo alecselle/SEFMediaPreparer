@@ -7,6 +7,9 @@
 #ifndef ApplicationExe
 # define ApplicationExe "SEFMediaPreparer.exe"
 #endif
+#ifndef ApplicationSource
+# define ApplicationSource "."
+#endif
 #ifndef Publisher
 # define Publisher "SuperEpicFuntime"
 #endif
@@ -28,9 +31,9 @@ DisableDirPage=yes
 DefaultGroupName={#ApplicationName}
 DisableProgramGroupPage=yes
 DisableWelcomePage=no
-OutputDir=F:\Workspace\Cpp\SEFMediaPreparer
+OutputDir={#ApplicationSource}/
 OutputBaseFilename=SEFMediaPreparer-{#ApplicationVersion}-Setup
-SetupIconFile=F:\Workspace\Cpp\SEFMediaPreparer\seflogo.ico
+SetupIconFile={#ApplicationSource}/seflogo.ico
 Compression=lzma
 SolidCompression=yes
 UsePreviousAppDir=False
