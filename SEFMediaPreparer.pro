@@ -30,14 +30,14 @@ DISTFILES += \
     $$PWD/ffmpeg/ffprobe.exe \
     $$PWD/README.md \
     $$PWD/.gitignore \
-    version.txt
+    $$PWD/version.txt
 
 win32: LIBS += \
     -L$$PWD/lib/ -lboost_filesystem-mgw53-mt-x32-1_66 \
     -L$$PWD/lib/ -lboost_container-mgw53-mt-x32-1_66 \
     -L$$PWD/lib/ -lboost_system-mgw53-mt-x32-1_66 \
-    -L$$PWD/lib/ -lboost_program_options-mgw53-mt-x32-1_66 \
-
+    -L$$PWD/lib/ -lboost_program_options-mgw53-mt-x32-1_66
+	
 INCLUDEPATH += \
     $$PWD/include
 DEPENDPATH += \
