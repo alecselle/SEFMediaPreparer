@@ -2,10 +2,10 @@
 #define FILE_HPP
 #pragma once
 
-#include <QTime>
+#include <QtCore/QTime>
 #include <boost/filesystem.hpp>
 #include <nlohmann/json.hpp>
-#include <string>
+#include <string.h>
 
 class File {
   private:

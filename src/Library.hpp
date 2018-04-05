@@ -8,7 +8,7 @@
 #include <boost/container/vector.hpp>
 #include <boost/filesystem.hpp>
 
-#include <string>
+#include <string.h>
 
 class Library {
   private:

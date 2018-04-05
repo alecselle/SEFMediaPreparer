@@ -4,7 +4,7 @@
 
 #include <boost/container/vector.hpp>
 #include <boost/filesystem.hpp>
-#include <string>
+#include <string.h>
 
 namespace bf = boost::filesystem;
 namespace bc = boost::container;

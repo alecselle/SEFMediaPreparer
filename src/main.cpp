@@ -1,4 +1,4 @@
-#include <QApplication>
+#include <QtWidgets/QApplication>
 #include <src/MediaPreparer.hpp>
 
 int main(int argc, char *argv[]) {

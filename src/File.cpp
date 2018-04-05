@@ -1,12 +1,12 @@
 #include "src/File.hpp"
 
-#include <QProcess>
-#include <QTime>
-#include <QWidget>
+#include <QtCore/QProcess>
+#include <QtCore/QTime>
+#include <QtWidgets/QWidget>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <nlohmann/json.hpp>
-#include <string>
+#include <string.h>
 
 namespace bf = boost::filesystem;
 namespace ba = boost::algorithm;

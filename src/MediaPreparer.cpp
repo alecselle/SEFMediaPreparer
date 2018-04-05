@@ -5,21 +5,21 @@
 #include <src/Library.hpp>
 #include <src/Settings.hpp>
 
-#include <QCloseEvent>
-#include <QFileDialog>
-#include <QFuture>
-#include <QMenu>
-#include <QMessageBox>
-#include <QProcess>
-#include <QString>
-#include <QSystemTrayIcon>
-#include <QTime>
+#include <QtGUI/QCloseEvent>
+#include <QtWidgets/QFileDialog>
+#include <QtCore/QFuture>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QMessageBox>
+#include <QtCore/QProcess>
+#include <QtCore/QString>
+#include <QtWidgets/QSystemTrayIcon>
+#include <QtCore/QTime>
 #include <QtConcurrent/QtConcurrent>
 #include <boost/algorithm/string.hpp>
 #include <boost/container/vector.hpp>
 #include <boost/filesystem.hpp>
 #include <nlohmann/json.hpp>
-#include <string>
+#include <string.h>
 #include <QtWebChannel/QtWebChannel>
 
 namespace bf = boost::filesystem;

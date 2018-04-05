@@ -8,15 +8,16 @@
 
 #include <boost/filesystem.hpp>
 
-#include <QAction>
-#include <QFuture>
-#include <QMenu>
-#include <QObject>
-#include <QProcess>
-#include <QSystemTrayIcon>
-#include <QTime>
-#include <QWidget>
+#include <QtWidgets/QAction>
+#include <QtCore/QFuture>
+#include <QtWidgets/QMenu>
+#include <QtCore/QObject>
+#include <QtCore/QProcess>
+#include <QtWidgets/QSystemTrayIcon>
+#include <QtCore/QTime>
+#include <QtWidgets/QWidget>
 #include <QtConcurrent/QtConcurrent>
+#include <string.h>
 
 namespace Ui {
 class MediaPreparer;
