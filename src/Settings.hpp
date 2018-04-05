@@ -6,7 +6,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 #include <nlohmann/json.hpp>
-#include <string.h>
+#include <string>
 
 class Settings {
 private:

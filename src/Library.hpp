@@ -8,7 +8,7 @@
 #include <boost/container/vector.hpp>
 #include <boost/filesystem.hpp>
 
-#include <string.h>
+#include <string>
 
 class Library {
 private:
@@ -20,7 +20,7 @@ private:
 	boost::container::vector<File> _Library = { };
 	boost::container::vector<File> _LibraryEncode = { };
 	boost::container::vector<std::string> _extensions = { ".wmv", ".avi", ".divx", ".mkv", ".mka", ".mks", ".webm", ".mp4", ".mpeg", ".mpg", ".mov", ".qt", ".flv" };
-	int _duration = -1;
+	int _duration = NULL;
 
 	Settings *_settings = new Settings();
 

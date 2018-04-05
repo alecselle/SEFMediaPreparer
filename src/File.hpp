@@ -5,7 +5,7 @@
 #include <QtCore/QTime>
 #include <boost/filesystem.hpp>
 #include <nlohmann/json.hpp>
-#include <string.h>
+#include <string>
 
 class File {
 private:
@@ -16,9 +16,9 @@ private:
 
 	std::string _vCodec;
 	std::string _aCodec;
-	int _duration = -1;
+	int _duration = NULL;
 
-	int _subtitles = -1;
+	int _subtitles = NULL;
 	bool _loaded = false;
 
 public:

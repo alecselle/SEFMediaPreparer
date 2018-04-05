@@ -17,7 +17,7 @@
 #include <QtCore/QTime>
 #include <QtWidgets/QWidget>
 #include <QtConcurrent/QtConcurrent>
-#include <string.h>
+#include <string>
 
 namespace Ui {
 	class MediaPreparer;

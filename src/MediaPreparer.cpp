@@ -20,7 +20,7 @@
 #include <boost/container/vector.hpp>
 #include <boost/filesystem.hpp>
 #include <nlohmann/json.hpp>
-#include <string.h>
+#include <string>
 
 namespace bf = boost::filesystem;
 namespace bc = boost::container;

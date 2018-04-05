@@ -6,7 +6,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <nlohmann/json.hpp>
-#include <string.h>
+#include <string>
 
 namespace bf = boost::filesystem;
 namespace ba = boost::algorithm;
