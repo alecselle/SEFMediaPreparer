@@ -43,4 +43,4 @@ INCLUDEPATH += \
 DEPENDPATH += \
     $$PWD/include
     
-CXXFLAGS += -Wno-conversion-null -Wno-sign-compare -Wno-return-type
+QMAKE_CXXFLAGS += -Wno-conversion-null -Wno-sign-compare -Wno-return-type -Wno-pointer-arith

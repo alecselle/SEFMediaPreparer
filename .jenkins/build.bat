@@ -82,7 +82,7 @@ set DEBUG=0
 	call :BUILD_DIR
 	echo.[Build] "!MINGW!"
 	if !DEBUG! EQU 1 call "!MINGW!" -w -s -j 8> "%~dp0/mingw.log" 2>&1
-	if !DEBUG! NEQ 1 call "!MINGW!" -w -s -j 2 -B> "%~dp0/mingw.log" 2>&1
+	if !DEBUG! NEQ 1 call "!MINGW!" -w -s -j 4 -B> "%~dp0/mingw.log" 2>&1
 	if %errorlevel% NEQ 0 call :ERROR_BUILD_FAILED "MINGW" "MinGW returned an error" "Check output for details" 
 	exit /b !ERROR_LEVEL!
 	goto EOF
