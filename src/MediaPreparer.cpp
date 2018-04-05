@@ -6,16 +6,16 @@
 #include <src/Settings.hpp>
 
 #include <QtGUI/QCloseEvent>
-#include <QtWidgets/QFileDialog>
+#include <QtConcurrent/QtConcurrent>
 #include <QtCore/QFuture>
-#include <QtWidgets/QMenu>
-#include <QtWidgets/QMessageBox>
 #include <QtCore/QProcess>
 #include <QtCore/QString>
-#include <QtWidgets/QSystemTrayIcon>
 #include <QtCore/QTime>
-#include <QtConcurrent/QtConcurrent>
 #include <QtWebChannel/QtWebChannel>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QSystemTrayIcon>
 #include <boost/algorithm/string.hpp>
 #include <boost/container/vector.hpp>
 #include <boost/filesystem.hpp>
@@ -28,8 +28,8 @@ namespace ba = boost::algorithm;
 using namespace nlohmann;
 using namespace std;
 
-MediaPreparer::MediaPreparer(QWidget *parent) :
-		QWidget(parent), ui(new Ui::MediaPreparer) {
+namespace SuperEpicFuntime {
+MediaPreparer::MediaPreparer(QWidget *parent) : QWidget(parent), ui(new Ui::MediaPreparer) {
 	ui->setupUi(this);
 	Init();
 }
@@ -43,7 +43,8 @@ void MediaPreparer::closeEvent(QCloseEvent *event) {
 }
 
 MediaPreparer::~MediaPreparer() {
-	if (diffPreset()) savePreset("Auto Saved");
+	if (diffPreset())
+		savePreset("Auto Saved");
 	saveConfig();
 	delete ui;
 }
@@ -74,8 +75,9 @@ void MediaPreparer::scanLibrary(boost::filesystem::path dir) {
 				} else {
 					process.setProgram(QString("ffprobe"));
 				}
-				process.setArguments(QStringList { QString("-v"), QString("quiet"), QString("-show_entries"), QString("format=duration:stream=codec_type:stream=codec_name"), QString("-of"),
-						QString("json"), QString(file.pathStr().c_str()) });
+				process.setArguments(QStringList{QString("-v"), QString("quiet"), QString("-show_entries"),
+												 QString("format=duration:stream=codec_type:stream=codec_name"),
+												 QString("-of"), QString("json"), QString(file.pathStr().c_str())});
 
 				emit progress_updated_scan(QString((file.nameStr() + file.extensionStr()).c_str()));
 				log("Reading File: " + file.pathStr());
@@ -83,16 +85,17 @@ void MediaPreparer::scanLibrary(boost::filesystem::path dir) {
 				process.start();
 				process.waitForFinished();
 				QByteArray out = process.readAllStandardOutput();
-				file.loadFileInfo(json::parse(out.begin(), out.end())); // @suppress("Function cannot be resolved") @suppress("Invalid arguments")
+				file.loadFileInfo(json::parse(out.begin(), out.end()));
 
 				emit item_added_scan(i);
-				emit progress_updated_scan((int) (((double) i / (double) library->size()) * 1000.0));
+				emit progress_updated_scan((int)(((double)i / (double)library->size()) * 1000.0));
 			}
 			setEncodeOptions();
 			library->duration();
 			library->scanEncode();
 			string temp = "Encode [" + to_string(library->sizeEncode()) + "]";
-			if (library->sizeEncode() != NULL) ui->button_encode->setText(QString(temp.c_str()));
+			if (library->sizeEncode() != NULL)
+				ui->button_encode->setText(QString(temp.c_str()));
 		}
 	}
 
@@ -116,7 +119,8 @@ void MediaPreparer::encodeLibrary() {
 		File &file = library->getFileEncode(i);
 		encodeIndex = i;
 
-		emit progress_updated_scan(QString(file.nameStr().c_str()), ((double) i / (double) library->sizeEncode()) * 1000.0);
+		emit progress_updated_scan(QString(file.nameStr().c_str()),
+								   ((double)i / (double)library->sizeEncode()) * 1000.0);
 		emit progress_updated_encode(QString("Encoding File"), 0);
 		emit item_changed_encode(i);
 
@@ -176,7 +180,8 @@ void MediaPreparer::encodeLibrary() {
 		params.push_back(QString("comment=Processed by SuperEpicFuntime Media Preparer (Reborn)"));
 		params.push_back(QString("-strict"));
 		params.push_back(QString("-2"));
-		params.push_back(QString((settings->tempDir.string() + "\\" + file.nameStr() + "." + settings->container).c_str()));
+		params.push_back(
+			QString((settings->tempDir.string() + "\\" + file.nameStr() + "." + settings->container).c_str()));
 
 		QProcess process;
 		if (bf::exists("./tools/ffmpeg.exe")) {
@@ -192,13 +197,14 @@ void MediaPreparer::encodeLibrary() {
 		process.waitForFinished(-1);
 		if (!cancelEncode) {
 			if (bf::exists(settings->tempDir.string() + "\\" + file.nameStr() + "." + settings->container)) {
-				bf::copy_file(settings->tempDir.string() + "\\" + file.nameStr() + "." + settings->container, settings->outputDir.string() + "\\" + file.nameStr() + "." + settings->container);
+				bf::copy_file(settings->tempDir.string() + "\\" + file.nameStr() + "." + settings->container,
+							  settings->outputDir.string() + "\\" + file.nameStr() + "." + settings->container);
 				if (bf::exists(settings->outputDir.string() + "\\" + file.nameStr() + "." + settings->container)) {
 					bf::remove(settings->tempDir.string() + "\\" + file.nameStr() + "." + settings->container);
 				}
 			}
 		}
-		emit progress_updated_scan((int) (((double) i / (double) library->sizeEncode()) * 1000.0));
+		emit progress_updated_scan((int)(((double)i / (double)library->sizeEncode()) * 1000.0));
 	}
 	if (!cancelEncode) {
 		emit progress_updated_scan("Complete...", 1000);
@@ -261,10 +267,14 @@ void MediaPreparer::loadConfig() {
 }
 
 bool MediaPreparer::checkConfig() {
-	if (!bf::exists(ui->setting_directory->text().toStdString().c_str())) return false;
-	if (!(library->size() > 0)) return false;
-	if (!bf::create_directories(ui->setting_dirOutput->text().toStdString().c_str()) && !bf::exists(ui->setting_dirOutput->text().toStdString().c_str())) {
-		if (bf::is_empty(ui->setting_dirOutput->text().toStdString().c_str())) bf::remove(ui->setting_dirOutput->text().toStdString().c_str());
+	if (!bf::exists(ui->setting_directory->text().toStdString().c_str()))
+		return false;
+	if (!(library->size() > 0))
+		return false;
+	if (!bf::create_directories(ui->setting_dirOutput->text().toStdString().c_str()) &&
+		!bf::exists(ui->setting_dirOutput->text().toStdString().c_str())) {
+		if (bf::is_empty(ui->setting_dirOutput->text().toStdString().c_str()))
+			bf::remove(ui->setting_dirOutput->text().toStdString().c_str());
 		return false;
 	}
 	return true;
@@ -296,14 +306,22 @@ void MediaPreparer::loadPreset(QString preset) {
 }
 
 bool MediaPreparer::diffPreset() {
-	if (ui->setting_vCodec->currentText().toStdString().compare(settings->vCodec) != 0) return true;
-	if (ui->setting_aCodec->currentText().toStdString().compare(settings->aCodec) != 0) return true;
-	if (ui->setting_vQuality->value() != stoi(settings->vQuality)) return true;
-	if (ui->setting_aQuality->value() != stoi(settings->aQuality)) return true;
-	if (ui->setting_container->currentText().toStdString().compare(settings->container) != 0) return true;
-	if (ui->setting_subtitles->currentText().toStdString().compare(settings->subtitles) != 0) return true;
-	if (ui->setting_threads->text().toStdString().compare(settings->threads) != 0) return true;
-	if (ui->setting_extraParams->text().toStdString().compare(settings->extraParams) != 0) return true;
+	if (ui->setting_vCodec->currentText().toStdString().compare(settings->vCodec) != 0)
+		return true;
+	if (ui->setting_aCodec->currentText().toStdString().compare(settings->aCodec) != 0)
+		return true;
+	if (ui->setting_vQuality->value() != stoi(settings->vQuality))
+		return true;
+	if (ui->setting_aQuality->value() != stoi(settings->aQuality))
+		return true;
+	if (ui->setting_container->currentText().toStdString().compare(settings->container) != 0)
+		return true;
+	if (ui->setting_subtitles->currentText().toStdString().compare(settings->subtitles) != 0)
+		return true;
+	if (ui->setting_threads->text().toStdString().compare(settings->threads) != 0)
+		return true;
+	if (ui->setting_extraParams->text().toStdString().compare(settings->extraParams) != 0)
+		return true;
 	return false;
 }
 
@@ -349,7 +367,8 @@ void MediaPreparer::lockUILoad(bool b) {
 	} else {
 		toggle = true;
 	}
-	if (b || checkConfig()) ui->button_encode->setEnabled(toggle);
+	if (b || checkConfig())
+		ui->button_encode->setEnabled(toggle);
 	ui->button_browse_directory->setEnabled(toggle);
 	ui->button_scan_directory->setEnabled(toggle);
 	ui->setting_directory->setEnabled(toggle);
@@ -401,18 +420,18 @@ void MediaPreparer::lockUIEncode(bool b) {
 void MediaPreparer::updateGUI() {
 	if (workerEncode.isRunning()) {
 		if (workerTimeStamp.isValid()) {
-			ui->value_encode_runtime->setText(QString("%1:%2:%3").arg(workerTimeStamp.elapsed() / 3600000, 2, 10, QChar('0')).arg((workerTimeStamp.elapsed() % 3600000) / 60000, 2, 10, QChar('0')).arg(((workerTimeStamp.elapsed()
-					% 3600000) % 60000) / 1000,
-					2,
-					10,
-					QChar('0')));
+			ui->value_encode_runtime->setText(
+				QString("%1:%2:%3")
+					.arg(workerTimeStamp.elapsed() / 3600000, 2, 10, QChar('0'))
+					.arg((workerTimeStamp.elapsed() % 3600000) / 60000, 2, 10, QChar('0'))
+					.arg(((workerTimeStamp.elapsed() % 3600000) % 60000) / 1000, 2, 10, QChar('0')));
 		}
 		if (fileTimeStamp.isValid()) {
-			ui->progress_encode->setFormat(QString("%1:%2:%3").arg(fileTimeStamp.elapsed() / 3600000, 2, 10, QChar('0')).arg((fileTimeStamp.elapsed() % 3600000) / 60000, 2, 10, QChar('0')).arg(((fileTimeStamp.elapsed()
-					% 3600000) % 60000) / 1000,
-					2,
-					10,
-					QChar('0')));
+			ui->progress_encode->setFormat(
+				QString("%1:%2:%3")
+					.arg(fileTimeStamp.elapsed() / 3600000, 2, 10, QChar('0'))
+					.arg((fileTimeStamp.elapsed() % 3600000) / 60000, 2, 10, QChar('0'))
+					.arg(((fileTimeStamp.elapsed() % 3600000) % 60000) / 1000, 2, 10, QChar('0')));
 			ui->progress_encode->setValue(fileTimeStamp.elapsed());
 			ui->progress_encode->repaint();
 		}
@@ -490,7 +509,8 @@ void MediaPreparer::Init() {
 	encodeTab(false);
 	ui->container_settings_tabs->setCurrentWidget(ui->container_settings_basic);
 
-	if (!settings->preserveLog) bf::remove(settings->baseDir.string() + "\\log.txt");
+	if (!settings->preserveLog)
+		bf::remove(settings->baseDir.string() + "\\log.txt");
 
 	showTrayMessage("Loaded");
 }
@@ -515,7 +535,8 @@ void MediaPreparer::InitGUI() {
 		ui->setting_container->addItem(QString(settings->containerList[i].c_str()));
 	}
 	for (int i = 0; i < settings->presetPathList.size(); i++) {
-		ui->setting_preset->addItem(QString(settings->presetPathList[i].filename().replace_extension().string().c_str()));
+		ui->setting_preset->addItem(
+			QString(settings->presetPathList[i].filename().replace_extension().string().c_str()));
 	}
 
 	ui->setting_preset->setCurrentText(QString(settings->presetName.c_str()));
@@ -586,7 +607,8 @@ void MediaPreparer::createTrayIcon() {
 	trayIcon->setToolTip(tr("SEF Media Preparer"));
 	trayIcon->setIcon(QIcon(":seflogo.png"));
 	trayIcon->show();
-	connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(trayIconActivated(QSystemTrayIcon::ActivationReason)));
+	connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this,
+			SLOT(trayIconActivated(QSystemTrayIcon::ActivationReason)));
 }
 
 void MediaPreparer::showTrayMessage(QString msg) {
@@ -605,8 +627,7 @@ void MediaPreparer::trayIconActivated(QSystemTrayIcon::ActivationReason reason) 
 	case QSystemTrayIcon::MiddleClick:
 		showTrayMessage("swag");
 		break;
-	default:
-		;
+	default:;
 	}
 }
 
@@ -646,7 +667,8 @@ bool MediaPreparer::cancelDialog() {
 }
 
 bool MediaPreparer::cancel() {
-	if (!cancelDialog()) return false;
+	if (!cancelDialog())
+		return false;
 	if (workerScan.isRunning()) {
 		cancelScan = true;
 		QProcess kill;
@@ -660,8 +682,10 @@ bool MediaPreparer::cancel() {
 		kill.start(QString("taskkill /F /T /IM ffmpeg.exe"));
 		kill.waitForFinished();
 		workerEncode.waitForFinished();
-		if (bf::exists(settings->tempDir.string() + "\\" + library->getFileEncode(encodeIndex).nameStr() + "." + settings->container)) {
-			bf::remove(settings->tempDir.string() + "\\" + library->getFileEncode(encodeIndex).nameStr() + "." + settings->container);
+		if (bf::exists(settings->tempDir.string() + "\\" + library->getFileEncode(encodeIndex).nameStr() + "." +
+					   settings->container)) {
+			bf::remove(settings->tempDir.string() + "\\" + library->getFileEncode(encodeIndex).nameStr() + "." +
+					   settings->container);
 		}
 	}
 	return cancelEncode;
@@ -669,10 +693,7 @@ bool MediaPreparer::cancel() {
 
 void MediaPreparer::blockAllSignals(bool b) {
 	QList<QWidget *> widgets = ui->container_main->findChildren<QWidget *>();
-	foreach (QWidget *x, widgets)
-	{
-		x->blockSignals(b);
-	}
+	foreach (QWidget *x, widgets) { x->blockSignals(b); }
 }
 
 void MediaPreparer::workerScanStart() {
@@ -683,7 +704,8 @@ void MediaPreparer::workerScanStart() {
 void MediaPreparer::workerScanAddItem(int pos) {
 	blockAllSignals(true);
 	File item = library->getFile(pos);
-	ui->label_fileCount->setText(QString(("<html><head/><body><p>" + std::to_string(pos + 1) + " file(s) found</p></body></html>").c_str()));
+	ui->label_fileCount->setText(
+		QString(("<html><head/><body><p>" + std::to_string(pos + 1) + " file(s) found</p></body></html>").c_str()));
 
 	ui->list_Library->setRowCount(pos + 1);
 	// ui->list_Library->setItem(pos, 0, new QTableWidgetItem());
@@ -725,11 +747,11 @@ void MediaPreparer::workerEncodeStart() {
 void MediaPreparer::workerEncodeChangeItem(int pos) {
 	blockAllSignals(true);
 	if (pos > 0) {
-		ui->value_encode_lastFile->setText(QString("%1:%2:%3").arg(fileTimeStamp.elapsed() / 3600000, 2, 10, QChar('0')).arg((fileTimeStamp.elapsed() % 3600000) / 60000, 2, 10, QChar('0')).arg(((fileTimeStamp.elapsed()
-				% 3600000) % 60000) / 1000,
-				2,
-				10,
-				QChar('0')));
+		ui->value_encode_lastFile->setText(
+			QString("%1:%2:%3")
+				.arg(fileTimeStamp.elapsed() / 3600000, 2, 10, QChar('0'))
+				.arg((fileTimeStamp.elapsed() % 3600000) / 60000, 2, 10, QChar('0'))
+				.arg(((fileTimeStamp.elapsed() % 3600000) % 60000) / 1000, 2, 10, QChar('0')));
 	}
 	File f = library->getFileEncode(pos);
 	ui->value_encode_count->setText(QString((to_string(pos + 1) + " / " + to_string(library->sizeEncode())).c_str()));
@@ -739,11 +761,10 @@ void MediaPreparer::workerEncodeChangeItem(int pos) {
 	ui->value_encode_file_container->setText(QString(f.extensionStr().c_str()));
 	ui->value_encode_file_subtitles->setText(QString(f.subtitlesStr().c_str()));
 	ui->list_encode_Library->removeRow(0);
-	ui->value_encode_file_duration->setText(QString("%1:%2:%3").arg(f.duration() / 3600000, 2, 10, QChar('0')).arg((f.duration() % 3600000) / 60000, 2, 10, QChar('0')).arg(((f.duration() % 3600000)
-			% 60000) / 1000,
-			2,
-			10,
-			QChar('0')));
+	ui->value_encode_file_duration->setText(QString("%1:%2:%3")
+												.arg(f.duration() / 3600000, 2, 10, QChar('0'))
+												.arg((f.duration() % 3600000) / 60000, 2, 10, QChar('0'))
+												.arg(((f.duration() % 3600000) % 60000) / 1000, 2, 10, QChar('0')));
 	ui->progress_encode->setMaximum(f.duration());
 	fileTimeStamp.restart();
 	blockAllSignals(false);
@@ -779,3 +800,5 @@ void MediaPreparer::workerEncodeUpdateProgress(QString msg) {
 void MediaPreparer::workerEncodeUpdateProgress(int percent) {
 	ui->progress_worker->setValue(percent);
 }
+
+} // namespace SuperEpicFuntime

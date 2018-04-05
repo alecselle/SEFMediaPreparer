@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MediaPreparer</class>
- <widget class="QWidget" name="MediaPreparer">
+ <class>SuperEpicFuntime::MediaPreparer</class>
+ <widget class="QWidget" name="SuperEpicFuntime::MediaPreparer">
   <property name="enabled">
    <bool>true</bool>
   </property>
@@ -41,7 +41,7 @@
 	 <height>480</height>
 	</rect>
    </property>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="layoutWidget1">
 	<property name="geometry">
 	 <rect>
 	  <x>10</x>
@@ -126,7 +126,7 @@
 	 </item>
 	</layout>
    </widget>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="layoutWidget2">
 	<property name="geometry">
 	 <rect>
 	  <x>10</x>
@@ -962,7 +962,7 @@
 	 </item>
 	</layout>
    </widget>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="layoutWidget3">
 	<property name="geometry">
 	 <rect>
 	  <x>10</x>
