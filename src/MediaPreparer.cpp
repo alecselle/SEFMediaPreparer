@@ -85,7 +85,7 @@ void MediaPreparer::scanLibrary(boost::filesystem::path dir) {
 				process.start();
 				process.waitForFinished();
 				QByteArray out = process.readAllStandardOutput();
-				file.loadFileInfo(json::parse(out.begin(), out.end()));
+				file.loadFileInfo(json::parse(out.begin(), out.end())); // @suppress("Invalid arguments") // @suppress("Function cannot be resolved")
 
 				emit item_added_scan(i);
 				emit progress_updated_scan((int)(((double)i / (double)library->size()) * 1000.0));

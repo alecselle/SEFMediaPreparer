@@ -116,27 +116,27 @@ namespace SuperEpicFuntime {
 			outputDir = DEFAULT_OUTPUT_DIR;
 		}
 		if (j.find("preserveLog") != j.end()) { // @suppress("Method cannot be resolved")
-			preserveLog = j.find("preserveLog").value();
+			preserveLog = j.find("preserveLog").value(); // @suppress("Method cannot be resolved")
 		} else {
 			preserveLog = DEFAULT_PRESERVE_LOG;
 		}
-		if (j.find("vCodecs") != j.end()) {
-			for (int i = 0; i < j.find("vCodecs").value().size(); i++) {
-				vCodecList.push_back(j.find("vCodecs").value()[i]);
+		if (j.find("vCodecs") != j.end()) { // @suppress("Method cannot be resolved")
+			for (int i = 0; i < j.find("vCodecs").value().size(); i++) { // @suppress("Method cannot be resolved")
+				vCodecList.push_back(j.find("vCodecs").value()[i]); // @suppress("Invalid arguments") // @suppress("Method cannot be resolved")
 			}
 		} else {
 			vCodecList = DEFAULT_VCODECS;
 		}
-		if (j.find("aCodecs") != j.end()) {
-			for (int i = 0; i < j.find("aCodecs").value().size(); i++) {
-				aCodecList.push_back(j.find("aCodecs").value()[i]);
+		if (j.find("aCodecs") != j.end()) { // @suppress("Method cannot be resolved")
+			for (int i = 0; i < j.find("aCodecs").value().size(); i++) { // @suppress("Method cannot be resolved")
+				aCodecList.push_back(j.find("aCodecs").value()[i]); // @suppress("Invalid arguments") // @suppress("Method cannot be resolved")
 			}
 		} else {
 			aCodecList = DEFAULT_ACODECS;
 		}
-		if (j.find("containers") != j.end()) {
-			for (int i = 0; i < j.find("containers").value().size(); i++) {
-				containerList.push_back(j.find("containers").value()[i]);
+		if (j.find("containers") != j.end()) { // @suppress("Method cannot be resolved")
+			for (int i = 0; i < j.find("containers").value().size(); i++) { // @suppress("Method cannot be resolved")
+				containerList.push_back(j.find("containers").value()[i]); // @suppress("Invalid arguments") // @suppress("Method cannot be resolved")
 			}
 		} else {
 			containerList = DEFAULT_CONTAINERS;
@@ -154,60 +154,60 @@ namespace SuperEpicFuntime {
 
 	void Settings::loadPresetFile(bf::path path) {
 		if (bf::exists(path)) {
-			json j = json::parse(ifstream(path.string().c_str()));
+			json j = json::parse(ifstream(path.string().c_str())); // @suppress("Function cannot be resolved")
 			presetPath = path;
 			presetName = path.filename().replace_extension().string();
-			loadPresetJson(j);
+			loadPresetJson(j); // @suppress("Invalid arguments")
 		} else {
 			if (!bf::exists(DEFAULT_PRESET)) {
 				createDefaultPreset();
 			}
-			json j = json::parse(ifstream(DEFAULT_PRESET.string().c_str()));
+			json j = json::parse(ifstream(DEFAULT_PRESET.string().c_str())); // @suppress("Function cannot be resolved")
 			presetPath = path;
 			presetName = path.filename().replace_extension().string();
-			loadPresetJson(j);
+			loadPresetJson(j); // @suppress("Invalid arguments")
 			savePresetAs(presetName);
 		}
 	}
 
-	void Settings::loadPresetJson(nlohmann::json j) {
-		if (j.find("vCodec") != j.end()) {
-			vCodec = j.find("vCodec").value();
+	void Settings::loadPresetJson(nlohmann::json j) { // @suppress("Member declaration not found")
+		if (j.find("vCodec") != j.end()) { // @suppress("Method cannot be resolved")
+			vCodec = j.find("vCodec").value(); // @suppress("Method cannot be resolved")
 		} else {
 			vCodec = DEFAULT_VCODEC;
 		}
-		if (j.find("vQuality") != j.end()) {
-			vQuality = j.find("vQuality").value();
+		if (j.find("vQuality") != j.end()) { // @suppress("Method cannot be resolved")
+			vQuality = j.find("vQuality").value(); // @suppress("Method cannot be resolved")
 		} else {
 			vQuality = DEFAULT_VQUALITY;
 		}
-		if (j.find("aCodec") != j.end()) {
-			aCodec = j.find("aCodec").value();
+		if (j.find("aCodec") != j.end()) { // @suppress("Method cannot be resolved")
+			aCodec = j.find("aCodec").value(); // @suppress("Method cannot be resolved")
 		} else {
 			aCodec = DEFAULT_ACODEC;
 		}
-		if (j.find("aQuality") != j.end()) {
-			aQuality = j.find("aQuality").value();
+		if (j.find("aQuality") != j.end()) { // @suppress("Method cannot be resolved")
+			aQuality = j.find("aQuality").value(); // @suppress("Method cannot be resolved")
 		} else {
 			aQuality = DEFAULT_AQUALITY;
 		}
-		if (j.find("container") != j.end()) {
-			container = j.find("container").value();
+		if (j.find("container") != j.end()) { // @suppress("Method cannot be resolved")
+			container = j.find("container").value(); // @suppress("Method cannot be resolved")
 		} else {
 			container = DEFAULT_CONTAINER;
 		}
-		if (j.find("subtitles") != j.end()) {
-			subtitles = j.find("subtitles").value();
+		if (j.find("subtitles") != j.end()) { // @suppress("Method cannot be resolved")
+			subtitles = j.find("subtitles").value(); // @suppress("Method cannot be resolved")
 		} else {
 			subtitles = DEFAULT_SUBTITLES;
 		}
-		if (j.find("threads") != j.end()) {
-			threads = j.find("threads").value();
+		if (j.find("threads") != j.end()) { // @suppress("Method cannot be resolved")
+			threads = j.find("threads").value(); // @suppress("Method cannot be resolved")
 		} else {
 			threads = DEFAULT_THREADS;
 		}
-		if (j.find("extraParams") != j.end()) {
-			extraParams = j.find("extraParams").value();
+		if (j.find("extraParams") != j.end()) { // @suppress("Method cannot be resolved")
+			extraParams = j.find("extraParams").value(); // @suppress("Method cannot be resolved")
 		} else {
 			extraParams = DEFAULT_EXTRA_PARAMS;
 		}
