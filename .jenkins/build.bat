@@ -6,6 +6,8 @@ set DEBUG=0
 	set PROJECT_DEFAULT=SEFMediaPreparer.pro
 	if "%~1" NEQ "" set PROJECT=%~1
 	if "%~1" EQU "" set PROJECT=!PROJECT_DEFAULT!
+	if "%~2" NEQ "debug" set DEBUG=0
+	if "%~2" EQU "debug" set DEBUG=1
 ::=============================================================================
 :: ~~ FUNCTION CALLS
 :RUN
@@ -85,7 +87,8 @@ set DEBUG=0
 :MINGW
 	call :BUILD_DIR
 	echo.[Build] "!MINGW!"
-	call "!MINGW!" -w -s -j 2 -B> "%~dp0/mingw.log" 2>&1
+	if !DEBUG! EQU 1 call "!MINGW!" -w -s -j 8> "%~dp0/mingw.log" 2>&1
+	if !DEBUG! NEQ 1 call "!MINGW!" -w -s -j 2 -B> "%~dp0/mingw.log" 2>&1
 	if %errorlevel% NEQ 0 call :ERROR_BUILD_FAILED "MINGW" "MinGW returned an error" "Check output for details" 
 	exit /b !ERROR_LEVEL!
 	goto EOF
