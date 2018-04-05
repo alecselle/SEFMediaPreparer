@@ -1,4 +1,4 @@
-@echo on
+@echo off
 setlocal EnableDelayedExpansion
 set ERROR_LEVEL=0
 set DEBUG=0
@@ -48,25 +48,22 @@ set DEBUG=0
 	if "!QMAKE!"=="" (
 		call where /q qmake.exe >nul 2>&1
 		if %errorlevel% NEQ 0 call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "qmake.exe"
-		for /f "tokens=*" %%i in ('where qmake.exe') do set QMAKE=%%i
+		for /f "tokens=*" %%i in ('where qmake.exe 2^> nul') do set QMAKE=%%i
+		echo.!QMAKE!
 	)
 	if not exist "!QMAKE!" call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "qmake.exe"
 	if "!MINGW!"=="" (
 		call where /q mingw32-make.exe >nul 2>&1
 		if %errorlevel% NEQ 0 call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "mingw32-make.exe"
-		for /f "tokens=*" %%i in ('where mingw32-make.exe') do set MINGW=%%i
+		for /f "tokens=*" %%i in ('where mingw32-make.exe 2^> nul') do set MINGW=%%i
+		echo.!MINGW!
 	)
 	if not exist "!MINGW!" call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "mingw32-make.exe"
-	if "!SIGNTOOL!"=="" (
-		call where /q signtool.exe >nul 2>&1
-		if %errorlevel% NEQ 0 call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "signtool.exe"
-		for /f "tokens=*" %%i in ('where signtool.exe') do set SIGNTOOL=%%i
-	)
-	if not exist "!SIGNTOOL!" call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "signtool.exe"
 	if "!WINDEPLOY!"=="" (
 		call where /q windeployqt.exe >nul 2>&1
 		if %errorlevel% NEQ 0 call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "windeployqt.exe"
-		for /f "tokens=*" %%i in ('where windeployqt.exe') do set WINDEPLOY=%%i
+		for /f "tokens=*" %%i in ('where windeployqt.exe 2^> nul') do set WINDEPLOY=%%i
+		echo.!WINDEPLOY!
 	)
 	if not exist "!WINDEPLOY!" call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "windeployqt.exe"
 	exit /b !ERROR_LEVEL!
