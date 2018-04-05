@@ -42,3 +42,5 @@ INCLUDEPATH += \
     $$PWD/include
 DEPENDPATH += \
     $$PWD/include
+    
+CXXFLAGS += -Wno-conversion-null -Wno-sign-compare -Wno-return-type

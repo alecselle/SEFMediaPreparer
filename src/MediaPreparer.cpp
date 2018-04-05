@@ -93,7 +93,7 @@ void MediaPreparer::scanLibrary(boost::filesystem::path dir) {
 			setEncodeOptions();
 			library->duration();
 			library->scanEncode();
-			string temp = "Encode [" + to_string(library->sizeEncode()) + "]";
+			string temp = "Encode [" + std::to_string(library->sizeEncode()) + "]"; // @suppress("Function cannot be resolved")
 			if (library->sizeEncode() != NULL)
 				ui->button_encode->setText(QString(temp.c_str()));
 		}
@@ -291,8 +291,8 @@ void MediaPreparer::loadPreset(string preset) {
 	ui->setting_preset->setToolTip(QString(settings->presetPath.string().c_str()));
 	ui->setting_vCodec->setCurrentText(QString(settings->vCodec.c_str()));
 	ui->setting_aCodec->setCurrentText(QString(settings->aCodec.c_str()));
-	ui->setting_vQuality->setValue(stoi(settings->vQuality.c_str()));
-	ui->setting_aQuality->setValue(stoi(settings->aQuality.c_str()));
+	ui->setting_vQuality->setValue(stoi(settings->vQuality.c_str())); // @suppress("Function cannot be resolved") // @suppress("Invalid arguments")
+	ui->setting_aQuality->setValue(stoi(settings->aQuality.c_str())); // @suppress("Function cannot be resolved") // @suppress("Invalid arguments")
 	ui->setting_container->setCurrentText(QString(settings->container.c_str()));
 	ui->setting_subtitles->setCurrentText(QString(settings->subtitles.c_str()));
 	ui->setting_threads->setText(QString(settings->threads.c_str()));
@@ -310,9 +310,9 @@ bool MediaPreparer::diffPreset() {
 		return true;
 	if (ui->setting_aCodec->currentText().toStdString().compare(settings->aCodec) != 0)
 		return true;
-	if (ui->setting_vQuality->value() != stoi(settings->vQuality))
+	if (ui->setting_vQuality->value() != stoi(settings->vQuality)) // @suppress("Function cannot be resolved")
 		return true;
-	if (ui->setting_aQuality->value() != stoi(settings->aQuality))
+	if (ui->setting_aQuality->value() != stoi(settings->aQuality)) // @suppress("Function cannot be resolved")
 		return true;
 	if (ui->setting_container->currentText().toStdString().compare(settings->container) != 0)
 		return true;
@@ -339,15 +339,15 @@ void MediaPreparer::savePreset() {
 void MediaPreparer::setEncodeOptions() {
 	settings->vCodec = ba::trim_copy(ui->setting_vCodec->currentText().toStdString());
 	settings->aCodec = ba::trim_copy(ui->setting_aCodec->currentText().toStdString());
-	settings->vQuality = ba::trim_copy(to_string(ui->setting_vQuality->value()));
-	settings->aQuality = ba::trim_copy(to_string(ui->setting_aQuality->value()));
+	settings->vQuality = ba::trim_copy(to_string(ui->setting_vQuality->value())); // @suppress("Invalid arguments") // @suppress("Function cannot be resolved")
+	settings->aQuality = ba::trim_copy(to_string(ui->setting_aQuality->value())); // @suppress("Invalid arguments") // @suppress("Function cannot be resolved")
 	settings->container = ba::trim_copy(ui->setting_container->currentText().toStdString());
 	settings->subtitles = ba::trim_copy(ui->setting_subtitles->currentText().toStdString());
 	settings->outputDir = ba::trim_copy(ui->setting_dirOutput->text().toStdString());
 	settings->threads = ba::trim_copy(ui->setting_threads->text().toStdString());
 	settings->extraParams = ba::trim_copy(ui->setting_extraParams->text().toStdString());
 
-	ui->button_encode->setText(QString(("Encode [" + to_string(library->sizeEncode()) + "]").c_str()));
+	ui->button_encode->setText(QString(("Encode [" + to_string(library->sizeEncode()) + "]").c_str())); // @suppress("Function cannot be resolved") // @suppress("Method cannot be resolved")
 }
 
 bf::path MediaPreparer::getPath(string path) {
@@ -378,7 +378,7 @@ void MediaPreparer::lockUILoad(bool b) {
 		ui->button_encode->setText(QString("Cancel"));
 		ui->button_encode->setEnabled(true);
 	} else {
-		ui->button_encode->setText(QString(("Encode [" + to_string(library->sizeEncode()) + "]").c_str()));
+		ui->button_encode->setText(QString(("Encode [" + to_string(library->sizeEncode()) + "]").c_str())); // @suppress("Function cannot be resolved") // @suppress("Method cannot be resolved")
 		ui->button_encode->setEnabled(true);
 	}
 }
@@ -410,7 +410,7 @@ void MediaPreparer::lockUIEncode(bool b) {
 		ui->button_encode->setText(QString("Cancel"));
 		ui->button_encode->setEnabled(true);
 	} else {
-		ui->button_encode->setText(QString(("Encode [" + to_string(library->sizeEncode()) + "]").c_str()));
+		ui->button_encode->setText(QString(("Encode [" + to_string(library->sizeEncode()) + "]").c_str())); // @suppress("Function cannot be resolved") // @suppress("Method cannot be resolved")
 		ui->button_encode->setEnabled(true);
 	}
 	encodeTab(true);
@@ -543,8 +543,8 @@ void MediaPreparer::InitGUI() {
 	ui->setting_preset->setToolTip(QString(settings->presetPath.string().c_str()));
 	ui->setting_vCodec->setCurrentText(QString(settings->vCodec.c_str()));
 	ui->setting_aCodec->setCurrentText(QString(settings->aCodec.c_str()));
-	ui->setting_vQuality->setValue(stoi(settings->vQuality.c_str()));
-	ui->setting_aQuality->setValue(stoi(settings->aQuality.c_str()));
+	ui->setting_vQuality->setValue(stoi(settings->vQuality.c_str())); // @suppress("Invalid arguments") // @suppress("Function cannot be resolved")
+	ui->setting_aQuality->setValue(stoi(settings->aQuality.c_str())); // @suppress("Invalid arguments") // @suppress("Function cannot be resolved")
 	ui->setting_container->setCurrentText(QString(settings->container.c_str()));
 	ui->setting_subtitles->setCurrentText(QString(settings->subtitles.c_str()));
 	ui->setting_threads->setText(QString(settings->threads.c_str()));
@@ -693,7 +693,7 @@ bool MediaPreparer::cancel() {
 
 void MediaPreparer::blockAllSignals(bool b) {
 	QList<QWidget *> widgets = ui->container_main->findChildren<QWidget *>();
-	foreach (QWidget *x, widgets) { x->blockSignals(b); }
+	foreach (QWidget *x, widgets) { x->blockSignals(b); } // @suppress("Invalid arguments") // @suppress("Field cannot be resolved")
 }
 
 void MediaPreparer::workerScanStart() {
@@ -705,7 +705,7 @@ void MediaPreparer::workerScanAddItem(int pos) {
 	blockAllSignals(true);
 	File item = library->getFile(pos);
 	ui->label_fileCount->setText(
-		QString(("<html><head/><body><p>" + std::to_string(pos + 1) + " file(s) found</p></body></html>").c_str()));
+		QString(("<html><head/><body><p>" + std::to_string(pos + 1) + " file(s) found</p></body></html>").c_str())); // @suppress("Function cannot be resolved") // @suppress("Method cannot be resolved")
 
 	ui->list_Library->setRowCount(pos + 1);
 	// ui->list_Library->setItem(pos, 0, new QTableWidgetItem());
@@ -754,7 +754,7 @@ void MediaPreparer::workerEncodeChangeItem(int pos) {
 				.arg(((fileTimeStamp.elapsed() % 3600000) % 60000) / 1000, 2, 10, QChar('0')));
 	}
 	File f = library->getFileEncode(pos);
-	ui->value_encode_count->setText(QString((to_string(pos + 1) + " / " + to_string(library->sizeEncode())).c_str()));
+	ui->value_encode_count->setText(QString((to_string(pos + 1) + " / " + to_string(library->sizeEncode())).c_str())); // @suppress("Function cannot be resolved") // @suppress("Method cannot be resolved")
 	ui->value_encode_file->setText(QString(f.nameStr().c_str()));
 	ui->value_encode_file_vCodec->setText(QString(f.vcodec().c_str()));
 	ui->value_encode_file_aCodec->setText(QString(f.acodec().c_str()));
