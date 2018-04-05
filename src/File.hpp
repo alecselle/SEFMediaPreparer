@@ -8,7 +8,7 @@
 #include <string.h>
 
 class File {
-  private:
+private:
 	boost::filesystem::path _path;
 	boost::filesystem::path _pathSub;
 	boost::filesystem::path _name;
@@ -16,12 +16,12 @@ class File {
 
 	std::string _vCodec;
 	std::string _aCodec;
-	int _duration = NULL;
+	int _duration = -1;
 
-	int _subtitles = NULL;
+	int _subtitles = -1;
 	bool _loaded = false;
 
-  public:
+public:
 	File();
 	File(boost::filesystem::path);
 	boost::filesystem::path path();

@@ -20,12 +20,12 @@
 #include <string.h>
 
 namespace Ui {
-class MediaPreparer;
+	class MediaPreparer;
 }
 
-class MediaPreparer : public QWidget {
-	Q_OBJECT
-  private:
+class MediaPreparer: public QWidget {
+Q_OBJECT
+private:
 	Ui::MediaPreparer *ui;
 	QSignalMapper *signalMapper = new QSignalMapper(this);
 	QSystemTrayIcon *trayIcon;
@@ -60,7 +60,7 @@ class MediaPreparer : public QWidget {
 	boost::filesystem::path getPath(std::string pathString);
 	boost::filesystem::path getPath();
 
-  public:
+public:
 	Settings *settings = new Settings();
 	Library *library = new Library();
 
@@ -68,7 +68,7 @@ class MediaPreparer : public QWidget {
 
 	~MediaPreparer();
 
-  private slots:
+private slots:
 	void runWorkerScan();
 	void workerScanStart();
 	void workerScanAddItem(int itemPosition);
@@ -126,7 +126,7 @@ class MediaPreparer : public QWidget {
 
 	void on_button_encode_clicked();
 
-  signals:
+signals:
 	void started_workerScan();
 	void finished_workerScan();
 

@@ -16,7 +16,7 @@ using namespace std;
 File::File() {
 }
 
-File::File(bf::path file) {
+File::File(boost::filesystem::path file) {
 	if (bf::exists(bf::canonical(file))) {
 
 		_path = bf::canonical(file);
@@ -41,13 +41,11 @@ string File::pathStr() {
 }
 
 bf::path File::pathSub() {
-	if (_loaded && _subtitles == 1)
-		return _pathSub;
+	if (_loaded && _subtitles == 1) return _pathSub;
 }
 
 string File::pathSubStr() {
-	if (_loaded && _subtitles == 1)
-		return _pathSub.string();
+	if (_loaded && _subtitles == 1) return _pathSub.string();
 }
 
 bf::path File::name() {
@@ -71,27 +69,21 @@ string File::extensionStr() {
 }
 
 string File::vcodec() {
-	if (_loaded)
-		return _vCodec;
+	if (_loaded) return _vCodec;
 	return "error";
 }
 
 string File::acodec() {
-	if (_loaded)
-		return _aCodec;
+	if (_loaded) return _aCodec;
 	return "error";
 }
 
 int File::duration() {
-	if (_loaded)
-		return _duration;
-	return NULL;
+	if (_loaded) return _duration;
 }
 
 int File::subtitles() {
-	if (_loaded)
-		return _subtitles;
-	return NULL;
+	if (_loaded) return _subtitles;
 }
 
 string File::subtitlesStr() {
@@ -113,9 +105,10 @@ string File::subtitlesStr() {
 	return "error";
 }
 
-bool File::loadFileInfo(json j) {
+bool File::loadFileInfo(nlohmann::json j) {
 	if (j.find("streams") != j.end()) {
-		foreach (auto stream, j.find("streams").value()) {
+		foreach (auto stream, j.find("streams").value())
+		{
 			string codec_type = stream.find("codec_type").value();
 			string codec_name = stream.find("codec_name").value();
 

@@ -9,7 +9,7 @@
 #include <string.h>
 
 class Settings {
-  private:
+private:
 	boost::filesystem::path APPDATA = getenv("APPDATA");
 	boost::filesystem::path USERPROFILE = getenv("USERPROFILE");
 
@@ -25,27 +25,26 @@ class Settings {
 	boost::filesystem::path DEFAULT_OUTPUT_DIR = DEFAULT_LIBRARY_DIR.string() + "\\Converted";
 	bool DEFAULT_PRESERVE_LOG = false;
 
-	boost::container::vector<boost::container::vector<std::string>> DEFAULT_VCODECS = {{"libx265", "hevc", "x265",
-																						"h265"},
-																					   {"libx264", "x264", "h264"},
-																					   {"libvpx-vp9", "vp9", "vpx"}},
-																	DEFAULT_ACODECS = {{"aac"},
-																					   {"ac3"},
-																					   {"libopus", "opus"},
-																					   {"libmp3lame", "mp3", "libmp3"}};
-	boost::container::vector<std::string> DEFAULT_CONTAINERS = {"mkv", "mp4", "mpeg", "avi", "mov", "webm"};
+	boost::container::vector<boost::container::vector<std::string>> DEFAULT_VCODECS = { { "libx265", "hevc", "x265", "h265" }, { "libx264", "x264", "h264" }, { "libvpx-vp9", "vp9", "vpx" } };
+	boost::container::vector<boost::container::vector<std::string>> DEFAULT_ACODECS = { { "aac" }, { "ac3" }, { "libopus", "opus" }, { "libmp3lame", "mp3", "libmp3" } };
+	boost::container::vector<std::string> DEFAULT_CONTAINERS = { "mkv", "mp4", "mpeg", "avi", "mov", "webm" };
 
-	std::string DEFAULT_VCODEC = "libx265", DEFAULT_ACODEC = "aac", DEFAULT_VQUALITY = "24", DEFAULT_AQUALITY = "384",
-				DEFAULT_CONTAINER = "mkv", DEFAULT_SUBTITLES = "Embed", DEFAULT_THREADS = "4",
-				DEFAULT_EXTRA_PARAMS = "-x265-params pools=3";
+	std::string DEFAULT_VCODEC = "libx265";
+	std::string DEFAULT_ACODEC = "aac";
+	std::string DEFAULT_VQUALITY = "24";
+	std::string DEFAULT_AQUALITY = "384";
+	std::string DEFAULT_CONTAINER = "mkv";
+	std::string DEFAULT_SUBTITLES = "Embed";
+	std::string DEFAULT_THREADS = "4";
+	std::string DEFAULT_EXTRA_PARAMS = "-x265-params pools=3";
 
-  public:
+public:
 	boost::filesystem::path baseDir, logPath, presetPath, tempDir, libraryDir, outputDir;
-	std::string presetName, vCodec, aCodec, vQuality, aQuality, subtitles, extraParams, threads, container;
 	boost::container::vector<boost::container::vector<std::string>> vCodecList, aCodecList;
 	boost::container::vector<std::string> containerList;
 	boost::container::vector<boost::filesystem::path> presetPathList;
 	boost::container::vector<std::string> presetNameList;
+	std::string presetName, vCodec, aCodec, vQuality, aQuality, subtitles, extraParams, threads, container;
 	bool preserveLog;
 
 	boost::program_options::options_description config;

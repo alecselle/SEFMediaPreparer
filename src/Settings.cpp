@@ -57,7 +57,7 @@ void Settings::savePreset() {
 	savePresetAs(presetName);
 }
 
-void Settings::savePresetAs(string name) {
+void Settings::savePresetAs(std::string name) {
 	json j;
 	j["vCodec"] = vCodec;
 	j["aCodec"] = aCodec;
@@ -147,7 +147,7 @@ void Settings::loadPreset() {
 	loadPresetFile(presetPath);
 }
 
-void Settings::loadPreset(string name) {
+void Settings::loadPreset(std::string name) {
 	loadPresetFile(PRESET_DIR.string() + "\\" + name + ".preset");
 }
 
@@ -169,7 +169,7 @@ void Settings::loadPresetFile(bf::path path) {
 	}
 }
 
-void Settings::loadPresetJson(json j) {
+void Settings::loadPresetJson(nlohmann::json j) {
 	if (j.find("vCodec") != j.end()) {
 		vCodec = j.find("vCodec").value();
 	} else {

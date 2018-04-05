@@ -11,21 +11,20 @@
 #include <string.h>
 
 class Library {
-  private:
+private:
 	bool _hasSettings = false;
 	bool _isInitialized = false;
 	bool _isChecked = false;
 	bool _isRecursive = false;
 	boost::filesystem::path _directory;
-	boost::container::vector<File> _Library = {};
-	boost::container::vector<File> _LibraryEncode = {};
-	boost::container::vector<std::string> _extensions = {".wmv", ".avi",  ".divx", ".mkv", ".mka", ".mks", ".webm",
-														 ".mp4", ".mpeg", ".mpg",  ".mov", ".qt",  ".flv"};
-	int _duration = NULL;
+	boost::container::vector<File> _Library = { };
+	boost::container::vector<File> _LibraryEncode = { };
+	boost::container::vector<std::string> _extensions = { ".wmv", ".avi", ".divx", ".mkv", ".mka", ".mks", ".webm", ".mp4", ".mpeg", ".mpg", ".mov", ".qt", ".flv" };
+	int _duration = -1;
 
 	Settings *_settings = new Settings();
 
-  public:
+public:
 	Library(Settings *settingsObject);
 	Library();
 	bool Init(boost::filesystem::path directoryPath, Settings *settingsObject, bool scanRecursive = false);

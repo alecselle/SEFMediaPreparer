@@ -23,7 +23,7 @@ Library::Library() {
 	_isChecked = false;
 }
 
-bool Library::Init(bf::path libraryDirectory, Settings *settings, bool scanRecursive) {
+bool Library::Init(boost::filesystem::path libraryDirectory, Settings *settings, bool scanRecursive) {
 	if (bf::exists(libraryDirectory) && bf::is_directory(libraryDirectory)) {
 		_settings = settings;
 		_directory = libraryDirectory;
@@ -41,7 +41,7 @@ bool Library::Init(bf::path libraryDirectory, Settings *settings, bool scanRecur
 	return false;
 }
 
-bool Library::Init(bf::path libraryDirectory, bool scanRecursive) {
+bool Library::Init(boost::filesystem::path libraryDirectory, bool scanRecursive) {
 	if (isValid(true, false, false) && bf::exists(libraryDirectory) && bf::is_directory(libraryDirectory)) {
 		_directory = libraryDirectory;
 		_isRecursive = scanRecursive;
@@ -58,12 +58,9 @@ bool Library::Init(bf::path libraryDirectory, bool scanRecursive) {
 }
 
 bool Library::isValid(bool settings, bool initialized, bool loaded) {
-	if (settings && !_hasSettings)
-		return false;
-	if (initialized && !_isInitialized)
-		return false;
-	if (loaded && !_isChecked)
-		return false;
+	if (settings && !_hasSettings) return false;
+	if (initialized && !_isInitialized) return false;
+	if (loaded && !_isChecked) return false;
 	return true;
 }
 
@@ -95,9 +92,7 @@ void Library::scan(bool scanRecursive) {
 }
 
 int Library::size() {
-	if (isValid(true, true, false))
-		return _Library.size();
-	return NULL;
+	if (isValid(true, true, false)) return _Library.size();
 }
 
 int Library::duration() {
@@ -110,7 +105,6 @@ int Library::duration() {
 		}
 		return _duration;
 	}
-	return NULL;
 }
 
 void Library::clear() {
@@ -118,49 +112,43 @@ void Library::clear() {
 	clearEncode();
 }
 
-bc::vector<File> &Library::getFiles() {
-	if (isValid(true, true, false))
-		return _Library;
+boost::container::vector<File> &Library::getFiles() {
+	if (isValid(true, true, false)) return _Library;
 }
 
 File &Library::getFile(int pos) {
-	if (isValid(true, true, false) && pos < _Library.size())
-		return _Library[pos];
+	if (isValid(true, true, false) && pos < _Library.size()) return _Library[pos];
 }
 
 int Library::findFile(File file) {
 	if (isValid(true, true, false)) {
 		for (int i = 0; i < size(); i++) {
-			if (getFile(i).path() == file.path())
-				return i;
+			if (getFile(i).path() == file.path()) return i;
 		}
 	}
-	return NULL;
 }
 
 int Library::findFile(boost::filesystem::path file) {
-	if (isValid(true, true, false))
-		return findFile(File(file));
+	if (isValid(true, true, false)) return findFile(File(file));
 }
 
 bool Library::addFile(File file) {
 	if (isValid(true, true, false) && bf::exists(file.path())) {
 		_Library.push_back(file);
-		if (_isChecked)
-			scanEncode();
+		if (_isChecked) scanEncode();
 		return true;
 	}
 	return false;
 }
 
 bool Library::addFile(boost::filesystem::path file) {
-	if (isValid(true, true, false))
-		return addFile(File(file));
+	if (isValid(true, true, false)) return addFile(File(file));
+	return false;
 }
 
 bool Library::checkEncode(File file) {
 	if (file.isLoaded()) {
-		bool matches[3] = {false, false, false};
+		bool matches[3] = { false, false, false };
 		for (int j = 0; j < _settings->vCodecList.size(); j++) {
 			if (_settings->vCodecList[j][0].compare(_settings->vCodec) == 0) {
 				for (int k = 0; k < _settings->vCodecList[j].size(); k++) {
@@ -184,7 +172,7 @@ bool Library::checkEncode(File file) {
 			matches[2] = true;
 		}
 
-		if (!matches[0] || !matches[1] || !matches[2] && findFileEncode(file) == NULL) {
+		if ((!matches[0] || !matches[1] || !matches[2]) && findFileEncode(file) == NULL) {
 			return true;
 		}
 	}
@@ -196,7 +184,7 @@ void Library::scanEncode() {
 		for (int i = 0; i < size(); i++) {
 			File &f = getFile(i);
 			if (f.isLoaded()) {
-				bool matches[3] = {false, false, false};
+				bool matches[3] = { false, false, false };
 				for (int j = 0; j < _settings->vCodecList.size(); j++) {
 					if (_settings->vCodecList[j][0].compare(_settings->vCodec) == 0) {
 						for (int k = 0; k < _settings->vCodecList[j].size(); k++) {
@@ -233,8 +221,7 @@ void Library::scanEncode() {
 }
 
 int Library::sizeEncode() {
-	if (isValid(true, true, true))
-		return _LibraryEncode.size();
+	if (isValid(true, true, true)) return _LibraryEncode.size();
 }
 
 int Library::durationEncode() {
@@ -253,29 +240,24 @@ void Library::clearEncode() {
 	_LibraryEncode.clear();
 }
 
-bc::vector<File> &Library::getFilesEncode() {
-	if (isValid(true, true, true))
-		return _LibraryEncode;
+boost::container::vector<File> &Library::getFilesEncode() {
+	if (isValid(true, true, true)) return _LibraryEncode;
 }
 
 File &Library::getFileEncode(int pos) {
-	if (isValid(true, true, true) && pos < _LibraryEncode.size())
-		return _LibraryEncode[pos];
+	if (isValid(true, true, true) && pos < _LibraryEncode.size()) return _LibraryEncode[pos];
 }
 
 int Library::findFileEncode(File file) {
 	if (isValid(true, true, true)) {
 		for (int i = 0; i < sizeEncode(); i++) {
-			if (getFileEncode(i).path() == file.path())
-				return i;
+			if (getFileEncode(i).path() == file.path()) return i;
 		}
 	}
-	return NULL;
 }
 
 int Library::findFileEncode(boost::filesystem::path file) {
-	if (isValid(true, true, true))
-		return findFileEncode(File(file));
+	if (isValid(true, true, true)) return findFileEncode(File(file));
 }
 
 bool Library::forceEncode(File file) {
@@ -288,8 +270,8 @@ bool Library::forceEncode(File file) {
 }
 
 bool Library::forceEncode(boost::filesystem::path file) {
-	if (isValid(true, true, true))
-		return forceEncode(File(file));
+	if (isValid(true, true, true)) return forceEncode(File(file));
+	return false;
 }
 
 bool Library::skipEncode(File file) {
@@ -302,6 +284,6 @@ bool Library::skipEncode(File file) {
 }
 
 bool Library::skipEncode(boost::filesystem::path file) {
-	if (isValid(true, true, true))
-		return skipEncode(File(file));
+	if (isValid(true, true, true)) return skipEncode(File(file));
+	return false;
 }
