@@ -8,17 +8,16 @@
 
 #include <boost/filesystem.hpp>
 
-#include <QtWidgets/QAction>
+#include <QtConcurrent/QtConcurrent>
 #include <QtCore/QFuture>
-#include <QtWidgets/QMenu>
 #include <QtCore/QObject>
 #include <QtCore/QProcess>
-#include <QtWidgets/QSystemTrayIcon>
 #include <QtCore/QTime>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QSystemTrayIcon>
 #include <QtWidgets/QWidget>
-#include <QtConcurrent/QtConcurrent>
 #include <string>
-
 
 namespace SuperEpicFuntime {
 	namespace Ui {
