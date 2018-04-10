@@ -1,5 +1,6 @@
 #include "src/Config.hpp"
 
+#include <QtCore/QSettings>
 #include <boost/algorithm/string.hpp>
 #include <boost/container/vector.hpp>
 #include <boost/filesystem.hpp>
@@ -13,8 +14,6 @@ namespace bpo = boost::program_options;
 using namespace std;
 
 namespace SuperEpicFuntime {
-	Config::Config(boost::filesystem::path configFile) {
-		boost::program_options::variables_map vm;
-	}
+
 
 } // namespace SuperEpicFuntime

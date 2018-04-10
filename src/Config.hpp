@@ -7,9 +7,11 @@
 namespace SuperEpicFuntime {
 	class Config {
 	private:
-
+		static boost::filesystem::path configFile;
 	public:
-		Config(boost::filesystem::path configFile);
+		static void load();
+		static void save();
+		static std::string value(std::string key);
 	};
 } //namespace SuperEpicFuntime
 #endif //CONFIG_HPP
