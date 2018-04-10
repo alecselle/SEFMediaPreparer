@@ -11,6 +11,7 @@ SEFMediaPreparer_resource.rc
 .externalToolBuilders/
 .project
 .settings/
+.vs/
 
 installer/
 release/
