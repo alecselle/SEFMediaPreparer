@@ -41,7 +41,7 @@ namespace SuperEpicFuntime {
 		return str;
 	}
 
-	bf::path File::pathSub() { // @suppress("No return")
+	bf::path File::pathSub() {
 		if (_loaded && _subtitles == 1) return _pathSub;
 	}
 
