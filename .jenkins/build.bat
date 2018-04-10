@@ -149,12 +149,12 @@ set DEBUG=0
 :: ~~
 ::=============================================================================
 :END_SUCCESS
-	echo.[Version] Completed Successfully
+	echo.[Build] Completed Successfully
 	endlocal
 	exit /b 0
 	goto EOF
 :END_FAILURE
-	echo.[Version][WARNING] Completed Unsuccessfully
+	echo.[Build][WARNING] Completed Unsuccessfully
 	endlocal
 	exit /b 1
 	goto EOF
