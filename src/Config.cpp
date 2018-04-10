@@ -1,23 +1,20 @@
 #include "src/Config.hpp"
 
-#include <QtCore/QSettings>
 #include <boost/algorithm/string.hpp>
 #include <boost/container/vector.hpp>
 #include <boost/filesystem.hpp>
-#include <boost/program_options.hpp>
+#include <nlohmann/json.hpp>
 #include <string>
-#include <iostream>
-#include <fstream>
 
 namespace bf = boost::filesystem;
 namespace bc = boost::container;
 namespace ba = boost::algorithm;
-namespace bpo = boost::program_options;
+using namespace nlohmann;
 using namespace std;
 
 namespace SuperEpicFuntime {
 	static void Config::load() {
-		std::ifstream config_file(CONFIG_FILE.string().c_str());
+		QSettings settings(CONFIG_FILE.string().c_str(), QSettings::IniFormat);
 	}
 
 	static void Config::save() {
@@ -25,6 +22,6 @@ namespace SuperEpicFuntime {
 	}
 
 	static string Config::value(string key) {
-
+		return settings.value(key.c_str(), "null").toString();
 	}
 } // namespace SuperEpicFuntime

@@ -1,8 +1,11 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
+#include <boost/container/vector.hpp>
 #include <boost/filesystem.hpp>
+#include <nlohmann/json.hpp>
 #include <string>
+
 
 namespace SuperEpicFuntime {
 	class Config {
@@ -16,9 +19,7 @@ namespace SuperEpicFuntime {
 
 		static const boost::filesystem::path CONFIG_FILE = BASE_DIR + "\\config.ini";
 
-		static void load();
-		static void save();
-		static std::string value(std::string key);
+
 	};
 } //namespace SuperEpicFuntime
 #endif //CONFIG_HPP
