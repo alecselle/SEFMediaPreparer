@@ -75,8 +75,7 @@ namespace SuperEpicFuntime {
 					} else {
 						process.setProgram(QString("ffprobe"));
 					}
-					process.setArguments(QStringList { QString("-v"), QString("quiet"), QString("-show_entries"), QString("format=duration:stream=codec_type:stream=codec_name"), QString("-of"),
-							QString("json"), QString(file.pathStr().c_str()) });
+					process.setArguments(QStringList { "-v", "quiet", "-show_entries", "format=duration:stream=codec_type:stream=codec_name", "-of", "json", file.pathStr().c_str() });
 
 					emit progress_updated_scan(QString((file.nameStr() + file.extensionStr()).c_str()));
 					log("Reading File: " + file.pathStr());
