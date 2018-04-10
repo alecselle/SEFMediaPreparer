@@ -68,16 +68,10 @@ namespace SuperEpicFuntime {
 					scanIndex = i;
 
 					QProcess process;
-					if (bf::exists("./tools/ffprobe.exe")) {
-						process.setProgram(QString("./tools/ffprobe"));
-					} else if (bf::exists("../tools/ffprobe.exe")) {
-						process.setProgram(QString("../tools/ffprobe"));
-					} else {
-						process.setProgram(QString("ffprobe"));
-					}
+					process.setProgram("ffprobe");
 					process.setArguments(QStringList { "-v", "quiet", "-show_entries", "format=duration:stream=codec_type:stream=codec_name", "-of", "json", file.pathStr().c_str() });
 
-					emit progress_updated_scan(QString((file.nameStr() + file.extensionStr()).c_str()));
+					emit progress_updated_scan((file.nameStr() + file.extensionStr()).c_str());
 					log("Reading File: " + file.pathStr());
 
 					process.start();
@@ -92,18 +86,18 @@ namespace SuperEpicFuntime {
 				library->duration();
 				library->scanEncode();
 				string temp = "Encode [" + std::to_string(library->sizeEncode()) + "]"; // @suppress("Function cannot be resolved")
-				if (library->sizeEncode() != NULL) ui->button_encode->setText(QString(temp.c_str()));
+				if (library->sizeEncode() != NULL) ui->button_encode->setText(temp.c_str());
 			}
 		}
 
 		if (!cancelScan) {
 			if (library->size() > 0) {
-				emit progress_updated_scan(QString("Complete..."), 1000);
+				emit progress_updated_scan("Complete...", 1000);
 			} else {
-				emit progress_updated_scan(QString("Invalid Directory..."), 0);
+				emit progress_updated_scan("Invalid Directory...", 0);
 			}
 		} else {
-			emit progress_updated_scan(QString("Canceled..."), 0);
+			emit progress_updated_scan("Canceled...", 0);
 		}
 
 		emit finished_workerScan();
