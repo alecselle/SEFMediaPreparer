@@ -68,7 +68,13 @@ namespace SuperEpicFuntime {
 					scanIndex = i;
 
 					QProcess process;
-					process.setProgram(QString("ffprobe.exe"));
+					if (bf::exists("./ffmpeg/ffprobe.exe")) {
+						process.setProgram(QString("./ffmpeg/ffprobe"));
+					} else if (bf::exists("../ffmpeg/ffprobe.exe")) {
+						process.setProgram(QString("../ffmpeg/ffprobe"));
+					} else {
+						process.setProgram(QString("ffprobe"));
+					}
 					process.setArguments(QStringList { QString("-v"), QString("quiet"), QString("-show_entries"), QString("format=duration:stream=codec_type:stream=codec_name"), QString("-of"),
 							QString("json"), QString(file.pathStr().c_str()) });
 
@@ -174,10 +180,10 @@ namespace SuperEpicFuntime {
 			params.push_back(QString((settings->tempDir.string() + "\\" + file.nameStr() + "." + settings->container).c_str()));
 
 			QProcess process;
-			if (bf::exists("./tools/ffmpeg.exe")) {
-				process.setProgram(QString("./tools/ffmpeg"));
-			} else if (bf::exists("../tools/ffmpeg.exe")) {
-				process.setProgram(QString("../tools/ffmpeg"));
+			if (bf::exists("./ffmpeg/ffmpeg.exe")) {
+				process.setProgram(QString("./ffmpeg/ffmpeg"));
+			} else if (bf::exists("../ffmpeg/ffmpeg.exe")) {
+				process.setProgram(QString("../ffmpeg/ffmpeg"));
 			} else {
 				process.setProgram(QString("ffmpeg"));
 			}
