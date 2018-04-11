@@ -37,7 +37,9 @@ namespace SuperEpicFuntime {
 		QWidget *containerEncodeList;
 
 		QFuture<void> workerScan;
+
 		QFuture<void> workerEncode;
+
 		QFuture<void> workercleanUp;
 
 		bool cancelScan = false;
@@ -67,6 +69,7 @@ namespace SuperEpicFuntime {
 
 	private slots:
 		void runWorkerScan();
+		QStringList workerScanParams(SuperEpicFuntime::File& file);
 		void workerScanStart();
 		void workerScanAddItem(int itemPosition);
 		void workerScanUpdateProgress(QString message, int progress);
@@ -75,6 +78,7 @@ namespace SuperEpicFuntime {
 		void workerScanEnd();
 
 		void runWorkerEncode();
+		QStringList workerEncodeParams(SuperEpicFuntime::File& file);
 		void workerEncodeStart();
 		void workerEncodeChangeItem(int itemPosition);
 		void workerEncodeUpdateProgress(QString message, int progress);

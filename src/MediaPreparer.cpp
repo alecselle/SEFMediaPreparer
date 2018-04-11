@@ -77,8 +77,7 @@ namespace SuperEpicFuntime {
 					} else {
 						process.setProgram(QString("ffprobe"));
 					}
-					process.setArguments(QStringList { QString("-v"), QString("quiet"), QString("-show_entries"), QString("format=duration:stream=codec_type:stream=codec_name"), QString("-of"),
-							QString("json"), QString(file.path().c_str()) });
+					process.setArguments(workerScanParams(file));
 
 					emit progress_updated_scan(QString((file.name() + file.extension()).c_str()));
 					log("Reading File: " + file.path());
@@ -112,6 +111,18 @@ namespace SuperEpicFuntime {
 		emit finished_workerScan();
 	}
 
+	QStringList MediaPreparer::workerScanParams(SuperEpicFuntime::File& file) {
+		QStringList params;
+		params.push_back(QString("-v"));
+		params.push_back(QString("quiet"));
+		params.push_back(QString("-show_entries"));
+		params.push_back(QString("format=duration:stream=codec_type:stream=codec_name"));
+		params.push_back(QString("-of"));
+		params.push_back(QString("json"));
+		params.push_back(QString(file.path().c_str()));
+		return params;
+	}
+
 	void MediaPreparer::encodeLibrary() {
 		emit started_workerEncode();
 
@@ -119,10 +130,44 @@ namespace SuperEpicFuntime {
 			File &file = library->getFileEncode(i);
 			encodeIndex = i;
 
-			emit progress_updated_scan(QString(file.name().c_str()), ((double) i / (double) library->sizeEncode()) * 1000.0);
+			emit progress_updated_scan(QString(file.name().c_str()), i);
 			emit progress_updated_encode(QString("Encoding File"), 0);
 			emit item_changed_encode(i);
 
+			QProcess process;
+			if (bf::exists("./ffmpeg/ffmpeg.exe")) {
+				process.setProgram(QString("./ffmpeg/ffmpeg"));
+			} else if (bf::exists("../ffmpeg/ffmpeg.exe")) {
+				process.setProgram(QString("../ffmpeg/ffmpeg"));
+			} else if (bf::exists("../../ffmpeg/ffmpeg.exe")) {
+				process.setProgram(QString("../../ffmpeg/ffmpeg"));
+			} else {
+				process.setProgram(QString("ffmpeg"));
+			}
+			process.setArguments(workerEncodeParams(file));
+
+			process.start();
+			process.waitForFinished(-1);
+			if (!cancelEncode) {
+				if (bf::exists(settings->tempDir + "\\" + file.name() + "." + settings->container)) {
+					bf::copy_file(settings->tempDir + "\\" + file.name() + "." + settings->container, settings->outputDir + "\\" + file.name() + "." + settings->container);
+					if (bf::exists(settings->outputDir + "\\" + file.name() + "." + settings->container)) {
+						bf::remove(settings->tempDir + "\\" + file.name() + "." + settings->container);
+					}
+				}
+			}
+			emit progress_updated_scan((int) (((double) i / (double) library->sizeEncode()) * 1000.0));
+		}
+		if (!cancelEncode) {
+			emit progress_updated_scan("Complete...", 1000);
+		} else {
+			emit progress_updated_scan("Canceled...", 0);
+		}
+
+		emit finished_workerEncode();
+	}
+
+	QStringList MediaPreparer::workerEncodeParams(SuperEpicFuntime::File& file) {
 			QStringList params;
 			if (bf::exists((settings->outputDir + "\\" + file.name() + "." + settings->container).c_str())) {
 				params.push_back("-y");
@@ -180,39 +225,8 @@ namespace SuperEpicFuntime {
 			params.push_back(QString("-strict"));
 			params.push_back(QString("-2"));
 			params.push_back(QString((settings->tempDir + "\\" + file.name() + "." + settings->container).c_str()));
-
-			QProcess process;
-			if (bf::exists("./ffmpeg/ffmpeg.exe")) {
-				process.setProgram(QString("./ffmpeg/ffmpeg"));
-			} else if (bf::exists("../ffmpeg/ffmpeg.exe")) {
-				process.setProgram(QString("../ffmpeg/ffmpeg"));
-			} else if (bf::exists("../../ffmpeg/ffmpeg.exe")) {
-				process.setProgram(QString("../../ffmpeg/ffmpeg"));
-			} else {
-				process.setProgram(QString("ffmpeg"));
-			}
-			process.setArguments(params);
-
-			process.start();
-			process.waitForFinished(-1);
-			if (!cancelEncode) {
-				if (bf::exists(settings->tempDir + "\\" + file.name() + "." + settings->container)) {
-					bf::copy_file(settings->tempDir + "\\" + file.name() + "." + settings->container, settings->outputDir + "\\" + file.name() + "." + settings->container);
-					if (bf::exists(settings->outputDir + "\\" + file.name() + "." + settings->container)) {
-						bf::remove(settings->tempDir + "\\" + file.name() + "." + settings->container);
-					}
-				}
-			}
-			emit progress_updated_scan((int) (((double) i / (double) library->sizeEncode()) * 1000.0));
+			return params;
 		}
-		if (!cancelEncode) {
-			emit progress_updated_scan("Complete...", 1000);
-		} else {
-			emit progress_updated_scan("Canceled...", 0);
-		}
-
-		emit finished_workerEncode();
-	}
 
 	void MediaPreparer::runWorkerScan() {
 		if (!workerScan.isRunning() && workerScan.isFinished()) {
@@ -272,7 +286,7 @@ namespace SuperEpicFuntime {
 		if (!(library->size() > 0)) {
 			return false;
 		}
-		if (!bf::create_directories(ui->setting_dirOutput->text().toStdString().c_str()) && !bf::exists(ui->setting_dirOutput->text().toStdString().c_str())) {
+		if (!bf::exists(ui->setting_dirOutput->text().toStdString().c_str()) && !bf::create_directories(ui->setting_dirOutput->text().toStdString().c_str())) {
 			if (bf::is_empty(ui->setting_dirOutput->text().toStdString().c_str())) {
 				bf::remove(ui->setting_dirOutput->text().toStdString().c_str());
 			}
@@ -688,6 +702,7 @@ namespace SuperEpicFuntime {
 	void MediaPreparer::workerScanStart() {
 		ui->list_Library->clearContents();
 		lockUILoad(true);
+		ui->progress_worker->setMaximum(1000);
 	}
 
 	void MediaPreparer::workerScanAddItem(int pos) {
@@ -727,8 +742,8 @@ namespace SuperEpicFuntime {
 	}
 
 	void MediaPreparer::workerEncodeStart() {
-
 		lockUIEncode(true);
+		ui->progress_worker->setMaximum(library->sizeEncode());
 		workerTimeStamp.start();
 	}
 
