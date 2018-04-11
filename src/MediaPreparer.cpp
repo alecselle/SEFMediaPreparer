@@ -511,6 +511,8 @@ namespace SuperEpicFuntime {
 
 		// connect(ui->list_Library, SIGNAL(cellChanged(int, int)), this, SLOT(toggleEncodeFile(int, int)));
 
+		connect(ui->setting_aCodec, SIGNAL(currentIndexChanged), this, SLOT(setEncodeOptions));
+
 		connect(updateTimer, SIGNAL(timeout()), this, SLOT(updateGUI()));
 		updateTimer->start(100);
 

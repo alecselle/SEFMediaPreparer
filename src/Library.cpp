@@ -103,6 +103,7 @@ namespace SuperEpicFuntime {
 				if (getFile(i).path() == file.path()) return i;
 			}
 		}
+		return -1;
 	}
 
 	int Library::findFile(std::string file) {
@@ -149,7 +150,7 @@ namespace SuperEpicFuntime {
 				matches[2] = true;
 			}
 
-			if ((!matches[0] || !matches[1] || !matches[2]) && findFileEncode(file) == NULL) {
+			if ((!matches[0] || !matches[1] || !matches[2]) && findFileEncode(file) == -1) {
 				return true;
 			}
 		}
@@ -184,7 +185,7 @@ namespace SuperEpicFuntime {
 					if (f.extension().compare("." + _settings->container) == 0) {
 						matches[2] = true;
 					}
-					if ((!matches[0] || !matches[1] || !matches[2]) && findFileEncode(f) == NULL) {
+					if ((!matches[0] || !matches[1] || !matches[2]) && findFileEncode(f) == -1) {
 						_LibraryEncode.push_back(f);
 					}
 				}
@@ -228,9 +229,10 @@ namespace SuperEpicFuntime {
 	int Library::findFileEncode(File file) {
 		if (isValid(true, true, true)) {
 			for (int i = 0; i < sizeEncode(); i++) {
-				if (getFileEncode(i).path().compare(file.path()) != 0) return i;
+				if (getFileEncode(i).path().compare(file.path()) == 0) return i;
 			}
 		}
+		return -1;
 	}
 
 	int Library::findFileEncode(std::string file) {
