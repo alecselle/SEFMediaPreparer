@@ -22,7 +22,7 @@ namespace SuperEpicFuntime {
 		}
 		baseDir = BASE_DIR;
 		logPath = LOG_FILE;
-		for (bf::directory_entry &x : bf::directory_iterator(bf::path(PRESET_DIR))) {
+		for (bf::directory_entry &x : bf::directory_iterator(PRESET_DIR)) {
 			if (x.path().extension().compare(PRESET_EXTENSION) == 0) {
 				presetPathList.push_back(x.path().string());
 				presetNameList.push_back(x.path().filename().replace_extension().string());
@@ -151,7 +151,7 @@ namespace SuperEpicFuntime {
 	}
 
 	void Settings::loadPresetFile(std::string path) {
-		bf::path p = bf::canonical(path);
+		bf::path p = path;
 		if (bf::exists(p)) {
 			json j = json::parse(ifstream(path.c_str())); // @suppress("Function cannot be resolved")
 

@@ -356,7 +356,12 @@ namespace SuperEpicFuntime {
 		settings->threads = ba::trim_copy(ui->setting_threads->text().toStdString());
 		settings->extraParams = ba::trim_copy(ui->setting_extraParams->text().toStdString());
 
-		ui->button_encode->setText(QString(("Encode [" + std::to_string(library->sizeEncode()) + "]").c_str())); // @suppress("Function cannot be resolved") // @suppress("Method cannot be resolved")
+		if (library->isValid()) {
+			library->scanEncode();
+			ui->button_encode->setText(QString(("Encode [" + std::to_string(library->sizeEncode()) + "]").c_str())); // @suppress("Function cannot be resolved") // @suppress("Method cannot be resolved")
+		} else {
+			ui->button_encode->setText(QString("Encode [0]"));
+		}
 	}
 
 	std::string MediaPreparer::getPath() {
@@ -538,8 +543,8 @@ namespace SuperEpicFuntime {
 		for (int i = 0; i < settings->containerList.size(); i++) {
 			ui->setting_container->addItem(QString(settings->containerList[i].c_str()));
 		}
-		for (int i = 0; i < settings->presetPathList.size(); i++) {
-			ui->setting_preset->addItem(QString(settings->presetPathList[i].c_str()));
+		for (int i = 0; i < settings->presetNameList.size(); i++) {
+			ui->setting_preset->addItem(QString(settings->presetNameList[i].c_str()));
 		}
 
 		ui->setting_preset->setCurrentText(QString(settings->presetName.c_str()));

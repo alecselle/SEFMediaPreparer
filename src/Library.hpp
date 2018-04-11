@@ -27,8 +27,6 @@ namespace SuperEpicFuntime {
 
 	public:
 		Library(SuperEpicFuntime::Settings *settingsObject);
-		Library();
-		bool Init(std::string directoryPath, SuperEpicFuntime::Settings *settingsObject, bool scanRecursive = false);
 		bool Init(std::string, bool scanRecursive = false);
 		bool setDirectory(std::string directoryPath, bool scanRecursive = true, bool scanNow = false);
 		void setSettings(SuperEpicFuntime::Settings *settingsObject);

@@ -18,30 +18,6 @@ namespace SuperEpicFuntime {
 		_isChecked = false;
 	}
 
-	Library::Library() {
-		_hasSettings = false;
-		_isInitialized = false;
-		_isChecked = false;
-	}
-
-	bool Library::Init(std::string libraryDirectory, SuperEpicFuntime::Settings *settings, bool scanRecursive) {
-		if (bf::exists(libraryDirectory) && bf::is_directory(libraryDirectory)) {
-			_settings = settings;
-			_directory = libraryDirectory;
-			_isRecursive = scanRecursive;
-			_Library.clear();
-			_LibraryEncode.clear();
-
-			_hasSettings = true;
-			_isInitialized = true;
-			scan(_isRecursive);
-			_isChecked = false;
-
-			return true;
-		}
-		return false;
-	}
-
 	bool Library::Init(std::string libraryDirectory, bool scanRecursive) {
 		if (isValid(true, false, false) && bf::exists(libraryDirectory) && bf::is_directory(libraryDirectory)) {
 			_directory = libraryDirectory;
@@ -252,7 +228,7 @@ namespace SuperEpicFuntime {
 	int Library::findFileEncode(File file) {
 		if (isValid(true, true, true)) {
 			for (int i = 0; i < sizeEncode(); i++) {
-				if (getFileEncode(i).path() == file.path()) return i;
+				if (getFileEncode(i).path().compare(file.path()) != 0) return i;
 			}
 		}
 	}
@@ -286,4 +262,5 @@ namespace SuperEpicFuntime {
 	bool Library::skipEncode(std::string file) {
 		return skipEncode(File(file));
 	}
+
 } // namespace SuperEpicFuntime
