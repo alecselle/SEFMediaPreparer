@@ -120,6 +120,8 @@ namespace SuperEpicFuntime {
 
 		void browseDialog(int type = 0);
 
+		void saveDialog();
+
 		bool cancelDialog();
 		bool cancel();
 

@@ -29,220 +29,9 @@ using namespace nlohmann;
 using namespace std;
 
 namespace SuperEpicFuntime {
-	MediaPreparer::MediaPreparer(QWidget *parent) :
-			QWidget(parent), ui(new Ui::MediaPreparer) {
-		ui->setupUi(this);
-		Init();
-	}
-
-	void MediaPreparer::closeEvent(QCloseEvent *event) {
-		if ((!workerEncode.isRunning() && !workerScan.isRunning()) || cancel()) {
-			event->accept();
-		} else {
-			event->ignore();
-		}
-	}
-
-	MediaPreparer::~MediaPreparer() {
-		if (diffPreset()) savePreset("Auto Saved");
-		saveConfig();
-		delete ui;
-	}
-
-#ifndef SEFMediaPreparer_Section_Workers
-	void MediaPreparer::scanLibrary(std::string dir) {
-		emit started_workerScan();
-
-		emit progress_updated_scan(QString("Checking Directory..."), 0);
-
-		if (bf::exists(dir)) {
-
-			ui->setting_dirOutput->setText(QString((dir + "\\Converted").c_str()));
-
-			emit progress_updated_scan(QString("Scanning Files..."), 0);
-			log("Scanning directory: " + dir);
-
-			bool recursive = ui->setting_subdirectories->isChecked();
-			if (library->Init(dir, recursive)) {
-				for (int i = 0; i < library->size() && cancelScan != true; i++) {
-					File &file = library->getFile(i);
-					scanIndex = i;
-
-					QProcess process;
-					if (bf::exists("./ffmpeg/ffprobe.exe")) {
-						process.setProgram(QString("./ffmpeg/ffprobe"));
-					} else if (bf::exists("../ffmpeg/ffprobe.exe")) {
-						process.setProgram(QString("../ffmpeg/ffprobe"));
-					} else if (bf::exists("../../ffmpeg/ffprobe.exe")) {
-						process.setProgram(QString("../../ffmpeg/ffprobe"));
-					} else {
-						process.setProgram(QString("ffprobe"));
-					}
-					process.setArguments(workerScanParams(file));
-
-					emit progress_updated_scan(QString((file.name() + file.extension()).c_str()));
-					log("Reading File: " + file.path());
-
-					process.start();
-					process.waitForFinished();
-					QByteArray out = process.readAllStandardOutput();
-					file.loadFileInfo(json::parse(out.begin(), out.end())); // @suppress("Invalid arguments") // @suppress("Function cannot be resolved")
-
-					emit item_added_scan(i);
-					emit progress_updated_scan((int) (((double) i / (double) library->size()) * 1000.0));
-				}
-				setEncodeOptions();
-				library->duration();
-				library->scanEncode();
-				string temp = "Encode [" + std::to_string(library->sizeEncode()) + "]"; // @suppress("Function cannot be resolved")
-				if (library->sizeEncode() != NULL) ui->button_encode->setText(QString(temp.c_str()));
-			}
-		}
-
-		if (!cancelScan) {
-			if (library->size() > 0) {
-				emit progress_updated_scan(QString("Complete..."), 1000);
-			} else {
-				emit progress_updated_scan(QString("Invalid Directory..."), 0);
-			}
-		} else {
-			emit progress_updated_scan(QString("Canceled..."), 0);
-		}
-
-		emit finished_workerScan();
-	}
-
-	QStringList MediaPreparer::workerScanParams(SuperEpicFuntime::File& file) {
-		QStringList params;
-		params.push_back(QString("-v"));
-		params.push_back(QString("quiet"));
-		params.push_back(QString("-show_entries"));
-		params.push_back(QString("format=duration:stream=codec_type:stream=codec_name"));
-		params.push_back(QString("-of"));
-		params.push_back(QString("json"));
-		params.push_back(QString(file.path().c_str()));
-		return params;
-	}
-
-	void MediaPreparer::encodeLibrary() {
-		emit started_workerEncode();
-
-		for (int i = 0; i < library->getFilesEncode().size() && cancelEncode != true; i++) {
-			File &file = library->getFileEncode(i);
-			encodeIndex = i;
-
-			emit progress_updated_scan(QString(file.name().c_str()), i);
-			emit progress_updated_encode(QString("Encoding File"), 0);
-			emit item_changed_encode(i);
-
-			QProcess process;
-			if (bf::exists("./ffmpeg/ffmpeg.exe")) {
-				process.setProgram(QString("./ffmpeg/ffmpeg"));
-			} else if (bf::exists("../ffmpeg/ffmpeg.exe")) {
-				process.setProgram(QString("../ffmpeg/ffmpeg"));
-			} else if (bf::exists("../../ffmpeg/ffmpeg.exe")) {
-				process.setProgram(QString("../../ffmpeg/ffmpeg"));
-			} else {
-				process.setProgram(QString("ffmpeg"));
-			}
-			process.setArguments(workerEncodeParams(file));
-
-			process.start();
-			process.waitForFinished(-1);
-			if (!cancelEncode) {
-				if (bf::exists(settings->tempDir + "\\" + file.name() + "." + settings->container)) {
-					bf::copy_file(settings->tempDir + "\\" + file.name() + "." + settings->container, settings->outputDir + "\\" + file.name() + "." + settings->container);
-					if (bf::exists(settings->outputDir + "\\" + file.name() + "." + settings->container)) {
-						bf::remove(settings->tempDir + "\\" + file.name() + "." + settings->container);
-					}
-				}
-			}
-			emit progress_updated_scan((int) (((double) i / (double) library->sizeEncode()) * 1000.0));
-		}
-		if (!cancelEncode) {
-			emit progress_updated_scan("Complete...", 1000);
-		} else {
-			emit progress_updated_scan("Canceled...", 0);
-		}
-
-		emit finished_workerEncode();
-	}
-
-	QStringList MediaPreparer::workerEncodeParams(SuperEpicFuntime::File& file) {
-			QStringList params;
-			if (bf::exists((settings->outputDir + "\\" + file.name() + "." + settings->container).c_str())) {
-				params.push_back("-y");
-			}
-			params.push_back(QString("-v"));
-			params.push_back(QString("quiet"));
-			params.push_back(QString("-stats"));
-			params.push_back(QString("-hwaccel"));
-			params.push_back(QString("dxva2"));
-			params.push_back(QString("-threads"));
-			params.push_back(QString(settings->threads.c_str()));
-			params.push_back(QString("-i"));
-			params.push_back(QString(file.path().c_str()));
-			if (file.subtitles() == 1 && settings->subtitles.compare("Embed") == 0) {
-				params.push_back(QString("-i"));
-				params.push_back(QString(file.pathSub().c_str()));
-			}
-			params.push_back(QString("-map"));
-			params.push_back(QString("0:0"));
-			params.push_back(QString("-map"));
-			params.push_back(QString("0:1?"));
-			if (file.subtitles() == 1 && settings->subtitles.compare("Embed") == 0) {
-				params.push_back(QString("-map"));
-				params.push_back(QString("1:0"));
-			}
-			if (file.subtitles() > 0 && settings->subtitles.compare("Remove") != 0) {
-				params.push_back(QString("-map"));
-				params.push_back(QString("0:2?"));
-				params.push_back(QString("-c:s"));
-				params.push_back(QString("srt"));
-				params.push_back(QString("-metadata:s:s:0"));
-				params.push_back(QString("language=eng"));
-				params.push_back(QString("-disposition:s:0"));
-				params.push_back(QString("default"));
-			}
-			params.push_back(QString("-c:v"));
-			params.push_back(QString(settings->vCodec.c_str()));
-			params.push_back(QString("-crf"));
-			params.push_back(QString(settings->vQuality.c_str()));
-			params.push_back(QString("-c:a"));
-			params.push_back(QString(settings->aCodec.c_str()));
-			params.push_back(QString("-b:a"));
-			params.push_back(QString((settings->aQuality + "k").c_str()));
-			if (!settings->extraParams.empty()) {
-				char s[2048];
-				strcpy(s, settings->extraParams.c_str());
-				for (char *p = strtok(s, " "); p != NULL; p = strtok(NULL, " ")) {
-					params.push_back(p);
-				}
-			}
-			params.push_back(QString("-metadata"));
-			params.push_back(QString(("title=" + file.name()).c_str()));
-			params.push_back(QString("-metadata"));
-			params.push_back(QString("comment=Processed by SuperEpicFuntime Media Preparer (Reborn)"));
-			params.push_back(QString("-strict"));
-			params.push_back(QString("-2"));
-			params.push_back(QString((settings->tempDir + "\\" + file.name() + "." + settings->container).c_str()));
-			return params;
-		}
-
-	void MediaPreparer::runWorkerScan() {
-		if (!workerScan.isRunning() && workerScan.isFinished()) {
-			workerScan = QtConcurrent::run(this, &MediaPreparer::scanLibrary, getPath());
-		}
-	}
-
-	void MediaPreparer::runWorkerEncode() {
-		if (!workerEncode.isRunning() && workerEncode.isFinished()) {
-			workerEncode = QtConcurrent::run(this, &MediaPreparer::encodeLibrary);
-		}
-	}
-#endif
 
 #ifndef SEFMediaPreparer_Section_Config_Presets
+
 	void MediaPreparer::loadConfig() {
 		blockAllSignals(true);
 		ui->setting_vCodec->clear();
@@ -333,35 +122,11 @@ namespace SuperEpicFuntime {
 	void MediaPreparer::savePreset() {
 		savePreset("Custom");
 	}
+
 #endif
 
-	void MediaPreparer::setEncodeOptions() {
-		settings->vCodec = ba::trim_copy(ui->setting_vCodec->currentText().toStdString());
-		settings->aCodec = ba::trim_copy(ui->setting_aCodec->currentText().toStdString());
-		settings->vQuality = ba::trim_copy(std::to_string(ui->setting_vQuality->value())); // @suppress("Invalid arguments") // @suppress("Function cannot be resolved")
-		settings->aQuality = ba::trim_copy(std::to_string(ui->setting_aQuality->value())); // @suppress("Invalid arguments") // @suppress("Function cannot be resolved")
-		settings->container = ba::trim_copy(ui->setting_container->currentText().toStdString());
-		settings->subtitles = ba::trim_copy(ui->setting_subtitles->currentText().toStdString());
-		settings->outputDir = ba::trim_copy(ui->setting_dirOutput->text().toStdString());
-		settings->threads = ba::trim_copy(ui->setting_threads->text().toStdString());
-		settings->extraParams = ba::trim_copy(ui->setting_extraParams->text().toStdString());
-
-		if (library->isValid()) {
-			library->scanEncode();
-			ui->button_encode->setText(QString(("Encode [" + std::to_string(library->sizeEncode()) + "]").c_str())); // @suppress("Function cannot be resolved") // @suppress("Method cannot be resolved")
-		} else {
-			ui->button_encode->setText(QString("Encode [0]"));
-		}
-	}
-
-	std::string MediaPreparer::getPath() {
-		string p = ui->setting_directory->text().toStdString();
-		ba::replace_all(p, "/", "\\");
-		ui->setting_directory->setText(QString(p.c_str()));
-		return p;
-	}
-
 #ifndef SEFMediaPreparer_Section_UI_Control
+
 	void MediaPreparer::lockUILoad(bool b) {
 		bool toggle;
 		if (b) {
@@ -466,9 +231,17 @@ namespace SuperEpicFuntime {
 			ui->container_settings_tabs->removeTab(3);
 		}
 	}
+
 #endif
 
 #ifndef SEFMediaPreparer_Section_Init
+
+	MediaPreparer::MediaPreparer(QWidget *parent) :
+			QWidget(parent), ui(new Ui::MediaPreparer) {
+		ui->setupUi(this);
+		Init();
+	}
+
 	void MediaPreparer::Init() {
 		createTrayIcon();
 		InitGUI();
@@ -489,7 +262,7 @@ namespace SuperEpicFuntime {
 		connect(this, SIGNAL(progress_updated_encode(QString)), this, SLOT(workerEncodeUpdateProgress(QString)));
 		connect(this, SIGNAL(progress_updated_encode(int)), this, SLOT(workerEncodeUpdateProgress(int)));
 
-		connect(ui->button_savePreset, SIGNAL(clicked()), this, SLOT(savePreset()));
+		connect(ui->button_savePreset, SIGNAL(clicked()), this, SLOT(saveDialog()));
 
 		connect(ui->setting_preset, SIGNAL(currentTextChanged(const QString)), this, SLOT(loadPreset(QString)));
 
@@ -572,22 +345,24 @@ namespace SuperEpicFuntime {
 
 		blockAllSignals(false);
 	}
+
+	void MediaPreparer::closeEvent(QCloseEvent *event) {
+		if ((!workerEncode.isRunning() && !workerScan.isRunning()) || cancel()) {
+			event->accept();
+		} else {
+			event->ignore();
+		}
+	}
+
+	MediaPreparer::~MediaPreparer() {
+		if (diffPreset()) savePreset("Auto Saved");
+		saveConfig();
+		delete ui;
+	}
+
 #endif
 
-	void MediaPreparer::log(std::string msg) {
-		bf::fstream fs;
-		fs.open(settings->logPath, bf::fstream::in | bf::fstream::out | bf::fstream::app);
-
-		char timeStamp[1024];
-		time_t t = time(0);
-		struct tm *now = localtime(&t);
-		strftime(timeStamp, sizeof(timeStamp), "%F %T", now);
-
-		fs << "[" << timeStamp << "] " << msg << endl;
-	}
-	void MediaPreparer::log(QString msg) {
-		log(msg.toStdString());
-	}
+#ifndef SEFMediaPreparer_Section_Tray_Icon
 
 	void MediaPreparer::createTrayActions() {
 		minimizeAction = new QAction(tr("Mi&nimize"), this);
@@ -637,6 +412,10 @@ namespace SuperEpicFuntime {
 		}
 	}
 
+#endif
+
+#ifndef SEFMediaPreparer_Section_Dialogs
+
 	void MediaPreparer::browseDialog(int type) {
 		QFileDialog dialog(this);
 		dialog.setFileMode(QFileDialog::DirectoryOnly);
@@ -659,6 +438,13 @@ namespace SuperEpicFuntime {
 		}
 	}
 
+	void MediaPreparer::saveDialog() {
+		QString fileName = QFileDialog::getSaveFileName(this, "Save Preset - Will Only Be Loaded From Presets Directory", (settings->baseDir + "//presets//Custom").c_str(), "SEF Preset (*.preset)");
+		if (!fileName.isEmpty()) {
+			savePreset(fileName.toStdString());
+		}
+	}
+
 	bool MediaPreparer::cancelDialog() {
 		QMessageBox confirm;
 		confirm.setText("Are you sure?");
@@ -670,6 +456,52 @@ namespace SuperEpicFuntime {
 			return false;
 		}
 		return true;
+	}
+
+#endif
+
+#ifndef SEFMediaPreparer_Section_Utility
+
+	void MediaPreparer::setEncodeOptions() {
+		settings->vCodec = ba::trim_copy(ui->setting_vCodec->currentText().toStdString());
+		settings->aCodec = ba::trim_copy(ui->setting_aCodec->currentText().toStdString());
+		settings->vQuality = ba::trim_copy(std::to_string(ui->setting_vQuality->value())); // @suppress("Invalid arguments") // @suppress("Function cannot be resolved")
+		settings->aQuality = ba::trim_copy(std::to_string(ui->setting_aQuality->value())); // @suppress("Invalid arguments") // @suppress("Function cannot be resolved")
+		settings->container = ba::trim_copy(ui->setting_container->currentText().toStdString());
+		settings->subtitles = ba::trim_copy(ui->setting_subtitles->currentText().toStdString());
+		settings->outputDir = ba::trim_copy(ui->setting_dirOutput->text().toStdString());
+		settings->threads = ba::trim_copy(ui->setting_threads->text().toStdString());
+		settings->extraParams = ba::trim_copy(ui->setting_extraParams->text().toStdString());
+
+		if (library->isValid()) {
+			library->scanEncode();
+			ui->button_encode->setText(QString(("Encode [" + std::to_string(library->sizeEncode()) + "]").c_str())); // @suppress("Function cannot be resolved") // @suppress("Method cannot be resolved")
+		} else {
+			ui->button_encode->setText(QString("Encode [0]"));
+		}
+	}
+
+	std::string MediaPreparer::getPath() {
+		string p = ui->setting_directory->text().toStdString();
+		ba::replace_all(p, "/", "\\");
+		ui->setting_directory->setText(QString(p.c_str()));
+		return p;
+	}
+
+	void MediaPreparer::log(std::string msg) {
+		bf::fstream fs;
+		fs.open(settings->logPath, bf::fstream::in | bf::fstream::out | bf::fstream::app);
+
+		char timeStamp[1024];
+		time_t t = time(0);
+		struct tm *now = localtime(&t);
+		strftime(timeStamp, sizeof(timeStamp), "%F %T", now);
+
+		fs << "[" << timeStamp << "] " << msg << endl;
+	}
+
+	void MediaPreparer::log(QString msg) {
+		log(msg.toStdString());
 	}
 
 	bool MediaPreparer::cancel() {
@@ -700,6 +532,90 @@ namespace SuperEpicFuntime {
 		{
 			x->blockSignals(b);
 		} // @suppress("Invalid arguments") // @suppress("Field cannot be resolved")
+	}
+
+#endif
+
+#ifndef SEFMediaPreparer_Section_Worker_Scan
+
+	void MediaPreparer::scanLibrary(std::string dir) {
+		emit started_workerScan();
+
+		emit progress_updated_scan(QString("Checking Directory..."), 0);
+
+		if (bf::exists(dir)) {
+
+			ui->setting_dirOutput->setText(QString((dir + "\\Converted").c_str()));
+
+			emit progress_updated_scan(QString("Scanning Files..."), 0);
+			log("Scanning directory: " + dir);
+
+			bool recursive = ui->setting_subdirectories->isChecked();
+			if (library->Init(dir, recursive)) {
+				for (int i = 0; i < library->size() && cancelScan != true; i++) {
+					File &file = library->getFile(i);
+					scanIndex = i;
+
+					QProcess process;
+					if (bf::exists("./ffmpeg/ffprobe.exe")) {
+						process.setProgram(QString("./ffmpeg/ffprobe"));
+					} else if (bf::exists("../ffmpeg/ffprobe.exe")) {
+						process.setProgram(QString("../ffmpeg/ffprobe"));
+					} else if (bf::exists("../../ffmpeg/ffprobe.exe")) {
+						process.setProgram(QString("../../ffmpeg/ffprobe"));
+					} else {
+						process.setProgram(QString("ffprobe"));
+					}
+					process.setArguments(workerScanParams(file));
+
+					emit progress_updated_scan(QString((file.name() + file.extension()).c_str()));
+					log("Reading File: " + file.path());
+
+					process.start();
+					process.waitForFinished();
+					QByteArray out = process.readAllStandardOutput();
+					file.loadFileInfo(json::parse(out.begin(), out.end())); // @suppress("Invalid arguments") // @suppress("Function cannot be resolved")
+
+					emit item_added_scan(i);
+					emit progress_updated_scan((int) (((double) i / (double) library->size()) * 1000.0));
+				}
+				setEncodeOptions();
+				library->duration();
+				library->scanEncode();
+				string temp = "Encode [" + std::to_string(library->sizeEncode()) + "]"; // @suppress("Function cannot be resolved")
+				if (library->sizeEncode() != NULL) ui->button_encode->setText(QString(temp.c_str()));
+			}
+		}
+
+		if (!cancelScan) {
+			if (library->size() > 0) {
+				emit progress_updated_scan(QString("Complete..."), 1000);
+			} else {
+				emit progress_updated_scan(QString("Invalid Directory..."), 0);
+			}
+		} else {
+			emit progress_updated_scan(QString("Canceled..."), 0);
+		}
+
+		emit finished_workerScan();
+	}
+
+	QStringList MediaPreparer::workerScanParams(SuperEpicFuntime::File& file) {
+		QStringList params;
+		params.push_back(QString("-v"));
+		params.push_back(QString("quiet"));
+		params.push_back(QString("-show_entries"));
+		params.push_back(QString("format=duration:stream=codec_type:stream=codec_name"));
+		params.push_back(QString("-of"));
+		params.push_back(QString("json"));
+		params.push_back(QString(file.path().c_str()));
+		return params;
+	}
+
+	void MediaPreparer::runWorkerScan() {
+		if (!workerScan.isRunning() && workerScan.isFinished()) {
+			workerScan = QtConcurrent::run(this, &MediaPreparer::scanLibrary, getPath());
+		}
 	}
 
 	void MediaPreparer::workerScanStart() {
@@ -744,10 +660,125 @@ namespace SuperEpicFuntime {
 		}
 	}
 
+#endif
+
+#ifndef SEFMediaPreparer_Section_Worker_Encode
+
+	void MediaPreparer::encodeLibrary() {
+		emit started_workerEncode();
+
+		for (int i = 0; i < library->getFilesEncode().size() && cancelEncode != true; i++) {
+			File &file = library->getFileEncode(i);
+			encodeIndex = i;
+
+			emit progress_updated_scan(QString(file.name().c_str()), i);
+			emit progress_updated_encode(QString("Encoding File"), 0);
+			emit item_changed_encode(i);
+
+			QProcess process;
+			if (bf::exists("./ffmpeg/ffmpeg.exe")) {
+				process.setProgram(QString("./ffmpeg/ffmpeg"));
+			} else if (bf::exists("../ffmpeg/ffmpeg.exe")) {
+				process.setProgram(QString("../ffmpeg/ffmpeg"));
+			} else if (bf::exists("../../ffmpeg/ffmpeg.exe")) {
+				process.setProgram(QString("../../ffmpeg/ffmpeg"));
+			} else {
+				process.setProgram(QString("ffmpeg"));
+			}
+			process.setArguments(workerEncodeParams(file));
+
+			process.start();
+			process.waitForFinished(-1);
+			if (!cancelEncode) {
+				if (bf::exists(settings->tempDir + "\\" + file.name() + "." + settings->container)) {
+					bf::copy_file(settings->tempDir + "\\" + file.name() + "." + settings->container, settings->outputDir + "\\" + file.name() + "." + settings->container);
+					if (bf::exists(settings->outputDir + "\\" + file.name() + "." + settings->container)) {
+						bf::remove(settings->tempDir + "\\" + file.name() + "." + settings->container);
+					}
+				}
+			}
+			emit progress_updated_scan((int) (((double) i / (double) library->sizeEncode()) * 1000.0));
+		}
+		if (!cancelEncode) {
+			emit progress_updated_scan("Complete...", 1000);
+		} else {
+			emit progress_updated_scan("Canceled...", 0);
+		}
+
+		emit finished_workerEncode();
+	}
+
+	QStringList MediaPreparer::workerEncodeParams(SuperEpicFuntime::File& file) {
+		QStringList params;
+		if (bf::exists((settings->outputDir + "\\" + file.name() + "." + settings->container).c_str())) {
+			params.push_back("-y");
+		}
+		params.push_back(QString("-v"));
+		params.push_back(QString("quiet"));
+		params.push_back(QString("-stats"));
+		params.push_back(QString("-hwaccel"));
+		params.push_back(QString("dxva2"));
+		params.push_back(QString("-threads"));
+		params.push_back(QString(settings->threads.c_str()));
+		params.push_back(QString("-i"));
+		params.push_back(QString(file.path().c_str()));
+		if (file.subtitles() == 1 && settings->subtitles.compare("Embed") == 0) {
+			params.push_back(QString("-i"));
+			params.push_back(QString(file.pathSub().c_str()));
+		}
+		params.push_back(QString("-map"));
+		params.push_back(QString("0:0"));
+		params.push_back(QString("-map"));
+		params.push_back(QString("0:1?"));
+		if (file.subtitles() == 1 && settings->subtitles.compare("Embed") == 0) {
+			params.push_back(QString("-map"));
+			params.push_back(QString("1:0"));
+		}
+		if (file.subtitles() > 0 && settings->subtitles.compare("Remove") != 0) {
+			params.push_back(QString("-map"));
+			params.push_back(QString("0:2?"));
+			params.push_back(QString("-c:s"));
+			params.push_back(QString("srt"));
+			params.push_back(QString("-metadata:s:s:0"));
+			params.push_back(QString("language=eng"));
+			params.push_back(QString("-disposition:s:0"));
+			params.push_back(QString("default"));
+		}
+		params.push_back(QString("-c:v"));
+		params.push_back(QString(settings->vCodec.c_str()));
+		params.push_back(QString("-crf"));
+		params.push_back(QString(settings->vQuality.c_str()));
+		params.push_back(QString("-c:a"));
+		params.push_back(QString(settings->aCodec.c_str()));
+		params.push_back(QString("-b:a"));
+		params.push_back(QString((settings->aQuality + "k").c_str()));
+		if (!settings->extraParams.empty()) {
+			char s[2048];
+			strcpy(s, settings->extraParams.c_str());
+			for (char *p = strtok(s, " "); p != NULL; p = strtok(NULL, " ")) {
+				params.push_back(p);
+			}
+		}
+		params.push_back(QString("-metadata"));
+		params.push_back(QString(("title=" + file.name()).c_str()));
+		params.push_back(QString("-metadata"));
+		params.push_back(QString("comment=Processed by SuperEpicFuntime Media Preparer (Reborn)"));
+		params.push_back(QString("-strict"));
+		params.push_back(QString("-2"));
+		params.push_back(QString((settings->tempDir + "\\" + file.name() + "." + settings->container).c_str()));
+		return params;
+	}
+
 	void MediaPreparer::workerEncodeStart() {
 		lockUIEncode(true);
 		ui->progress_worker->setMaximum(library->sizeEncode());
 		workerTimeStamp.start();
+	}
+
+	void MediaPreparer::runWorkerEncode() {
+		if (!workerEncode.isRunning() && workerEncode.isFinished()) {
+			workerEncode = QtConcurrent::run(this, &MediaPreparer::encodeLibrary);
+		}
 	}
 
 	void MediaPreparer::workerEncodeChangeItem(int pos) {
@@ -807,5 +838,7 @@ namespace SuperEpicFuntime {
 	void MediaPreparer::workerEncodeUpdateProgress(int percent) {
 		ui->progress_worker->setValue(percent);
 	}
+
+#endif
 
 } // namespace SuperEpicFuntime
