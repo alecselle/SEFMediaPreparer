@@ -22,7 +22,7 @@ namespace SuperEpicFuntime {
 		}
 		baseDir = BASE_DIR;
 		logPath = LOG_FILE;
-		for (bf::directory_entry &x : bf::directory_iterator(PRESET_DIR)) {
+		for (bf::directory_entry &x : bf::directory_iterator(bf::path(PRESET_DIR))) {
 			if (x.path().extension().compare(PRESET_EXTENSION) == 0) {
 				presetPathList.push_back(x.path().string());
 				presetNameList.push_back(x.path().filename().replace_extension().string());
@@ -67,7 +67,7 @@ namespace SuperEpicFuntime {
 		j["threads"] = threads;
 		j["extraParams"] = extraParams;
 
-		string newPath = PRESET_DIR + "\\" + name + ".preset";
+		string newPath = PRESET_DIR + "\\" + name + PRESET_EXTENSION;
 
 		ofstream newPreset(newPath);
 		newPreset << setw(4) << j;
@@ -147,7 +147,7 @@ namespace SuperEpicFuntime {
 	}
 
 	void Settings::loadPreset(std::string name) {
-		loadPresetFile(PRESET_DIR + "\\" + name + ".preset");
+		loadPresetFile(PRESET_DIR + "\\" + name + PRESET_EXTENSION);
 	}
 
 	void Settings::loadPresetFile(std::string path) {
@@ -244,7 +244,7 @@ namespace SuperEpicFuntime {
 		j["threads"] = DEFAULT_THREADS;
 		j["extraParams"] = DEFAULT_EXTRA_PARAMS;
 
-		ofstream newPreset(PRESET_DIR + "\\SEF Standard.preset");
+		ofstream newPreset(PRESET_DIR + "\\SEF Standard" + PRESET_EXTENSION);
 		newPreset << setw(4) << j;
 		newPreset.close();
 	}
