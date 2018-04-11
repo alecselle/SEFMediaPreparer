@@ -24,7 +24,7 @@ namespace SuperEpicFuntime {
 		_isChecked = false;
 	}
 
-	bool Library::Init(boost::filesystem::path libraryDirectory, SuperEpicFuntime::Settings *settings, bool scanRecursive) {
+	bool Library::Init(std::string libraryDirectory, SuperEpicFuntime::Settings *settings, bool scanRecursive) {
 		if (bf::exists(libraryDirectory) && bf::is_directory(libraryDirectory)) {
 			_settings = settings;
 			_directory = libraryDirectory;
@@ -42,7 +42,7 @@ namespace SuperEpicFuntime {
 		return false;
 	}
 
-	bool Library::Init(boost::filesystem::path libraryDirectory, bool scanRecursive) {
+	bool Library::Init(std::string libraryDirectory, bool scanRecursive) {
 		if (isValid(true, false, false) && bf::exists(libraryDirectory) && bf::is_directory(libraryDirectory)) {
 			_directory = libraryDirectory;
 			_isRecursive = scanRecursive;
@@ -72,7 +72,7 @@ namespace SuperEpicFuntime {
 				for (bf::directory_entry &x : bf::directory_iterator(_directory)) {
 					for (int i = 0; i < _extensions.size(); i++) {
 						if (x.path().extension().string() == _extensions[i]) {
-							File file = File(x.path());
+							File file = File(x.path().string());
 							_Library.push_back(file);
 						}
 					}
@@ -82,7 +82,7 @@ namespace SuperEpicFuntime {
 					if (x.path().parent_path().filename().string().compare("Converted") != 0) {
 						for (int i = 0; i < _extensions.size(); i++) {
 							if (x.path().extension().string().compare(_extensions[i]) == 0) {
-								File file = File(x.path());
+								File file = File(x.path().string());
 								_Library.push_back(file);
 							}
 						}
@@ -129,8 +129,8 @@ namespace SuperEpicFuntime {
 		}
 	}
 
-	int Library::findFile(boost::filesystem::path file) {
-		if (isValid(true, true, false)) return findFile(File(file));
+	int Library::findFile(std::string file) {
+		return findFile(File(file));
 	}
 
 	bool Library::addFile(File file) {
@@ -142,7 +142,7 @@ namespace SuperEpicFuntime {
 		return false;
 	}
 
-	bool Library::addFile(boost::filesystem::path file) {
+	bool Library::addFile(std::string file) {
 		if (isValid(true, true, false)) return addFile(File(file));
 		return false;
 	}
@@ -169,7 +169,7 @@ namespace SuperEpicFuntime {
 				}
 			}
 
-			if (file.extensionStr().compare("." + _settings->container) == 0) {
+			if (file.extension().compare("." + _settings->container) == 0) {
 				matches[2] = true;
 			}
 
@@ -205,7 +205,7 @@ namespace SuperEpicFuntime {
 						}
 					}
 
-					if (f.extensionStr().compare("." + _settings->container) == 0) {
+					if (f.extension().compare("." + _settings->container) == 0) {
 						matches[2] = true;
 					}
 					if ((!matches[0] || !matches[1] || !matches[2]) && findFileEncode(f) == NULL) {
@@ -257,8 +257,8 @@ namespace SuperEpicFuntime {
 		}
 	}
 
-	int Library::findFileEncode(boost::filesystem::path file) {
-		if (isValid(true, true, true)) return findFileEncode(File(file));
+	int Library::findFileEncode(std::string file) {
+		return findFileEncode(File(file));
 	}
 
 	bool Library::forceEncode(File file) {
@@ -270,9 +270,8 @@ namespace SuperEpicFuntime {
 		return false;
 	}
 
-	bool Library::forceEncode(boost::filesystem::path file) {
-		if (isValid(true, true, true)) return forceEncode(File(file));
-		return false;
+	bool Library::forceEncode(std::string file) {
+		return forceEncode(File(file));
 	}
 
 	bool Library::skipEncode(File file) {
@@ -284,8 +283,7 @@ namespace SuperEpicFuntime {
 		return false;
 	}
 
-	bool Library::skipEncode(boost::filesystem::path file) {
-		if (isValid(true, true, true)) return skipEncode(File(file));
-		return false;
+	bool Library::skipEncode(std::string file) {
+		return skipEncode(File(file));
 	}
 } // namespace SuperEpicFuntime

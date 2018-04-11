@@ -6,8 +6,6 @@
 #include <src/Library.hpp>
 #include <src/Settings.hpp>
 
-#include <boost/filesystem.hpp>
-
 #include <QtConcurrent/QtConcurrent>
 #include <QtCore/QFuture>
 #include <QtCore/QObject>
@@ -53,16 +51,15 @@ namespace SuperEpicFuntime {
 
 		void closeEvent(QCloseEvent *);
 
-		void scanLibrary(boost::filesystem::path directoryPath);
+		void scanLibrary(std::string directoryPath);
 
 		void encodeLibrary();
 
-		boost::filesystem::path getPath(std::string pathString);
-		boost::filesystem::path getPath();
+		std::string getPath();
 
 	public:
 		SuperEpicFuntime::Settings *settings = new SuperEpicFuntime::Settings();
-		SuperEpicFuntime::Library *library = new SuperEpicFuntime::Library();
+		SuperEpicFuntime::Library *library = new SuperEpicFuntime::Library(settings);
 
 		explicit MediaPreparer(QWidget *parent = 0);
 

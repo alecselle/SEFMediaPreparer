@@ -1,7 +1,5 @@
 #include "src/File.hpp"
 
-#include <QtCore/QProcess>
-#include <QtCore/QTime>
 #include <QtWidgets/QWidget>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
@@ -17,56 +15,36 @@ namespace SuperEpicFuntime {
 	File::File() {
 	}
 
-	File::File(boost::filesystem::path file) {
+	File::File(std::string file) {
 		if (bf::exists(bf::canonical(file))) {
+			bf::path path = bf::canonical(file);
+			bf::path pathSub = file;
+			pathSub.replace_extension(".srt");
 
-			_path = bf::canonical(file);
+			_path = path.string();
 
-			_pathSub = _path;
-			_pathSub.replace_extension(".srt");
+			_pathSub = pathSub.string();
 
-			_name = bf::canonical(file).filename().replace_extension();
+			_name = path.filename().replace_extension().string();
 
-			_extension = bf::canonical(file).extension();
+			_extension = path.extension().string();
 		}
 	}
 
-	bf::path File::path() {
+	std::string File::path() {
 		return _path;
 	}
 
-	string File::pathStr() {
-		string str = _path.string();
-		ba::replace_all(str, "/", "\\");
-		return str;
-	}
-
-	bf::path File::pathSub() {
+	std::string File::pathSub() {
 		if (_loaded && _subtitles == 1) return _pathSub;
 	}
 
-	string File::pathSubStr() {
-		if (_loaded && _subtitles == 1) return _pathSub.string();
-	}
-
-	bf::path File::name() {
+	std::string File::name() {
 		return _name;
 	}
 
-	string File::nameStr() {
-		string str = _name.string();
-		ba::replace_all(str, "/", "\\");
-		return str;
-	}
-
-	bf::path File::extension() {
+	std::string File::extension() {
 		return _extension;
-	}
-
-	string File::extensionStr() {
-		string str = _extension.string();
-		ba::replace_all(str, "/", "\\");
-		return str;
 	}
 
 	string File::vcodec() {

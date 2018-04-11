@@ -2,18 +2,16 @@
 #define FILE_HPP
 #pragma once
 
-#include <QtCore/QTime>
-#include <boost/filesystem.hpp>
 #include <nlohmann/json.hpp>
 #include <string>
 
 namespace SuperEpicFuntime {
 	class File {
 	private:
-		boost::filesystem::path _path;
-		boost::filesystem::path _pathSub;
-		boost::filesystem::path _name;
-		boost::filesystem::path _extension;
+		std::string _path;
+		std::string _pathSub;
+		std::string _name;
+		std::string _extension;
 
 		std::string _vCodec;
 		std::string _aCodec;
@@ -24,15 +22,11 @@ namespace SuperEpicFuntime {
 
 	public:
 		File();
-		File(boost::filesystem::path);
-		boost::filesystem::path path();
-		std::string pathStr();
-		boost::filesystem::path pathSub();
-		std::string pathSubStr();
-		boost::filesystem::path name();
-		std::string nameStr();
-		boost::filesystem::path extension();
-		std::string extensionStr();
+		File(std::string);
+		std::string path();
+		std::string pathSub();
+		std::string name();
+		std::string extension();
 		std::string vcodec();
 		std::string acodec();
 		int duration();

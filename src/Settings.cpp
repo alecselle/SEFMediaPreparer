@@ -23,8 +23,8 @@ namespace SuperEpicFuntime {
 		baseDir = BASE_DIR;
 		logPath = LOG_FILE;
 		for (bf::directory_entry &x : bf::directory_iterator(PRESET_DIR)) {
-			if (x.path().extension().string().compare(".preset") == 0) {
-				presetPathList.push_back(x.path());
+			if (x.path().extension().compare(PRESET_EXTENSION) == 0) {
+				presetPathList.push_back(x.path().string());
 				presetNameList.push_back(x.path().filename().replace_extension().string());
 			}
 		}
@@ -34,10 +34,10 @@ namespace SuperEpicFuntime {
 
 	void Settings::saveConfig() {
 		json j;
-		j["preset"] = presetPath.string();
-		j["libraryDir"] = libraryDir.string();
-		j["tempDir"] = tempDir.string();
-		j["outputDir"] = outputDir.string();
+		j["preset"] = presetPath;
+		j["libraryDir"] = libraryDir;
+		j["tempDir"] = tempDir;
+		j["outputDir"] = outputDir;
 		j["preserveLog"] = preserveLog;
 		for (int i = 0; i < vCodecList.size(); i++) {
 			j["vCodecs"][i] = vCodecList[i];
@@ -47,7 +47,7 @@ namespace SuperEpicFuntime {
 		}
 		j["containers"] = containerList;
 
-		ofstream newConfig(CONFIG_FILE.string().c_str());
+		ofstream newConfig(CONFIG_FILE.c_str());
 		newConfig << setw(4) << j;
 		newConfig.close();
 	}
@@ -67,7 +67,7 @@ namespace SuperEpicFuntime {
 		j["threads"] = threads;
 		j["extraParams"] = extraParams;
 
-		string newPath = PRESET_DIR.string() + "\\" + name + ".preset";
+		string newPath = PRESET_DIR + "\\" + name + ".preset";
 
 		ofstream newPreset(newPath);
 		newPreset << setw(4) << j;
@@ -77,7 +77,7 @@ namespace SuperEpicFuntime {
 	}
 
 	void Settings::loadConfig() {
-		auto j = json::parse(ifstream(CONFIG_FILE.string().c_str())); // @suppress("Function cannot be resolved")
+		auto j = json::parse(ifstream(CONFIG_FILE.c_str())); // @suppress("Function cannot be resolved")
 		if (j.find("preset") != j.end()) { // @suppress("Method cannot be resolved")
 			string presetStr = j.find("preset").value(); // @suppress("Method cannot be resolved")
 			ba::ireplace_all(presetStr, "%APPDATA%", APPDATA.c_str());
@@ -147,22 +147,24 @@ namespace SuperEpicFuntime {
 	}
 
 	void Settings::loadPreset(std::string name) {
-		loadPresetFile(PRESET_DIR.string() + "\\" + name + ".preset");
+		loadPresetFile(PRESET_DIR + "\\" + name + ".preset");
 	}
 
-	void Settings::loadPresetFile(bf::path path) {
-		if (bf::exists(path)) {
-			json j = json::parse(ifstream(path.string().c_str())); // @suppress("Function cannot be resolved")
-			presetPath = path;
-			presetName = path.filename().replace_extension().string();
+	void Settings::loadPresetFile(std::string path) {
+		bf::path p = bf::canonical(path);
+		if (bf::exists(p)) {
+			json j = json::parse(ifstream(path.c_str())); // @suppress("Function cannot be resolved")
+
+			presetPath = p.string();
+			presetName = p.filename().replace_extension().string();
 			loadPresetJson(j); // @suppress("Invalid arguments")
 		} else {
 			if (!bf::exists(DEFAULT_PRESET)) {
 				createDefaultPreset();
 			}
-			json j = json::parse(ifstream(DEFAULT_PRESET.string().c_str())); // @suppress("Function cannot be resolved")
-			presetPath = path;
-			presetName = path.filename().replace_extension().string();
+			json j = json::parse(ifstream(DEFAULT_PRESET.c_str())); // @suppress("Function cannot be resolved")
+			presetPath = p.string();
+			presetName = p.filename().replace_extension().string();
 			loadPresetJson(j); // @suppress("Invalid arguments")
 			savePresetAs(presetName);
 		}
@@ -226,7 +228,7 @@ namespace SuperEpicFuntime {
 		}
 		j["containers"] = DEFAULT_CONTAINERS;
 
-		ofstream newConfig(CONFIG_FILE.string().c_str());
+		ofstream newConfig(CONFIG_FILE.c_str());
 		newConfig << setw(4) << j;
 		newConfig.close();
 	}
@@ -242,7 +244,7 @@ namespace SuperEpicFuntime {
 		j["threads"] = DEFAULT_THREADS;
 		j["extraParams"] = DEFAULT_EXTRA_PARAMS;
 
-		ofstream newPreset(PRESET_DIR.string() + "\\SEF Standard.preset");
+		ofstream newPreset(PRESET_DIR + "\\SEF Standard.preset");
 		newPreset << setw(4) << j;
 		newPreset.close();
 	}

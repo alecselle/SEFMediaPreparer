@@ -17,7 +17,7 @@ namespace SuperEpicFuntime {
 		bool _isInitialized = false;
 		bool _isChecked = false;
 		bool _isRecursive = false;
-		boost::filesystem::path _directory;
+		std::string _directory;
 		boost::container::vector<File> _Library = { };
 		boost::container::vector<File> _LibraryEncode = { };
 		boost::container::vector<std::string> _extensions = { ".wmv", ".avi", ".divx", ".mkv", ".mka", ".mks", ".webm", ".mp4", ".mpeg", ".mpg", ".mov", ".qt", ".flv" };
@@ -28,9 +28,9 @@ namespace SuperEpicFuntime {
 	public:
 		Library(SuperEpicFuntime::Settings *settingsObject);
 		Library();
-		bool Init(boost::filesystem::path directoryPath, SuperEpicFuntime::Settings *settingsObject, bool scanRecursive = false);
-		bool Init(boost::filesystem::path, bool scanRecursive = false);
-		bool setDirectory(boost::filesystem::path directoryPath, bool scanRecursive = true, bool scanNow = false);
+		bool Init(std::string directoryPath, SuperEpicFuntime::Settings *settingsObject, bool scanRecursive = false);
+		bool Init(std::string, bool scanRecursive = false);
+		bool setDirectory(std::string directoryPath, bool scanRecursive = true, bool scanNow = false);
 		void setSettings(SuperEpicFuntime::Settings *settingsObject);
 		void setRecursive(bool scanRecursive = true, bool scanNow = false);
 
@@ -44,13 +44,13 @@ namespace SuperEpicFuntime {
 		boost::container::vector<SuperEpicFuntime::File> &getFiles();
 		SuperEpicFuntime::File &getFile(int filePosition);
 		int findFile(SuperEpicFuntime::File fileObject);
-		int findFile(boost::filesystem::path filePath);
+		int findFile(std::string filePath);
 
 		bool addFile(SuperEpicFuntime::File fileObject);
-		bool addFile(boost::filesystem::path filePath);
+		bool addFile(std::string filePath);
 
 		bool removeFile(File fileObject);
-		bool removeFile(boost::filesystem::path filePath);
+		bool removeFile(std::string filePath);
 
 		bool checkEncode(SuperEpicFuntime::File fileObject);
 
@@ -62,13 +62,13 @@ namespace SuperEpicFuntime {
 		boost::container::vector<SuperEpicFuntime::File> &getFilesEncode();
 		SuperEpicFuntime::File &getFileEncode(int filePosition);
 		int findFileEncode(SuperEpicFuntime::File fileObject);
-		int findFileEncode(boost::filesystem::path filePath);
+		int findFileEncode(std::string filePath);
 
 		bool forceEncode(SuperEpicFuntime::File fileObject);
-		bool forceEncode(boost::filesystem::path filePath);
+		bool forceEncode(std::string filePath);
 
 		bool skipEncode(SuperEpicFuntime::File fileObject);
-		bool skipEncode(boost::filesystem::path filePath);
+		bool skipEncode(std::string filePath);
 	};
 } // namespace SuperEpicFuntime
 #endif // LIBRARY_HPP
