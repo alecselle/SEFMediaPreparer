@@ -159,6 +159,7 @@ namespace SuperEpicFuntime {
 
 	void Library::scanEncode() {
 		if (isValid(true, true, false)) {
+			_LibraryEncode.clear();
 			for (int i = 0; i < size(); i++) {
 				File &f = getFile(i);
 				if (f.isLoaded()) {
