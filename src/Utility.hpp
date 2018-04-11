@@ -11,13 +11,6 @@ namespace SuperEpicFuntime {
 
 	};
 
-	class Json {
-	private:
-
-	public:
-
-	};
-
 } // namespace SuperEpicFuntime
 
 #endif // UTILITY_HPP
