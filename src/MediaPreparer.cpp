@@ -49,6 +49,7 @@ namespace SuperEpicFuntime {
 		delete ui;
 	}
 
+#ifndef SEFMediaPreparer_Section_Workers
 	void MediaPreparer::scanLibrary(std::string dir) {
 		emit started_workerScan();
 
@@ -239,21 +240,9 @@ namespace SuperEpicFuntime {
 			workerEncode = QtConcurrent::run(this, &MediaPreparer::encodeLibrary);
 		}
 	}
-	/*
-	 void MediaPreparer::updateEncodeList() {}
+#endif
 
-	 void MediaPreparer::toggleEncodeFile(int position, int null) {
-	 File f = library->getFile(position);
-	 if (ui->list_Library->item(position, 0)->checkState() == Qt::Checked) {
-	 cout << "Force Encoding: " << f.nameStr();
-	 library->forceEncode(f);
-	 } else {
-	 cout << "Skipping File: " << f.nameStr();
-	 library->skipEncode(f);
-	 }
-	 }
-	 */
-
+#ifndef SEFMediaPreparer_Section_Config_Presets
 	void MediaPreparer::loadConfig() {
 		blockAllSignals(true);
 		ui->setting_vCodec->clear();
@@ -344,6 +333,7 @@ namespace SuperEpicFuntime {
 	void MediaPreparer::savePreset() {
 		savePreset("Custom");
 	}
+#endif
 
 	void MediaPreparer::setEncodeOptions() {
 		settings->vCodec = ba::trim_copy(ui->setting_vCodec->currentText().toStdString());
@@ -371,6 +361,7 @@ namespace SuperEpicFuntime {
 		return p;
 	}
 
+#ifndef SEFMediaPreparer_Section_UI_Control
 	void MediaPreparer::lockUILoad(bool b) {
 		bool toggle;
 		if (b) {
@@ -475,7 +466,9 @@ namespace SuperEpicFuntime {
 			ui->container_settings_tabs->removeTab(3);
 		}
 	}
+#endif
 
+#ifndef SEFMediaPreparer_Section_Init
 	void MediaPreparer::Init() {
 		createTrayIcon();
 		InitGUI();
@@ -579,6 +572,7 @@ namespace SuperEpicFuntime {
 
 		blockAllSignals(false);
 	}
+#endif
 
 	void MediaPreparer::log(std::string msg) {
 		bf::fstream fs;
