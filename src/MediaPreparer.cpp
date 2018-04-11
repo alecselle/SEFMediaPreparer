@@ -439,10 +439,14 @@ namespace SuperEpicFuntime {
 	}
 
 	void MediaPreparer::saveDialog() {
-		QString fileName = QFileDialog::getSaveFileName(this, "Save Preset - Will Only Be Loaded From Presets Directory", (settings->baseDir + "//presets//Custom").c_str(), "SEF Preset (*.preset)");
-		if (!fileName.isEmpty()) {
-			savePreset(fileName.toStdString());
-		}
+		QMessageBox save;
+		QLineEdit le;
+
+		save.layout()->addWidget(&le);
+		save.setText("Save Preset");
+		save.setStandardButtons(QMessageBox::Save);
+		save.exec();
+
 	}
 
 	bool MediaPreparer::cancelDialog() {

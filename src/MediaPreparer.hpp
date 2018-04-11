@@ -15,6 +15,7 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QSystemTrayIcon>
 #include <QtWidgets/QWidget>
+#include <QtWidgets/QLineEdit>
 #include <string>
 
 namespace SuperEpicFuntime {
