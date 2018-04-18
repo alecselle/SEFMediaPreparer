@@ -53,7 +53,8 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "bin\*"; DestDir: "{app}\bin"; Flags: ignoreversion recursesubdirs createallsubdirs replacesameversion
+Source: "bin\*"; DestDir: "{app}\bin"; Flags: ignoreversion recursesubdirs createallsubdirs replacesameversion; Components: Core; Excludes: "ffmpeg.exe,ffprobe.exe"
+Source: "bin\ff*.exe"; DestDir: "{app}\bin"; Components: ffmpeg
 
 [Icons]
 Name: "{group}\{#ApplicationName}"; Filename: "{app}\bin\{#ApplicationExe}"
@@ -69,3 +70,11 @@ WelcomeLabel2=Developed by SuperEpicFuntime%n%nWe appreciate your support!
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}"
 Type: dirifempty; Name: "{userappdata}\SuperEpicFuntime"
+
+[Components]
+Name: "core"; Description: "SEFMediaPreparer Binaries"; Types: full minimal; Flags: fixed; Languages: english
+Name: "ffmpeg"; Description: "FFmpeg Binaries"; Types: full; Languages: english
+
+[Types]
+Name: "Full"; Description: "Full Installation"; Languages: english
+Name: "Minimal"; Description: "Minimal Installation (No FFmpeg)"
