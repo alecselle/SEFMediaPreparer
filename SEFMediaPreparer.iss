@@ -1,4 +1,5 @@
 // clang-format off
+#include <idp.iss>
 #ifndef ApplicationName
 # define ApplicationName "SEFMediaPreparer"
 #endif
@@ -68,3 +69,4 @@ WelcomeLabel2=Developed by SuperEpicFuntime%n%nWe appreciate your support!
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}"
+Type: dirifempty; Name: "{userappdata}\SuperEpicFuntime"

@@ -36,6 +36,7 @@ call "%~dp0/version.bat" 2>&1 nul
 	)
 	
 	echo.[Build] Copying Artifacts (5/5)
+	call :COPY_ARTIFACTS_EXE
 	if "!LINK!" EQU "shared" call :COPY_ARTIFACTS_DLL
 	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
 	
@@ -103,8 +104,13 @@ call "%~dp0/version.bat" 2>&1 nul
 	if %errorlevel% NEQ 0 call :ERROR_BUILD_FAILED "WINDEPLOY" "WinDeployQt returned an error" "Check output for details" 
 	exit /b !ERROR_LEVEL!
 	goto EOF
+:COPY_ARTIFACTS_EXE
+	call xcopy /Y "!WORKSPACE!\lib\*.exe" "!WORKSPACE!\bin\"> "%~dp0/.data/xcopy.log" 2>&1
+	if %errorlevel% NEQ 0 call :ERROR_COPY_FAILED "COPY_ARTIFACTS"
+	exit /b !ERROR_LEVEL!
+	goto EOF
 :COPY_ARTIFACTS_DLL
-	call xcopy /Y "!WORKSPACE!\lib\*" "!WORKSPACE!\bin\"> "%~dp0/.data/xcopy.log" 2>&1
+	call xcopy /Y "!WORKSPACE!\lib\*.dll" "!WORKSPACE!\bin\"> "%~dp0/.data/xcopy.log" 2>&1
 	if %errorlevel% NEQ 0 call :ERROR_COPY_FAILED "COPY_ARTIFACTS"
 	exit /b !ERROR_LEVEL!
 	goto EOF
