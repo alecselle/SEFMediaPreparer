@@ -98,8 +98,8 @@ call "%~dp0/version.bat" 2>&1 nul
 	goto EOF
 :WINDEPLOY
 	call :BUILD_DIR
-	echo.[Build] "!WINDEPLOY!" "SEFMediaPreparer-!VERSION!.exe"
-	call "!WINDEPLOY!" "!WORKSPACE!/bin/SEFMediaPreparer-!VERSION!.exe" --release --force --no-translations --dir "!WORKSPACE!/bin"> "%~dp0/.data/windeploy.log" 2>&1
+	echo.[Build] "!WINDEPLOY!" "SEFMediaPreparer.exe"
+	call "!WINDEPLOY!" "!WORKSPACE!/bin/SEFMediaPreparer.exe" --release --force --no-translations --dir "!WORKSPACE!/bin"> "%~dp0/.data/windeploy.log" 2>&1
 	if %errorlevel% NEQ 0 call :ERROR_BUILD_FAILED "WINDEPLOY" "WinDeployQt returned an error" "Check output for details" 
 	exit /b !ERROR_LEVEL!
 	goto EOF

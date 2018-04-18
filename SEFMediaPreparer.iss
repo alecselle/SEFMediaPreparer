@@ -6,7 +6,7 @@
 # define ApplicationVersion FileRead(FileOpen("version.txt"))
 #endif
 #ifndef ApplicationExe
-# define ApplicationExe "SEFMediaPreparer-"+ApplicationVersion+".exe"
+# define ApplicationExe "SEFMediaPreparer.exe"
 #endif
 #ifndef ApplicationSource
 # define ApplicationSource "."
@@ -65,3 +65,6 @@ Filename: "{app}\bin\{#ApplicationExe}"; Description: "{cm:LaunchProgram,{#Strin
 [Messages]
 WelcomeLabel1=Thank you for downloading {#ApplicationName} {#ApplicationVersion}!
 WelcomeLabel2=Developed by SuperEpicFuntime%n%nWe appreciate your support!
+
+[UninstallDelete]
+Type: filesandordirs; Name: "{app}"
