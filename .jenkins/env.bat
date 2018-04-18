@@ -30,6 +30,7 @@ set MINGW=%MSYS%\bin\mingw32-make.exe
 set WINDEPLOY=%MSYS%\bin\windeployqt.exe
 set INNOSETUP=C:\Program Files (x86)\Inno Setup 5\ISCC.exe
 set ZIP=C:\Program Files\7-ZIP\7z.exe
+set GIT=C:\Program Files\Git\cmd\git.exe
 
 cd "%~dp0"&& cd ".."
 if "!WORKSPACE!" EQU "" set WORKSPACE="%CD%"
