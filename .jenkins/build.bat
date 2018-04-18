@@ -1,13 +1,17 @@
 @echo off
 setlocal EnableDelayedExpansion
 set ERROR_LEVEL=0
-set DEBUG=0
-:PROJECT
-	set PROJECT_DEFAULT=SEFMediaPreparer.pro
-	if "%~1" NEQ "" set PROJECT=%~1
-	if "%~1" EQU "" set PROJECT=!PROJECT_DEFAULT!
-	if "%~2" NEQ "debug" set DEBUG=0
-	if "%~2" EQU "debug" set DEBUG=1
+set PROJECT_DEFAULT=SEFMediaPreparer.pro
+call "%~dp0/env.bat"
+call "%~dp0/version.bat" 2>&1 nul
+:VARIABLES
+	if "%~1" NEQ "" (
+		if "%~1" EQU "-static" set LINK=static
+		if "%~1" EQU "-shared" set LINK=shared
+		if exist "!WORKSPACE!/%~1" set PROJECT=%~1
+		shift
+	)
+	if "%~1" NEQ "" goto VARIABLES
 ::=============================================================================
 :: ~~ FUNCTION CALLS
 :RUN
@@ -25,12 +29,14 @@ set DEBUG=0
 	call :MINGW
 	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
 	
-	echo.[Build] Running windeployqt (4/5)
-	call :WINDEPLOY
-	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
+	if "!LINK!" EQU "shared" (
+		echo.[Build] Running windependloyqt ^(4/5^)
+		call :WINDEPLOY
+		if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
+	)
 	
 	echo.[Build] Copying Artifacts (5/5)
-	call :COPY_ARTIFACTS
+	if "!LINK!" EQU "shared" call :COPY_ARTIFACTS_DLL
 	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
 	
 	goto END_SUCCESS
@@ -39,30 +45,35 @@ set DEBUG=0
 ::=============================================================================
 :: ~~ FUNCTION DECLARATIONS
 :CHECK_VARIABLES
-	if "!WORKSPACE!"=="" cd "%~dp0"& cd ..& set WORKSPACE=!CD!
+	if "!WORKSPACE!" EQU "" cd "%~dp0"& cd ..& set WORKSPACE=!CD!
+	if "!PROJECT!" EQU "" set PROJECT=!PROJECT_DEFAULT!
+	if not exist "!WORKSPACE!/.jenkins/.data" mkdir "!WORKSPACE!/.jenkins/.data" & attrib +h "!WORKSPACE!/.jenkins/.data" /s /d
 	if not exist "!WORKSPACE!/!PROJECT!" call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "!PROJECT!"
 	if not exist "!WORKSPACE!/!PROJECT!" (
 		if not exist "!WORKSPACE!/!PROJECT_DEFAULT!" call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "!PROJECT!"
 		set PROJECT=!PROJECT_DEFAULT!
 	)
-	if "!QMAKE!"=="" (
+	if "!LINK!" EQU "" set LINK=shared
+	if "!LINK!" EQU "shared" set QMAKE=!QMAKE_SHARED!
+	if "!LINK!" EQU "static" set QMAKE=!QMAKE_STATIC!
+	if "!QMAKE!" EQU "" (
 		call where /q qmake.exe >nul 2>&1
 		if %errorlevel% NEQ 0 call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "qmake.exe"
 		for /f "tokens=*" %%i in ('where qmake.exe 2^> nul') do set QMAKE=%%i
 	)
 	if not exist "!QMAKE!" call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "qmake.exe"
-	if "!MINGW!"=="" (
+	if "!MINGW!" EQU "" (
 		call where /q mingw32-make.exe >nul 2>&1
 		if %errorlevel% NEQ 0 call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "mingw32-make.exe"
 		for /f "tokens=*" %%i in ('where mingw32-make.exe 2^> nul') do set MINGW=%%i
 	)
 	if not exist "!MINGW!" call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "mingw32-make.exe"
-	if "!WINDEPLOY!"=="" (
-		call where /q windeployqt.exe >nul 2>&1
-		if %errorlevel% NEQ 0 call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "windeployqt.exe"
-		for /f "tokens=*" %%i in ('where windeployqt.exe 2^> nul') do set WINDEPLOY=%%i
+	if "!WINDEPLOY!" EQU "" (
+		call where /q windependloyqt.exe >nul 2>&1
+		if %errorlevel% NEQ 0 call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "windependloyqt.exe"
+		for /f "tokens=*" %%i in ('where windependloyqt.exe 2^> nul') do set WINDEPLOY=%%i
 	)
-	if not exist "!WINDEPLOY!" call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "windeployqt.exe"
+	if not exist "!WINDEPLOY!" call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "windependloyqt.exe"
 	exit /b !ERROR_LEVEL!
 	goto EOF
 :BUILD_DIR
@@ -73,30 +84,27 @@ set DEBUG=0
 	goto EOF
 :QMAKE
 	call :BUILD_DIR
-	echo.[Build] "!QMAKE!"
-	call "!QMAKE!" -spec win32-g++ "CONFIG+=release" "!WORKSPACE!/!PROJECT!" >nul 2>&1
+	echo.[Build] "!QMAKE!" "!PROJECT!"
+	call "!QMAKE!" -spec win32-g++ -nocache "CONFIG+=release" "!WORKSPACE!/!PROJECT!"> "%~dp0/.data/qmake.log" 2>&1
 	if !errorlevel! NEQ 0 call :ERROR_BUILD_FAILED "QMAKE" "Qmake returned an error" "Check output for details"
 	exit /b !ERROR_LEVEL!
 	goto EOF
 :MINGW
 	call :BUILD_DIR
 	echo.[Build] "!MINGW!"
-	if !DEBUG! EQU 1 call "!MINGW!" -w -s -j 8> "%~dp0/mingw.log" 2>&1
-	if !DEBUG! NEQ 1 call "!MINGW!" -w -s -j 4 -B> "%~dp0/mingw.log" 2>&1
+	call "!MINGW!" -s -j 8 -B> "%~dp0/.data/mingw.log" 2>&1
 	if %errorlevel% NEQ 0 call :ERROR_BUILD_FAILED "MINGW" "MinGW returned an error" "Check output for details" 
 	exit /b !ERROR_LEVEL!
 	goto EOF
 :WINDEPLOY
 	call :BUILD_DIR
-	echo.[Build] "!WINDEPLOY!" "SEFMediaPreparer.exe"
-	call "!WINDEPLOY!" "!WORKSPACE!/build/release/SEFMediaPreparer.exe" --release --force --no-translations --dir "!WORKSPACE!/bin"> "%~dp0/windeploy.log" 2>&1
+	echo.[Build] "!WINDEPLOY!" "SEFMediaPreparer-!VERSION!.exe"
+	call "!WINDEPLOY!" "!WORKSPACE!/bin/SEFMediaPreparer-!VERSION!.exe" --release --force --no-translations --dir "!WORKSPACE!/bin"> "%~dp0/.data/windeploy.log" 2>&1
 	if %errorlevel% NEQ 0 call :ERROR_BUILD_FAILED "WINDEPLOY" "WinDeployQt returned an error" "Check output for details" 
 	exit /b !ERROR_LEVEL!
 	goto EOF
-:COPY_ARTIFACTS
-	call xcopy /Y "!WORKSPACE!\build\release\SEFMediaPreparer.exe" "!WORKSPACE!\bin\"
-	if %errorlevel% NEQ 0 call :ERROR_COPY_FAILED "COPY_ARTIFACTS"
-	call xcopy /Y "!WORKSPACE!\lib\*" "!WORKSPACE!\bin\"
+:COPY_ARTIFACTS_DLL
+	call xcopy /Y "!WORKSPACE!\lib\*" "!WORKSPACE!\bin\"> "%~dp0/.data/xcopy.log" 2>&1
 	if %errorlevel% NEQ 0 call :ERROR_COPY_FAILED "COPY_ARTIFACTS"
 	exit /b !ERROR_LEVEL!
 	goto EOF
@@ -128,7 +136,7 @@ set DEBUG=0
 :ERROR
 :: call :ERROR "<ERROR_CODE>" "<IDENTIFIER>" "[<MESSAGES>]"
 	set ERROR_LEVEL=1
-	if "%~2"=="" (
+	if "%~2" EQU "" (
 		set ERROR_CODE=ERROR_CRITICAL_INVALID
 		set ERROR_IDENTIFIER=INVALID
 	) else (

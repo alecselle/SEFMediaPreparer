@@ -1,20 +1,12 @@
 SEFMediaPreparer.pro.user
 
-Makefile*
-.qmake.stash
-mocinclude.opt
-ui_MediaPreparer.h
-sefmediapreparer_plugin_import.cpp
-SEFMediaPreparer_resource.rc
-
 .cproject
 .externalToolBuilders/
 .project
 .settings/
-.vs/
+.vs
+*.lnk
 
-installer/
-release/
 build/
 bin/
 
@@ -23,5 +15,4 @@ SEFMediaPreparer-*-Setup.exe
 tools/deploy.bat
 tools/commit.bat
 
-.jenkins/*.txt
-.jenkins/*.log
+.jenkins/.data/**

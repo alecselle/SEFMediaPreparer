@@ -2,30 +2,27 @@
 setlocal EnableDelayedExpansion
 set ERROR_LEVEL=0
 set DEBUG=0
+call "%~dp0/env.bat"
 :RESET
-	if "%~1"=="-r" goto :RESET_SETTINGS
+	if "%~1" EQU "-r" goto :RESET_SETTINGS
 ::=============================================================================
 :: ~~ FUNCTION CALLS
 :RUN
-	echo.[Version] Running Script (0/6)
+	echo.[Version] Running Script (0/4)
 	
-	echo.[Version] Checking Variables (1/5)
+	echo.[Version] Checking Variables (1/4)
 	call :CHECK_VARIABLES
 	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
 	
-	echo.[Version] Loading Data (2/5)
+	echo.[Version] Loading Data (2/4)
 	call :LOAD_SETTINGS
 	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
 	
-	echo.[Version] Parsing Data (3/5)
+	echo.[Version] Parsing Data (3/4)
 	call :PARSE_VERSION
 	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
 	
-	echo.[Version] Checking Versions (4/5)
-	call :UPDATE_SETTINGS
-	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
-	
-	echo.[Version] Saving Data (5/5)
+	echo.[Version] Saving Data (4/4)
 	call :SAVE_SETTINGS
 	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
 	
@@ -35,92 +32,36 @@ set DEBUG=0
 	goto END_SUCCESS
 	goto EOF
 :: ~~
-::=============================================================================
+::============================================================================= 
 :: ~~ FUNCTION DECLARATIONS
 :CHECK_VARIABLES
-	if "!WORKSPACE!"=="" cd "%~dp0"& cd ..& set WORKSPACE=!CD!
+	if "!WORKSPACE!" EQU "" cd "%~dp0"& cd ..& set WORKSPACE=!CD!
 	if not exist "!WORKSPACE!/version.txt" call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "version.txt"
-	if not exist "%WORKSPACE%/.jenkins" mkdir "%WORKSPACE%/.jenkins" & attrib +h "%WORKSPACE%/.jenkins" /s /d
-	if not exist "%WORKSPACE%/.jenkins/build.txt" echo|set /p="0">"%WORKSPACE%/.jenkins/build.txt"
-	if not exist "%WORKSPACE%/.jenkins/version.txt" call xcopy "%WORKSPACE%\version.txt" "%WORKSPACE%\.jenkins\"
+	if not exist "!WORKSPACE!/.jenkins/.data" mkdir "!WORKSPACE!/.jenkins/.data" & attrib +h "!WORKSPACE!/.jenkins/.data" /s /d
 	exit /b !ERROR_LEVEL!
 	goto EOF
 :LOAD_SETTINGS
-	if not exist "%WORKSPACE%/.jenkins/build.txt" call :ERROR_FILE_NOT_FOUND "LOAD_SETTINGS" ".jenkins/build.txt"
-	if not exist "%WORKSPACE%/.jenkins/version.txt" call :ERROR_FILE_NOT_FOUND "LOAD_SETTINGS" ".jenkins/version.txt"
-	if not exist "%WORKSPACE%/version.txt" call :ERROR_FILE_NOT_FOUND "LOAD_SETTINGS" "version.txt"
-	set /p BUILD_OLD=<"%WORKSPACE%/.jenkins/build.txt"
-	set /p VERSION_OLD=<"%WORKSPACE%/.jenkins/version.txt"
-	set /p VERSION_NEW=<"%WORKSPACE%/version.txt"
-	exit /b !ERROR_LEVEL!
-	goto EOF
-:UPDATE_SETTINGS
-	if "!VERSION_NEW!" EQU "!VERSION_OLD!" set /a BUILD_NEW=!BUILD_OLD! + 1
-	if "!VERSION_NEW!" NEQ "!VERSION_OLD!" set BUILD_NEW=1
+	if not exist "!WORKSPACE!/version.txt" call :ERROR_FILE_NOT_FOUND "LOAD_SETTINGS" "version.txt"
+	set /p VERSION=<"!WORKSPACE!/version.txt"
 	exit /b !ERROR_LEVEL!
 	goto EOF
 :SAVE_SETTINGS
-	echo|set /p="!BUILD_NEW!" >"!WORKSPACE!/.jenkins/build.txt"
-	echo|set /p="!VERSION_NEW!" >"!WORKSPACE!/.jenkins/version.txt"
-	echo|set /p="!VERSION_OLD!" >"!WORKSPACE!/.jenkins/version.old.txt"
-	set /p BUILD_TEMP=<"%WORKSPACE%/.jenkins/build.txt"
-	set /p VERSION_TEMP=<"%WORKSPACE%/.jenkins/version.txt"
-	if !BUILD_TEMP! NEQ !BUILD_NEW! call :ERROR_SAVE_FAILED "SAVE_SETTINGS" 
-	if !VERSION_TEMP! NEQ !VERSION_NEW! call :ERROR_SAVE_FAILED "SAVE_SETTINGS"
+	echo|set /p="!VERSION!" >"!WORKSPACE!/version.txt"
 	exit /b !ERROR_LEVEL!
 	goto EOF
 :PARSE_VERSION
-	for /F "tokens=1,2,3 delims=." %%a in ("!VERSION_OLD!") do (
-		set MAJOR_OLD=%%a
-		set MINOR_OLD=%%b
-		set PATCH_OLD=%%c
+	for /F "tokens=1,2,3 delims=. " %%a in ("!VERSION!") do (
+		set MAJOR=%%a
+		set MINOR=%%b
+		set PATCH=%%c
 	)
-	if %errorlevel% NEQ 0 call :ERROR_PARSE_FAILED "PARSE_VERSION_OLD"
+	if %errorlevel% NEQ 0 call :ERROR_PARSE_FAILED "PARSE_VERSION"
 	if !ERROR_LEVEL! NEQ 0 exit /b !ERROR_LEVEL! && goto EOF
-	set VERSION_OLD=!MAJOR_OLD!.!MINOR_OLD!.!PATCH_OLD!
-	for /F "tokens=1,2,3 delims=." %%a in ("!VERSION_NEW!") do (
-		set MAJOR_NEW=%%a
-		set MINOR_NEW=%%b
-		set PATCH_NEW=%%c
-	)
-	if %errorlevel% NEQ 0 call :ERROR_PARSE_FAILED "PARSE_VERSION_NEW"
-	if !ERROR_LEVEL! NEQ 0 exit /b !ERROR_LEVEL! && goto EOF
-	set VERSION_NEW=!MAJOR_NEW!.!MINOR_NEW!.!PATCH_NEW!
-	if !MAJOR_NEW! GTR !MAJOR_OLD! set MAJOR_DIFF=1
-	if !MAJOR_NEW! EQU !MAJOR_OLD! set MAJOR_DIFF=0
-	if !MAJOR_NEW! LSS !MAJOR_OLD! set MAJOR_DIFF=-1
-	if !MINOR_NEW! GTR !MINOR_OLD! set MINOR_DIFF=1
-	if !MINOR_NEW! EQU !MINOR_OLD! set MINOR_DIFF=0
-	if !MINOR_NEW! LSS !MINOR_OLD! set MINOR_DIFF=-1
-	if !PATCH_NEW! GTR !PATCH_OLD! set PATCH_DIFF=1
-	if !PATCH_NEW! EQU !PATCH_OLD! set PATCH_DIFF=0
-	if !PATCH_NEW! LSS !PATCH_OLD! set PATCH_DIFF=-1
-	if "!MAJOR_DIFF!"=="" call :ERROR_PARSE_FAILED "PARSE_VERSION_DIFF"
-	if "!MINOR_DIFF!"=="" call :ERROR_PARSE_FAILED "PARSE_VERSION_DIFF"
-	if "!PATCH_DIFF!"=="" call :ERROR_PARSE_FAILED "PARSE_VERSION_DIFF"
+	set "VERSION=!MAJOR!.!MINOR!.!PATCH!"
 	exit /b !ERROR_LEVEL!
 	goto EOF
 :DISPLAY
-	echo.
-	if !PATCH_DIFF! EQU 1 if !MINOR_DIFF! GEQ 0 if !MAJOR_DIFF! GEQ 0 echo.[Version] Upgrading from !VERSION_OLD!-!BUILD_OLD! to !VERSION_NEW!-!BUILD_NEW!
-	if !PATCH_DIFF! GEQ 0 if !MINOR_DIFF! EQU 1 if !MAJOR_DIFF! GEQ 0 echo.[Version] Upgrading from !VERSION_OLD!-!BUILD_OLD! to !VERSION_NEW!-!BUILD_NEW!
-	if !PATCH_DIFF! GEQ 0 if !MINOR_DIFF! GEQ 0 if !MAJOR_DIFF! EQU 1 echo.[Version] Upgrading from !VERSION_OLD!-!BUILD_OLD! to !VERSION_NEW!-!BUILD_NEW!
-	if !PATCH_DIFF! EQU 0 if !MINOR_DIFF! EQU 0 if !MAJOR_DIFF! EQU 0 echo.[Version] Rebuilding !VERSION_NEW!-!BUILD_NEW!
-	if !PATCH_DIFF! EQU -1 echo.[Version] Downgrading from !VERSION_OLD!-!BUILD_OLD! to !VERSION_NEW!-!BUILD_NEW!
-	if !MINOR_DIFF! EQU -1 echo.[Version] Downgrading from !VERSION_OLD!-!BUILD_OLD! to !VERSION_NEW!-!BUILD_NEW!
-	if !MAJOR_DIFF! EQU -1 echo.[Version] Downgrading from !VERSION_OLD!-!BUILD_OLD! to !VERSION_NEW!-!BUILD_NEW!
-	echo.
-	exit /b !ERROR_LEVEL!
-	goto EOF
-:RESET_SETTINGS
-	if not exist "%WORKSPACE%/version.txt" (
-		call :ERROR_FILE_NOT_FOUND "RESET_SETTINGS" "version.txt"
-	) else (
-		set /p VERSION_NEW=<"%WORKSPACE%/version.txt"
-		set BUILD_NEW=0
-		echo|set /p="!BUILD_NEW!" >"!WORKSPACE!/.jenkins/build.txt"
-		echo|set /p="!VERSION_NEW!" >"!WORKSPACE!/.jenkins/version.txt"
-	)
+	echo.[Version] Building !VERSION!
 	exit /b !ERROR_LEVEL!
 	goto EOF
 :: ~~
@@ -152,7 +93,7 @@ set DEBUG=0
 :ERROR
 :: call :ERROR "<ERROR_CODE>" "<IDENTIFIER>" "[<MESSAGES>]"
 	set ERROR_LEVEL=1
-	if "%~2"=="" (
+	if "%~2" EQU "" (
 		set ERROR_CODE=ERROR_CRITICAL_INVALID
 		set ERROR_IDENTIFIER=INVALID
 	) else (

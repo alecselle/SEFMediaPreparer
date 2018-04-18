@@ -2,6 +2,8 @@
 setlocal EnableDelayedExpansion
 set ERROR_LEVEL=0
 set DEBUG=0
+call "%~dp0/env.bat"
+call "%~dp0/version.bat" 2>&1 nul
 ::=============================================================================
 :: ~~ FUNCTION CALLS
 :RUN
@@ -21,8 +23,9 @@ set DEBUG=0
 ::=============================================================================
 :: ~~ FUNCTION DECLARATIONS
 :CHECK_VARIABLES
-	if "!WORKSPACE!"=="" cd "%~dp0"& cd ..& set WORKSPACE=!CD!
-	if "!INNOSETUP!"=="" (
+	if "!WORKSPACE!" EQU "" cd "%~dp0"& cd ..& set WORKSPACE=!CD!
+	if not exist "!WORKSPACE!/.jenkins/.data" mkdir "!WORKSPACE!/.jenkins/.data" & attrib +h "!WORKSPACE!/.jenkins/.data" /s /d
+	if "!INNOSETUP!" EQU "" (
 		call where /q ISCC.exe 2>&1nul
 		if %errorlevel% NEQ 0 call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "ISCC.exe"
 		for /f "tokens=*" %%i in ('where ISCC.exe') do set INNOSETUP=%%i
@@ -33,7 +36,7 @@ set DEBUG=0
 :INNOSETUP
 	cd "!WORKSPACE!"
 	echo.[Release] "!INNOSETUP!"
-	call "!INNOSETUP!" "!WORKSPACE!/SEFMediaPreparer.iss"> "%~dp0/iscc.log" 2>&1
+	call "!INNOSETUP!" "!WORKSPACE!/SEFMediaPreparer.iss"> "%~dp0/.data/iscc.log" 2>&1
 	if %errorlevel% NEQ 0 call :ERROR_BUILD_FAILED "INNOSETUP" "ISCC returned an error" "Check output for details" 
 	exit /b !ERROR_LEVEL!
 	goto EOF
@@ -53,7 +56,7 @@ set DEBUG=0
 :ERROR_BUILD_FAILED
 :: call :ERROR_BUILD_FAILED "<IDENTIFIER>" "<EXECUTABLE>"
 	call :ERROR "ERROR_BUILD_FAILED" "%~1" "%~2 returned an error" "Check log for details"
-	if exist "!WORKSPACE!/.jenkins/%~2.log" echo>"!WORKSPACE!/.jenkins/%~2.log"
+	if exist "!WORKSPACE!/.jenkins/.data/%~2.log" echo>"!WORKSPACE!/.jenkins/.data/%~2.log"
 	exit /b 1
 	goto EOF
 :ERROR_COPY_FAILED
@@ -70,7 +73,7 @@ set DEBUG=0
 :ERROR
 :: call :ERROR "<ERROR_CODE>" "<IDENTIFIER>" "[<MESSAGES>]"
 	set ERROR_LEVEL=1
-	if "%~2"=="" (
+	if "%~2" EQU "" (
 		set ERROR_CODE=ERROR_CRITICAL_INVALID
 		set ERROR_IDENTIFIER=INVALID
 	) else (

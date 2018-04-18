@@ -1,3 +1,4 @@
+// clang-format off
 #ifndef ApplicationName
 # define ApplicationName "SEFMediaPreparer"
 #endif
@@ -5,7 +6,7 @@
 # define ApplicationVersion FileRead(FileOpen("version.txt"))
 #endif
 #ifndef ApplicationExe
-# define ApplicationExe "SEFMediaPreparer.exe"
+# define ApplicationExe "SEFMediaPreparer-"+ApplicationVersion+".exe"
 #endif
 #ifndef ApplicationSource
 # define ApplicationSource "."
@@ -53,7 +54,6 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "bin\*"; DestDir: "{app}\bin"; Flags: ignoreversion recursesubdirs createallsubdirs replacesameversion
-Source: "ffmpeg\*"; DestDir: "{app}\bin"; Flags: ignoreversion replacesameversion; Components: FFmpeg
 
 [Icons]
 Name: "{group}\{#ApplicationName}"; Filename: "{app}\bin\{#ApplicationExe}"
@@ -61,14 +61,6 @@ Name: "{commondesktop}\{#ApplicationName}"; Filename: "{app}\bin\{#ApplicationEx
 
 [Run]
 Filename: "{app}\bin\{#ApplicationExe}"; Description: "{cm:LaunchProgram,{#StringChange(ApplicationName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
-
-[Components]
-Name: "SEFMediaPreparer"; Description: "SEFMediaPreparer"; Types: Lite Full; Flags: fixed
-Name: "FFmpeg"; Description: "FFmpeg"; Types: Full
-
-[Types]
-Name: "Full"; Description: "Full Installation (with FFmpeg)"
-Name: "Lite"; Description: "Lite Installation (without FFmpeg)"
 
 [Messages]
 WelcomeLabel1=Thank you for downloading {#ApplicationName} {#ApplicationVersion}!

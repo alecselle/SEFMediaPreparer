@@ -1,251 +1,375 @@
 #include "src/Settings.hpp"
 
+#include "rapidjson/filereadstream.h"
 #include <boost/algorithm/string.hpp>
 #include <boost/container/vector.hpp>
 #include <boost/filesystem.hpp>
-#include <nlohmann/json.hpp>
+#include <cstdio>
+#include <iostream>
+#include <rapidjson/document.h>
+#include <rapidjson/filewritestream.h>
+#include <rapidjson/prettywriter.h>
 #include <string>
 
 namespace bf = boost::filesystem;
 namespace bc = boost::container;
 namespace ba = boost::algorithm;
-using namespace nlohmann;
+using namespace rapidjson;
 using namespace std;
 
 namespace SuperEpicFuntime {
-	Settings::Settings() {
-		if (!bf::exists(BASE_DIR)) {
-			bf::create_directories(BASE_DIR);
+Settings::Settings() {
+	if (!bf::exists(BASE_DIR)) {
+		bf::create_directories(BASE_DIR);
+	}
+	if (!bf::exists(CONFIG_FILE)) {
+		createDefaultConfig();
+	}
+	baseDir = BASE_DIR;
+	logPath = LOG_FILE;
+	refreshPresets();
+	loadConfig();
+	loadPreset();
+}
+
+void Settings::saveConfig() {
+	string json = "{}";
+	StringStream s(json.c_str());
+
+	Document d;
+	Document::AllocatorType &alloc = d.GetAllocator();
+	d.ParseStream(s);
+
+	if (d.HasParseError()) {
+		cout << "faq";
+	}
+
+	d.AddMember(StringRef("preset"), Value(StringRef(presetPath.c_str())), alloc);
+	d.AddMember(StringRef("libraryDir"), Value(StringRef(libraryDir.c_str())), alloc);
+	d.AddMember(StringRef("tempDir"), Value(StringRef(tempDir.c_str())), alloc);
+	d.AddMember(StringRef("outputDir"), Value(StringRef(outputDir.c_str())), alloc);
+	d.AddMember(StringRef("preserveLog"), Value(preserveLog), alloc);
+	d.AddMember(StringRef("vCodecs"), Value(), alloc);
+	d["vCodecs"].SetArray();
+	d.AddMember(StringRef("aCodecs"), Value(), alloc);
+	d["aCodecs"].SetArray();
+	d.AddMember(StringRef("containers"), Value(), alloc);
+	d["containers"].SetArray();
+
+	for (int i = 0; i < vCodecList.size(); i++) {
+		Value a(kArrayType);
+		for (int j = 0; j < vCodecList[i].size(); j++) {
+			a.PushBack(Value().SetString(StringRef(vCodecList[i][j].c_str())), alloc);
 		}
-		if (!bf::exists(CONFIG_FILE)) {
-			createDefaultConfig();
+		d["vCodecs"].PushBack(a, alloc);
+	}
+
+	for (int i = 0; i < aCodecList.size(); i++) {
+		Value a(kArrayType);
+		for (int j = 0; j < aCodecList[i].size(); j++) {
+			a.PushBack(Value().SetString(StringRef(aCodecList[i][j].c_str())), alloc);
 		}
-		baseDir = BASE_DIR;
-		logPath = LOG_FILE;
-		for (bf::directory_entry &x : bf::directory_iterator(PRESET_DIR)) {
-			if (x.path().extension().compare(PRESET_EXTENSION) == 0) {
-				presetPathList.push_back(x.path().string());
-				presetNameList.push_back(x.path().filename().replace_extension().string());
+		d["aCodecs"].PushBack(a, alloc);
+	}
+
+	for (int i = 0; i < containerList.size(); i++) {
+		d["containers"].PushBack(Value().SetString(StringRef(containerList[i].c_str())), alloc);
+	}
+
+	FILE *fp = fopen(CONFIG_FILE.c_str(), "wb");
+	char writeBuffer[65536];
+	FileWriteStream os(fp, writeBuffer, sizeof(writeBuffer));
+	PrettyWriter<FileWriteStream> writer(os);
+	d.Accept(writer);
+	fclose(fp);
+}
+
+void Settings::savePreset() {
+	savePresetAs(presetName);
+}
+
+void Settings::savePresetAs(std::string name) {
+	string json = "{}";
+	StringStream s(json.c_str());
+
+	Document d;
+	Document::AllocatorType &alloc = d.GetAllocator();
+	d.ParseStream(s);
+
+	d.AddMember(StringRef("vCodec"), Value(StringRef(vCodec.c_str())), alloc);
+	d.AddMember(StringRef("vQuality"), Value(StringRef(vQuality.c_str())), alloc);
+	d.AddMember(StringRef("aCodec"), Value(StringRef(aCodec.c_str())), alloc);
+	d.AddMember(StringRef("aQuality"), Value(StringRef(aQuality.c_str())), alloc);
+	d.AddMember(StringRef("container"), Value(StringRef(container.c_str())), alloc);
+	d.AddMember(StringRef("subtitles"), Value(StringRef(subtitles.c_str())), alloc);
+	d.AddMember(StringRef("threads"), Value(StringRef(threads.c_str())), alloc);
+	d.AddMember(StringRef("extraParams"), Value(StringRef(extraParams.c_str())), alloc);
+
+	string newPath;
+	if (name.find(":/") == name.back() || name.find(":\\") == name.back()) {
+		newPath += PRESET_DIR + "\\";
+	}
+	newPath += name;
+	if (name.capacity() > PRESET_EXTENSION.capacity() &&
+		name.substr(name.capacity() - 7).compare(PRESET_EXTENSION) != 0) {
+		newPath += PRESET_EXTENSION;
+	}
+	FILE *fp = fopen(newPath.c_str(), "wb");
+	char writeBuffer[65536];
+	FileWriteStream os(fp, writeBuffer, sizeof(writeBuffer));
+	PrettyWriter<FileWriteStream> writer(os);
+	d.Accept(writer);
+	fclose(fp);
+
+	refreshPresets();
+	presetPath = newPath.c_str();
+	presetName = bf::path(newPath).filename().replace_extension().string();
+}
+
+void Settings::refreshPresets() {
+	presetPathList.clear();
+	presetNameList.clear();
+	for (bf::directory_entry &x : bf::directory_iterator(PRESET_DIR)) {
+		if (x.path().extension().compare(PRESET_EXTENSION) == 0) {
+			presetPathList.push_back(x.path().string());
+			presetNameList.push_back(x.path().filename().replace_extension().string());
+		}
+	}
+}
+
+void Settings::loadConfig() {
+	FILE *fp = fopen(CONFIG_FILE.c_str(), "rb");
+	char readBuffer[65536];
+	FileReadStream is(fp, readBuffer, sizeof(readBuffer));
+	Document d;
+	d.ParseStream(is);
+
+	if (d.HasMember("preset") && d["preset"].IsString()) {
+		string presetStr = d["preset"].GetString();
+		ba::ireplace_all(presetStr, "%APPDATA%", APPDATA.c_str());
+		ba::ireplace_all(presetStr, "%USERPROFILE%", USERPROFILE.c_str());
+		presetPath = presetStr.c_str();
+	} else {
+		presetPath = DEFAULT_PRESET;
+	}
+	presetName = bf::path(presetPath).filename().replace_extension().string();
+	if (d.HasMember("tempDir") && d["tempDir"].IsString()) {
+		string tempDirStr = d["tempDir"].GetString();
+		ba::ireplace_all(tempDirStr, "%APPDATA%", APPDATA.c_str());
+		ba::ireplace_all(tempDirStr, "%USERPROFILE%", USERPROFILE.c_str());
+		tempDir = tempDirStr.c_str();
+		if (!bf::exists(tempDir)) {
+			bf::create_directories(tempDir);
+		}
+	} else {
+		tempDir = DEFAULT_TEMP_DIR;
+	}
+	if (d.HasMember("libraryDir") && d["libraryDir"].IsString()) {
+		string libraryDirStr = d["libraryDir"].GetString();
+		ba::ireplace_all(libraryDirStr, "%APPDATA%", APPDATA.c_str());
+		ba::ireplace_all(libraryDirStr, "%USERPROFILE%", USERPROFILE.c_str());
+		libraryDir = libraryDirStr.c_str();
+	} else {
+		libraryDir = DEFAULT_LIBRARY_DIR;
+	}
+	if (d.HasMember("outputDir") && d["outputDir"].IsString()) {
+		string outputDirStr = d["outputDir"].GetString();
+		ba::ireplace_all(outputDirStr, "%APPDATA%", APPDATA.c_str());
+		ba::ireplace_all(outputDirStr, "%USERPROFILE%", USERPROFILE.c_str());
+		outputDir = outputDirStr.c_str();
+	} else {
+		outputDir = DEFAULT_OUTPUT_DIR;
+	}
+	if (d.HasMember("preserveLog") && d["preserveLog"].IsBool()) {
+		preserveLog = d["preserveLog"].GetBool();
+	} else {
+		preserveLog = DEFAULT_PRESERVE_LOG;
+	}
+	if (d.HasMember("vCodecs") && d["vCodecs"].IsArray()) {
+		vCodecList.clear();
+		for (int i = 0; i < d["vCodecs"].GetArray().Size(); i++) {
+			vCodecList.push_back({});
+			for (int j = 0; j < d["vCodecs"].GetArray()[i].GetArray().Size(); j++) {
+				vCodecList[i].push_back(d["vCodecs"].GetArray()[i].GetArray()[j].GetString());
 			}
 		}
-		loadConfig();
-		loadPreset();
+	} else {
+		vCodecList = DEFAULT_VCODECS;
 	}
-
-	void Settings::saveConfig() {
-		json j;
-		j["preset"] = presetPath;
-		j["libraryDir"] = libraryDir;
-		j["tempDir"] = tempDir;
-		j["outputDir"] = outputDir;
-		j["preserveLog"] = preserveLog;
-		for (int i = 0; i < vCodecList.size(); i++) {
-			j["vCodecs"][i] = vCodecList[i];
-		}
-		for (int i = 0; i < aCodecList.size(); i++) {
-			j["aCodecs"][i] = aCodecList[i];
-		}
-		j["containers"] = containerList;
-
-		ofstream newConfig(CONFIG_FILE.c_str());
-		newConfig << setw(4) << j;
-		newConfig.close();
-	}
-
-	void Settings::savePreset() {
-		savePresetAs(presetName);
-	}
-
-	void Settings::savePresetAs(std::string name) {
-		json j;
-		j["vCodec"] = vCodec;
-		j["aCodec"] = aCodec;
-		j["vQuality"] = vQuality;
-		j["aQuality"] = aQuality;
-		j["container"] = container;
-		j["subtitles"] = subtitles;
-		j["threads"] = threads;
-		j["extraParams"] = extraParams;
-
-		string newPath = PRESET_DIR + "\\" + name + PRESET_EXTENSION;
-
-		ofstream newPreset(newPath);
-		newPreset << setw(4) << j;
-		newPreset.close();
-		presetPath = newPath.c_str();
-		presetName = name;
-	}
-
-	void Settings::loadConfig() {
-		auto j = json::parse(ifstream(CONFIG_FILE.c_str())); // @suppress("Function cannot be resolved")
-		if (j.find("preset") != j.end()) { // @suppress("Method cannot be resolved")
-			string presetStr = j.find("preset").value(); // @suppress("Method cannot be resolved")
-			ba::ireplace_all(presetStr, "%APPDATA%", APPDATA.c_str());
-			ba::ireplace_all(presetStr, "%USERPROFILE%", USERPROFILE.c_str());
-			presetPath = presetStr.c_str();
-		} else {
-			presetPath = DEFAULT_PRESET;
-		}
-		if (j.find("tempDir") != j.end()) { // @suppress("Method cannot be resolved")
-			string tempDirStr = j.find("tempDir").value(); // @suppress("Method cannot be resolved")
-			ba::ireplace_all(tempDirStr, "%APPDATA%", APPDATA.c_str());
-			ba::ireplace_all(tempDirStr, "%USERPROFILE%", USERPROFILE.c_str());
-			tempDir = tempDirStr.c_str();
-			if (!bf::exists(tempDir)) {
-				bf::create_directories(tempDir);
+	if (d.HasMember("aCodecs") && d["aCodecs"].IsArray()) {
+		aCodecList.clear();
+		for (int i = 0; i < d["aCodecs"].GetArray().Size(); i++) {
+			aCodecList.push_back({});
+			for (int j = 0; j < d["aCodecs"].GetArray()[i].GetArray().Size(); j++) {
+				aCodecList[i].push_back(d["aCodecs"].GetArray()[i].GetArray()[j].GetString());
 			}
-		} else {
-			tempDir = DEFAULT_TEMP_DIR;
 		}
-		if (j.find("libraryDir") != j.end()) { // @suppress("Method cannot be resolved")
-			string libraryDirStr = j.find("libraryDir").value(); // @suppress("Method cannot be resolved")
-			ba::ireplace_all(libraryDirStr, "%APPDATA%", APPDATA.c_str());
-			ba::ireplace_all(libraryDirStr, "%USERPROFILE%", USERPROFILE.c_str());
-			libraryDir = libraryDirStr.c_str();
-		} else {
-			libraryDir = DEFAULT_LIBRARY_DIR;
-		}
-		if (j.find("outputDir") != j.end()) { // @suppress("Method cannot be resolved")
-			string outputDirStr = j.find("outputDir").value(); // @suppress("Method cannot be resolved")
-			ba::ireplace_all(outputDirStr, "%APPDATA%", APPDATA.c_str());
-			ba::ireplace_all(outputDirStr, "%USERPROFILE%", USERPROFILE.c_str());
-			outputDir = outputDirStr.c_str();
-		} else {
-			outputDir = DEFAULT_OUTPUT_DIR;
-		}
-		if (j.find("preserveLog") != j.end()) { // @suppress("Method cannot be resolved")
-			preserveLog = j.find("preserveLog").value(); // @suppress("Method cannot be resolved")
-		} else {
-			preserveLog = DEFAULT_PRESERVE_LOG;
-		}
-		if (j.find("vCodecs") != j.end()) { // @suppress("Method cannot be resolved")
-			for (int i = 0; i < j.find("vCodecs").value().size(); i++) { // @suppress("Method cannot be resolved")
-				vCodecList.push_back(j.find("vCodecs").value()[i]); // @suppress("Invalid arguments") // @suppress("Method cannot be resolved")
-			}
-		} else {
-			vCodecList = DEFAULT_VCODECS;
-		}
-		if (j.find("aCodecs") != j.end()) { // @suppress("Method cannot be resolved")
-			for (int i = 0; i < j.find("aCodecs").value().size(); i++) { // @suppress("Method cannot be resolved")
-				aCodecList.push_back(j.find("aCodecs").value()[i]); // @suppress("Invalid arguments") // @suppress("Method cannot be resolved")
-			}
-		} else {
-			aCodecList = DEFAULT_ACODECS;
-		}
-		if (j.find("containers") != j.end()) { // @suppress("Method cannot be resolved")
-			for (int i = 0; i < j.find("containers").value().size(); i++) { // @suppress("Method cannot be resolved")
-				containerList.push_back(j.find("containers").value()[i]); // @suppress("Invalid arguments") // @suppress("Method cannot be resolved")
-			}
-		} else {
-			containerList = DEFAULT_CONTAINERS;
-		}
-		saveConfig();
+	} else {
+		aCodecList = DEFAULT_ACODECS;
 	}
-
-	void Settings::loadPreset() {
-		loadPresetFile(presetPath);
-	}
-
-	void Settings::loadPreset(std::string name) {
-		loadPresetFile(PRESET_DIR + "\\" + name + PRESET_EXTENSION);
-	}
-
-	void Settings::loadPresetFile(std::string path) {
-		bf::path p = path;
-		if (bf::exists(p)) {
-			json j = json::parse(ifstream(path.c_str())); // @suppress("Function cannot be resolved")
-
-			presetPath = p.string();
-			presetName = p.filename().replace_extension().string();
-			loadPresetJson(j); // @suppress("Invalid arguments")
-		} else {
-			if (!bf::exists(DEFAULT_PRESET)) {
-				createDefaultPreset();
-			}
-			json j = json::parse(ifstream(DEFAULT_PRESET.c_str())); // @suppress("Function cannot be resolved")
-			presetPath = p.string();
-			presetName = p.filename().replace_extension().string();
-			loadPresetJson(j); // @suppress("Invalid arguments")
-			savePresetAs(presetName);
+	if (d.HasMember("containers") && d["containers"].IsArray()) {
+		for (int i = 0; i < d["containers"].GetArray().Size(); i++) {
+			containerList.push_back(d["containers"].GetArray()[i].GetString());
 		}
+	} else {
+		containerList = DEFAULT_CONTAINERS;
 	}
+	//	saveConfig();
+	fclose(fp);
+}
 
-	void Settings::loadPresetJson(nlohmann::json j) { // @suppress("Member declaration not found")
-		if (j.find("vCodec") != j.end()) { // @suppress("Method cannot be resolved")
-			vCodec = j.find("vCodec").value(); // @suppress("Method cannot be resolved")
+void Settings::loadPreset() {
+	loadPresetFile(presetPath);
+}
+
+void Settings::loadPreset(std::string name) {
+	string newPath;
+	if (name.find(":/") == name.back() || name.find(":\\") == name.back()) {
+		newPath += PRESET_DIR + "\\";
+	}
+	newPath += name;
+	if (name.capacity() > PRESET_EXTENSION.capacity() &&
+		name.substr(name.capacity() - 7).compare(PRESET_EXTENSION) != 0) {
+		newPath += PRESET_EXTENSION;
+	}
+	loadPresetFile(newPath);
+}
+
+void Settings::loadPresetFile(std::string path) {
+	bf::path p(path.c_str());
+	if (bf::exists(p)) {
+		FILE *fp = fopen(p.string().c_str(), "rb");
+		char readBuffer[65536];
+		FileReadStream is(fp, readBuffer, sizeof(readBuffer));
+		Document d;
+		d.ParseStream(is);
+
+		if (d.HasMember("vCodec") && d["vCodec"].IsString()) {
+			vCodec = d["vCodec"].GetString();
 		} else {
 			vCodec = DEFAULT_VCODEC;
 		}
-		if (j.find("vQuality") != j.end()) { // @suppress("Method cannot be resolved")
-			vQuality = j.find("vQuality").value(); // @suppress("Method cannot be resolved")
+		if (d.HasMember("vQuality") && d["vQuality"].IsString()) {
+			vQuality = d["vQuality"].GetString();
 		} else {
 			vQuality = DEFAULT_VQUALITY;
 		}
-		if (j.find("aCodec") != j.end()) { // @suppress("Method cannot be resolved")
-			aCodec = j.find("aCodec").value(); // @suppress("Method cannot be resolved")
+		if (d.HasMember("aCodec") && d["aCodec"].IsString()) {
+			aCodec = d["aCodec"].GetString();
 		} else {
 			aCodec = DEFAULT_ACODEC;
 		}
-		if (j.find("aQuality") != j.end()) { // @suppress("Method cannot be resolved")
-			aQuality = j.find("aQuality").value(); // @suppress("Method cannot be resolved")
+		if (d.HasMember("aQuality") && d["aQuality"].IsString()) {
+			aQuality = d["aQuality"].GetString();
 		} else {
 			aQuality = DEFAULT_AQUALITY;
 		}
-		if (j.find("container") != j.end()) { // @suppress("Method cannot be resolved")
-			container = j.find("container").value(); // @suppress("Method cannot be resolved")
+		if (d.HasMember("container") && d["container"].IsString()) {
+			container = d["container"].GetString();
 		} else {
 			container = DEFAULT_CONTAINER;
 		}
-		if (j.find("subtitles") != j.end()) { // @suppress("Method cannot be resolved")
-			subtitles = j.find("subtitles").value(); // @suppress("Method cannot be resolved")
+		if (d.HasMember("subtitles") && d["subtitles"].IsString()) {
+			subtitles = d["subtitles"].GetString();
 		} else {
 			subtitles = DEFAULT_SUBTITLES;
 		}
-		if (j.find("threads") != j.end()) { // @suppress("Method cannot be resolved")
-			threads = j.find("threads").value(); // @suppress("Method cannot be resolved")
+		if (d.HasMember("threads") && d["threads"].IsString()) {
+			threads = d["threads"].GetString();
 		} else {
 			threads = DEFAULT_THREADS;
 		}
-		if (j.find("extraParams") != j.end()) { // @suppress("Method cannot be resolved")
-			extraParams = j.find("extraParams").value(); // @suppress("Method cannot be resolved")
+		if (d.HasMember("extraParams") && d["extraParams"].IsString()) {
+			extraParams = d["extraParams"].GetString();
 		} else {
 			extraParams = DEFAULT_EXTRA_PARAMS;
 		}
-	}
-
-	void Settings::createDefaultConfig() {
-		json j;
-		j["preset"] = DEFAULT_PRESET;
-		j["libraryDir"] = DEFAULT_LIBRARY_DIR;
-		j["tempDir"] = DEFAULT_TEMP_DIR;
-		j["outputDir"] = DEFAULT_OUTPUT_DIR;
-		j["preserveLog"] = DEFAULT_PRESERVE_LOG;
-		for (int i = 0; i < DEFAULT_VCODECS.size(); i++) {
-			j["vCodecs"][i] = DEFAULT_VCODECS[i];
+		presetPath = path;
+		presetName = bf::path(presetPath).filename().replace_extension().string();
+	} else {
+		if (!bf::exists(DEFAULT_PRESET)) {
+			createDefaultPreset();
 		}
-		for (int i = 0; i < DEFAULT_ACODECS.size(); i++) {
-			j["aCodecs"][i] = DEFAULT_ACODECS[i];
+		if (bf::exists(DEFAULT_PRESET)) {
+			loadPresetFile(DEFAULT_PRESET);
 		}
-		j["containers"] = DEFAULT_CONTAINERS;
+	}
+}
+void Settings::createDefaultConfig() {
+	string json = "{}";
+	StringStream s(json.c_str());
 
-		ofstream newConfig(CONFIG_FILE.c_str());
-		newConfig << setw(4) << j;
-		newConfig.close();
+	Document d;
+	Document::AllocatorType &alloc = d.GetAllocator();
+	d.ParseStream(s);
+
+	if (d.HasParseError()) {
+		cout << "faq";
 	}
 
-	void Settings::createDefaultPreset() {
-		json j;
-		j["vCodec"] = DEFAULT_VCODEC;
-		j["aCodec"] = DEFAULT_ACODEC;
-		j["vQuality"] = DEFAULT_VQUALITY;
-		j["aQuality"] = DEFAULT_AQUALITY;
-		j["container"] = DEFAULT_CONTAINER;
-		j["subtitles"] = DEFAULT_SUBTITLES;
-		j["threads"] = DEFAULT_THREADS;
-		j["extraParams"] = DEFAULT_EXTRA_PARAMS;
+	d.AddMember(StringRef("preset"), Value(StringRef(DEFAULT_PRESET.c_str())), alloc);
+	d.AddMember(StringRef("libraryDir"), Value(StringRef(DEFAULT_LIBRARY_DIR.c_str())), alloc);
+	d.AddMember(StringRef("tempDir"), Value(StringRef(DEFAULT_TEMP_DIR.c_str())), alloc);
+	d.AddMember(StringRef("outputDir"), Value(StringRef(DEFAULT_OUTPUT_DIR.c_str())), alloc);
+	d.AddMember(StringRef("preserveLog"), Value(DEFAULT_PRESERVE_LOG), alloc);
+	d.AddMember(StringRef("vCodecs"), Value(), alloc);
+	d["vCodecs"].SetArray();
+	d.AddMember(StringRef("aCodecs"), Value(), alloc);
+	d["aCodecs"].SetArray();
+	d.AddMember(StringRef("containers"), Value(), alloc);
+	d["containers"].SetArray();
 
-		ofstream newPreset(PRESET_DIR + "\\SEF Standard" + PRESET_EXTENSION);
-		newPreset << setw(4) << j;
-		newPreset.close();
+	for (int i = 0; i < DEFAULT_VCODECS.size(); i++) {
+		Value a(kArrayType);
+		for (int j = 0; j < DEFAULT_VCODECS[i].size(); j++) {
+			a.PushBack(Value().SetString(StringRef(DEFAULT_VCODECS[i][j].c_str())), alloc);
+		}
+		d["vCodecs"].PushBack(a, alloc);
 	}
+
+	for (int i = 0; i < DEFAULT_ACODECS.size(); i++) {
+		Value a(kArrayType);
+		for (int j = 0; j < DEFAULT_ACODECS[i].size(); j++) {
+			a.PushBack(Value().SetString(StringRef(DEFAULT_ACODECS[i][j].c_str())), alloc);
+		}
+		d["aCodecs"].PushBack(a, alloc);
+	}
+
+	for (int i = 0; i < DEFAULT_CONTAINERS.size(); i++) {
+		d["containers"].PushBack(Value().SetString(StringRef(DEFAULT_CONTAINERS[i].c_str())), alloc);
+	}
+
+	FILE *fp = fopen(CONFIG_FILE.c_str(), "wb");
+	char writeBuffer[65536];
+	FileWriteStream os(fp, writeBuffer, sizeof(writeBuffer));
+	PrettyWriter<FileWriteStream> writer(os);
+	d.Accept(writer);
+	fclose(fp);
+}
+
+void Settings::createDefaultPreset() {
+	string json = "{}";
+	StringStream s(json.c_str());
+
+	Document d;
+	Document::AllocatorType &alloc = d.GetAllocator();
+	d.ParseStream(s);
+
+	d.AddMember(StringRef("vCodec"), Value(StringRef(DEFAULT_VCODEC.c_str())), alloc);
+	d.AddMember(StringRef("vQuality"), Value(StringRef(DEFAULT_VQUALITY.c_str())), alloc);
+	d.AddMember(StringRef("aCodec"), Value(StringRef(DEFAULT_ACODEC.c_str())), alloc);
+	d.AddMember(StringRef("aQuality"), Value(StringRef(DEFAULT_AQUALITY.c_str())), alloc);
+	d.AddMember(StringRef("container"), Value(StringRef(DEFAULT_CONTAINER.c_str())), alloc);
+	d.AddMember(StringRef("subtitles"), Value(StringRef(DEFAULT_SUBTITLES.c_str())), alloc);
+	d.AddMember(StringRef("threads"), Value(StringRef(DEFAULT_THREADS.c_str())), alloc);
+	d.AddMember(StringRef("extraParams"), Value(StringRef(DEFAULT_EXTRA_PARAMS.c_str())), alloc);
+
+	FILE *fp = fopen(DEFAULT_PRESET.c_str(), "wb");
+	char writeBuffer[65536];
+	FileWriteStream os(fp, writeBuffer, sizeof(writeBuffer));
+	PrettyWriter<FileWriteStream> writer(os);
+	d.Accept(writer);
+	fclose(fp);
+	refreshPresets();
+}
 } // namespace SuperEpicFuntime
