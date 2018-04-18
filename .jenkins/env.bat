@@ -31,7 +31,8 @@ set WINDEPLOY=%MSYS%\bin\windeployqt.exe
 set INNOSETUP=C:\Program Files (x86)\Inno Setup 5\ISCC.exe
 set ZIP=C:\Program Files\7-ZIP\7z.exe
 
-if "!WORKSPACE!" EQU "" set WORKSPACE=F:\Workspace\Cpp\SEFMediaPreparer
+cd "%~dp0"&& cd ".."
+if "!WORKSPACE!" EQU "" set WORKSPACE="%CD%"
 
 set /p VERSION=<"%WORKSPACE%/version.txt"
 

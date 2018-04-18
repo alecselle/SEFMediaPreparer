@@ -9,7 +9,7 @@
 
 #define PRODUCT_NAME "SEFMediaPreparer"
 #define PRODUCT_EXECUTABLE "SEFMediaPreparer.exe"
-#define PRODUCT_LOGO "F:/Workspace/Cpp/SEFMediaPreparer/seflogo.ico"
+#define PRODUCT_LOGO "../seflogo.ico"
 #define PRODUCT_DESCRIPTION "SuperEpicFuntime Media Preparer"
 #define PRODUCT_VERSION xstr(VER_MAJ) "." xstr(VER_MIN) "." xstr(VER_PAT)
 
