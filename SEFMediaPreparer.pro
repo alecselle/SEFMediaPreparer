@@ -36,7 +36,8 @@ DISTFILES += \
     $$PWD/seflogo.ico \
     $$PWD/README.md \
     $$PWD/.gitignore \
-    $$PWD/version.txt
+    $$PWD/version.txt \
+    .travis.yml
 
 LIBS += \
     -LC:/MSYS/mingw32/lib/ -lboost_filesystem-mt \
