@@ -6,7 +6,7 @@ QMAKE_CXXFLAGS += -std=c++17 -static-libstdc++ -static-libgcc
 
 !defined(VER_MAJ):VER_MAJ = 3
 !defined(VER_MIN):VER_MIN = 2
-!defined(VER_PAT):VER_PAT = 1
+!defined(VER_PAT):VER_PAT = 2
 VERSION = $${VER_MAJ}.$${VER_MIN}.$${VER_PAT}
 
 DESTDIR = $$PWD/bin
