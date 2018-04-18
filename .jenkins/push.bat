@@ -41,10 +41,9 @@ call "%~dp0/env.bat"
 	cd "!WORKSPACE!"
 	echo.[Push] "!GIT!" add *
 	call "!GIT!" add *
-	if !errorlevel! NEQ 0 call :ERROR_PULL_FAILED "PUSH" "Git returned an error" "Check output for details"
+	if !errorlevel! NEQ 0 call :ERROR_PULL_FAILED "PUSH" "Git add returned an error" "Check output for details"
 	echo.[Push] "!GIT!" commit -m "Automatic Commit (Jenkins)"
 	call "!GIT!" commit -m "Automatic Commit (Jenkins)"
-	if !errorlevel! NEQ 0 call :ERROR_PULL_FAILED "PUSH" "Git returned an error" "Check output for details"
 	echo.[Push] "!GIT!" push
 	call "!GIT!" push
 	if !errorlevel! NEQ 0 call :ERROR_PULL_FAILED "PUSH" "Git returned an error" "Check output for details"
