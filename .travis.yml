@@ -2,11 +2,11 @@ language: cpp
 addons:
   apt:
     packages:
-	  - build-essential
-	  - mingw-w64
-	  - qtbase5-dev
-	  - libboost-all-dev
-	  - svn
+      - build-essential
+      - mingw-w64
+      - qtbase5-dev
+      - libboost-all-dev
+      - svn
 install:
   - svn export https://github.com/Tencent/rapidjson.git/trunk/include/rapidjson ./include/rapidjson
   - git clone https://github.com/boostorg/boost.git ./boost
