@@ -6,7 +6,7 @@ set USERPROFILE=C:\Users\conta
 set APPDATA=C:\Users\conta\AppData\Roaming
 set COMSPEC=C:\Windows\System32\cmd.exe
 
-set PATH=%MSYS%\bin;C:\Program Files\Git\cmd;C:\Windows\System32
+set PATH=%MSYS%\bin;C:\Program Files\Git\cmd;C:\Windows\System32;%~dp0
 set PATH_STATIC=%MSYS%\qt5-static\bin;%PATH%
 set PATH_SHARED=%PATH%
 
