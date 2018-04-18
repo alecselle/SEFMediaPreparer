@@ -10,7 +10,7 @@ QMAKE_CXXFLAGS += -std=c++17 -static-libstdc++ -static-libgcc
 VERSION = $${VER_MAJ}.$${VER_MIN}.$${VER_PAT}
 
 DESTDIR = $$PWD/bin
-TARGET = SEFMediaPreparer-$${VERSION}
+TARGET = SEFMediaPreparer
 
 SOURCES += \
     $$PWD/src/main.cpp \

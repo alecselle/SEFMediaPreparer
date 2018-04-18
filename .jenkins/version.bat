@@ -3,8 +3,6 @@ setlocal EnableDelayedExpansion
 set ERROR_LEVEL=0
 set DEBUG=0
 call "%~dp0/env.bat"
-:RESET
-	if "%~1" EQU "-r" goto :RESET_SETTINGS
 ::=============================================================================
 :: ~~ FUNCTION CALLS
 :RUN
@@ -58,6 +56,7 @@ call "%~dp0/env.bat"
 	if %errorlevel% NEQ 0 call :ERROR_PARSE_FAILED "PARSE_VERSION"
 	if !ERROR_LEVEL! NEQ 0 exit /b !ERROR_LEVEL! && goto EOF
 	set "VERSION=!MAJOR!.!MINOR!.!PATCH!"
+	set VERSION=!VERSION!
 	exit /b !ERROR_LEVEL!
 	goto EOF
 :DISPLAY
