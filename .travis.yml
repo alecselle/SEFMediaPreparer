@@ -9,8 +9,6 @@ addons:
 install:
   - svn export https://github.com/Tencent/rapidjson.git/trunk/include/rapidjson ./include/rapidjson
   - git clone https://github.com/boostorg/boost.git ./boost
-  - ./boost/bootstrap.sh
-  - ./boost/b2 -j4
 script:
   - mkdir ./build
   - cd ./build
