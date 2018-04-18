@@ -22,6 +22,9 @@ Settings::Settings() {
 	if (!bf::exists(BASE_DIR)) {
 		bf::create_directories(BASE_DIR);
 	}
+	if (!bf::exists(PRESET_DIR)) {
+		bf::create_directories(PRESET_DIR);
+	}
 	if (!bf::exists(CONFIG_FILE)) {
 		createDefaultConfig();
 	}

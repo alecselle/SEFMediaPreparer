@@ -15,9 +15,9 @@ class File {
 
 	std::string _vCodec;
 	std::string _aCodec;
-	int _duration = NULL;
+	int _duration = -1;
 
-	int _subtitles = NULL;
+	int _subtitles = -1;
 	bool _loaded = false;
 
   public:
@@ -32,7 +32,7 @@ class File {
 	int duration();
 	int subtitles();
 	std::string subtitlesStr();
-	bool loadFileInfo(rapidjson::Document &jsonDocument);
+	bool loadFileInfo(rapidjson::StringStream ss);
 	bool isLoaded();
 };
 } // namespace SuperEpicFuntime

@@ -3,6 +3,7 @@
 #include <QtWidgets/QWidget>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
+#include <iostream>
 #include <rapidjson/document.h>
 #include <string>
 
@@ -36,8 +37,9 @@ std::string File::path() {
 }
 
 std::string File::pathSub() {
-	if (_loaded && _subtitles == 1)
+	if (_loaded && _subtitles == 1) {
 		return _pathSub;
+	}
 }
 
 std::string File::name() {
@@ -49,25 +51,29 @@ std::string File::extension() {
 }
 
 string File::vcodec() {
-	if (_loaded)
+	if (_loaded) {
 		return _vCodec;
+	}
 	return "error";
 }
 
 string File::acodec() {
-	if (_loaded)
+	if (_loaded) {
 		return _aCodec;
+	}
 	return "error";
 }
 
 int File::duration() {
-	if (_loaded)
+	if (_loaded) {
 		return _duration;
+	}
 }
 
 int File::subtitles() {
-	if (_loaded)
+	if (_loaded) {
 		return _subtitles;
+	}
 }
 
 string File::subtitlesStr() {
@@ -89,42 +95,43 @@ string File::subtitlesStr() {
 	return "error";
 }
 
-bool File::loadFileInfo(Document &d) {
-	//	if (!d["streams"].IsNull() && d["streams"].IsArray()) {
-	//		for (auto &stream : d["streams"].GetArray()) {
-	//			string codec_type = stream["codec_type"].GetString();
-	//			string codec_name = stream["codec_name"].GetString();
+bool File::loadFileInfo(StringStream out) {
+	Document d;
+	d.ParseStream(out);
 
-	//			if (codec_type.compare("video") == 0 && codec_name.compare("png") != 0 && _vCodec.empty()) {
-	//				_vCodec = codec_name;
-	//			} else if (codec_type.compare("audio") == 0 && _aCodec.empty()) {
-	//				_aCodec = codec_name;
-	//			} else if (codec_type.compare("subtitle") == 0) {
-	//				_subtitles = 2;
-	//			}
-	//		}
-	//	}
+	if (d.HasMember("streams") && d["streams"].IsArray()) {
+		for (auto &stream : d["streams"].GetArray()) {
+			string codec_type = stream["codec_type"].GetString();
+			string codec_name = stream["codec_name"].GetString();
 
-	//	if (!d["format"].IsNull() && d["format"].IsArray()) {
-	//		for (auto &format : d["streams"].GetArray()) {
-	//			_duration = format["duration"].GetFloat() * 1000.0;
-	//		}
-	//	} else {
-	_duration = 0;
-	//	}
+			if (codec_type.compare("video") == 0 && codec_name.compare("png") != 0 && _vCodec.empty()) {
+				_vCodec = codec_name;
+			} else if (codec_type.compare("audio") == 0 && _aCodec.empty()) {
+				_aCodec = codec_name;
+			} else if (codec_type.compare("subtitle") == 0) {
+				_subtitles = 2;
+			}
+		}
+	}
 
-	if (!_vCodec.empty() && !_aCodec.empty() && _duration != NULL) {
-		if (_subtitles == NULL && bf::exists(_pathSub)) {
+	if (d.HasMember("format") && d["format"].HasMember("duration")) {
+		string t = d["format"]["duration"].GetString();
+		_duration = stoi(t) * 1000.0;
+	} else {
+		_duration = 0;
+	}
+
+	if (!_vCodec.empty() && !_aCodec.empty()) {
+		if (_subtitles == -1 && bf::exists(_pathSub)) {
 			_subtitles = 1;
 		} else {
 			_subtitles = 0;
 		}
 		_loaded = true;
-		return true;
 	} else {
 		_loaded = false;
-		return false;
 	}
+	return _loaded;
 }
 
 bool File::isLoaded() {
