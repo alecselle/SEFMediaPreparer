@@ -6,7 +6,6 @@ addons:
       - mingw-w64
       - qtbase5-dev
       - libboost-all-dev
-      - svn
 install:
   - svn export https://github.com/Tencent/rapidjson.git/trunk/include/rapidjson ./include/rapidjson
   - git clone https://github.com/boostorg/boost.git ./boost
