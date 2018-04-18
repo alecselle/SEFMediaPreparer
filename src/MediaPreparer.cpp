@@ -22,6 +22,7 @@
 #include <iostream>
 #include <rapidjson/document.h>
 #include <string>
+#include <QtWebChannel/QtWebChannel>
 
 namespace bf = boost::filesystem;
 namespace bc = boost::container;
