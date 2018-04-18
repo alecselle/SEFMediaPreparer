@@ -1,5 +1,4 @@
 // clang-format off
-#include <idp.iss>
 #ifndef ApplicationName
 # define ApplicationName "SEFMediaPreparer"
 #endif

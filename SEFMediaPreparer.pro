@@ -39,16 +39,16 @@ DISTFILES += \
     $$PWD/version.txt
 
 LIBS += \
-    -LC:/MSYS/mingw32/lib/ -lboost_filesystem-mt \
-    -LC:/MSYS/mingw32/lib/ -lboost_container-mt \
-    -LC:/MSYS/mingw32/lib/ -lboost_system-mt \
+    -L$$(LIBS) -lboost_filesystem-mt \
+    -L$$(LIBS) -lboost_container-mt \
+    -L$$(LIBS) -lboost_system-mt \
     -L$$PWD/lib/
 
 INCLUDEPATH += \
-    C:/MSYS/mingw32/include
+    $$(INCLUDE)
 
 DEPENDPATH += \
-    C:/MSYS/mingw32/include
+    $$(INCLUDE)
 
 DEFINES += \
     VER_MAJ=$$VER_MAJ \
