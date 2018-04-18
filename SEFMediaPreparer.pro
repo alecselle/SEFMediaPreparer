@@ -5,8 +5,8 @@ CONFIG += c++17 c++14 embed_manifest_exe
 QMAKE_CXXFLAGS += -std=c++17 -static-libstdc++ -static-libgcc
 
 !defined(VER_MAJ):VER_MAJ = 3
-!defined(VER_MIN):VER_MIN = 1
-!defined(VER_PAT):VER_PAT = 0
+!defined(VER_MIN):VER_MIN = 2
+!defined(VER_PAT):VER_PAT = 1
 VERSION = $${VER_MAJ}.$${VER_MIN}.$${VER_PAT}
 
 DESTDIR = $$PWD/bin

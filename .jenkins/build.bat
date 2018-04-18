@@ -53,7 +53,7 @@ call "%~dp0/version.bat" 2>&1 nul
 		if not exist "!WORKSPACE!/!PROJECT_DEFAULT!" call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "!PROJECT!"
 		set PROJECT=!PROJECT_DEFAULT!
 	)
-	if "!LINK!" EQU "" set LINK=shared
+	if "!LINK!" EQU "" set LINK=static
 	if "!LINK!" EQU "shared" set QMAKE=!QMAKE_SHARED!
 	if "!LINK!" EQU "static" set QMAKE=!QMAKE_STATIC!
 	if "!QMAKE!" EQU "" (

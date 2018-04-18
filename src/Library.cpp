@@ -76,6 +76,7 @@ int Library::size() {
 	if (isValid(true, true, false)) {
 		return _Library.size();
 	}
+	return 0;
 }
 
 int Library::duration() {
@@ -88,6 +89,7 @@ int Library::duration() {
 		}
 		return _duration;
 	}
+	return 0;
 }
 
 void Library::clear() {
@@ -217,6 +219,7 @@ int Library::sizeEncode() {
 	if (isValid(true, true, true)) {
 		return _LibraryEncode.size();
 	}
+	return 0;
 }
 
 int Library::durationEncode() {
@@ -229,6 +232,7 @@ int Library::durationEncode() {
 		}
 		return _duration;
 	}
+	return 0;
 }
 
 void Library::clearEncode() {
