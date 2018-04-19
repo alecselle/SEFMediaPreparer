@@ -113,6 +113,7 @@ class MediaPreparer : public QWidget {
 	bool diffPreset();
 	void savePreset(std::string presetName);
 	void savePreset();
+	void loadPresets();
 	void loadPreset(std::string presetName);
 	void loadPreset(QString presetName);
 

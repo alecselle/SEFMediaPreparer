@@ -43,10 +43,6 @@ void Settings::saveConfig() {
 	Document::AllocatorType &alloc = d.GetAllocator();
 	d.ParseStream(s);
 
-	if (d.HasParseError()) {
-		cout << "faq";
-	}
-
 	d.AddMember(StringRef("preset"), Value(StringRef(presetPath.c_str())), alloc);
 	d.AddMember(StringRef("libraryDir"), Value(StringRef(libraryDir.c_str())), alloc);
 	d.AddMember(StringRef("tempDir"), Value(StringRef(tempDir.c_str())), alloc);
@@ -109,12 +105,11 @@ void Settings::savePresetAs(std::string name) {
 	d.AddMember(StringRef("extraParams"), Value(StringRef(extraParams.c_str())), alloc);
 
 	string newPath;
-	if (name.find(":/") == name.back() || name.find(":\\") == name.back()) {
+	if (name.find(":/") == name.npos && name.find(":\\") == name.npos) {
 		newPath += PRESET_DIR + "\\";
 	}
 	newPath += name;
-	if (name.capacity() > PRESET_EXTENSION.capacity() &&
-		name.substr(name.capacity() - 7).compare(PRESET_EXTENSION) != 0) {
+	if (name.capacity() > PRESET_EXTENSION.capacity() && name.substr(name.capacity() - 7).compare(PRESET_EXTENSION) != 0) {
 		newPath += PRESET_EXTENSION;
 	}
 	FILE *fp = fopen(newPath.c_str(), "wb");
@@ -124,9 +119,10 @@ void Settings::savePresetAs(std::string name) {
 	d.Accept(writer);
 	fclose(fp);
 
-	refreshPresets();
 	presetPath = newPath.c_str();
 	presetName = bf::path(newPath).filename().replace_extension().string();
+
+	refreshPresets();
 }
 
 void Settings::refreshPresets() {
@@ -217,7 +213,7 @@ void Settings::loadConfig() {
 	} else {
 		containerList = DEFAULT_CONTAINERS;
 	}
-	//	saveConfig();
+	saveConfig();
 	fclose(fp);
 }
 
@@ -227,12 +223,11 @@ void Settings::loadPreset() {
 
 void Settings::loadPreset(std::string name) {
 	string newPath;
-	if (name.find(":/") == name.back() || name.find(":\\") == name.back()) {
+	if (name.find(":/") == name.npos && name.find(":\\") == name.npos) {
 		newPath += PRESET_DIR + "\\";
 	}
 	newPath += name;
-	if (name.capacity() > PRESET_EXTENSION.capacity() &&
-		name.substr(name.capacity() - 7).compare(PRESET_EXTENSION) != 0) {
+	if (name.capacity() > PRESET_EXTENSION.capacity() && name.substr(name.capacity() - 7).compare(PRESET_EXTENSION) != 0) {
 		newPath += PRESET_EXTENSION;
 	}
 	loadPresetFile(newPath);
@@ -240,7 +235,8 @@ void Settings::loadPreset(std::string name) {
 
 void Settings::loadPresetFile(std::string path) {
 	bf::path p(path.c_str());
-	if (bf::exists(p)) {
+	if (bf::exists(p) && bf::is_regular_file(p)) {
+
 		FILE *fp = fopen(p.string().c_str(), "rb");
 		char readBuffer[65536];
 		FileReadStream is(fp, readBuffer, sizeof(readBuffer));

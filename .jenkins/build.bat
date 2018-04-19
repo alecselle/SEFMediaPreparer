@@ -6,7 +6,9 @@ call "%~dp0/env.bat"
 :VARIABLES
 	if "%~1" NEQ "" (
 		if "%~1" EQU "-static" set LINK=static
+		if "%~1" EQU "static" set LINK=static
 		if "%~1" EQU "-shared" set LINK=shared
+		if "%~1" EQU "shared" set LINK=shared
 		if exist "!WORKSPACE!/%~1" set PROJECT=%~1
 		shift
 	)
