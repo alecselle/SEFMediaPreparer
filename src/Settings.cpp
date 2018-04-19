@@ -35,105 +35,7 @@ Settings::Settings() {
 	loadPreset();
 }
 
-void Settings::saveConfig() {
-	string json = "{}";
-	StringStream s(json.c_str());
-
-	Document d;
-	Document::AllocatorType &alloc = d.GetAllocator();
-	d.ParseStream(s);
-
-	d.AddMember(StringRef("preset"), Value(StringRef(presetPath.c_str())), alloc);
-	d.AddMember(StringRef("libraryDir"), Value(StringRef(libraryDir.c_str())), alloc);
-	d.AddMember(StringRef("tempDir"), Value(StringRef(tempDir.c_str())), alloc);
-	d.AddMember(StringRef("outputDir"), Value(StringRef(outputDir.c_str())), alloc);
-	d.AddMember(StringRef("preserveLog"), Value(preserveLog), alloc);
-	d.AddMember(StringRef("vCodecs"), Value(), alloc);
-	d["vCodecs"].SetArray();
-	d.AddMember(StringRef("aCodecs"), Value(), alloc);
-	d["aCodecs"].SetArray();
-	d.AddMember(StringRef("containers"), Value(), alloc);
-	d["containers"].SetArray();
-
-	for (int i = 0; i < vCodecList.size(); i++) {
-		Value a(kArrayType);
-		for (int j = 0; j < vCodecList[i].size(); j++) {
-			a.PushBack(Value().SetString(StringRef(vCodecList[i][j].c_str())), alloc);
-		}
-		d["vCodecs"].PushBack(a, alloc);
-	}
-
-	for (int i = 0; i < aCodecList.size(); i++) {
-		Value a(kArrayType);
-		for (int j = 0; j < aCodecList[i].size(); j++) {
-			a.PushBack(Value().SetString(StringRef(aCodecList[i][j].c_str())), alloc);
-		}
-		d["aCodecs"].PushBack(a, alloc);
-	}
-
-	for (int i = 0; i < containerList.size(); i++) {
-		d["containers"].PushBack(Value().SetString(StringRef(containerList[i].c_str())), alloc);
-	}
-
-	FILE *fp = fopen(CONFIG_FILE.c_str(), "wb");
-	char writeBuffer[65536];
-	FileWriteStream os(fp, writeBuffer, sizeof(writeBuffer));
-	PrettyWriter<FileWriteStream> writer(os);
-	d.Accept(writer);
-	fclose(fp);
-}
-
-void Settings::savePreset() {
-	savePresetAs(presetName);
-}
-
-void Settings::savePresetAs(std::string name) {
-	string json = "{}";
-	StringStream s(json.c_str());
-
-	Document d;
-	Document::AllocatorType &alloc = d.GetAllocator();
-	d.ParseStream(s);
-
-	d.AddMember(StringRef("vCodec"), Value(StringRef(vCodec.c_str())), alloc);
-	d.AddMember(StringRef("vQuality"), Value(StringRef(vQuality.c_str())), alloc);
-	d.AddMember(StringRef("aCodec"), Value(StringRef(aCodec.c_str())), alloc);
-	d.AddMember(StringRef("aQuality"), Value(StringRef(aQuality.c_str())), alloc);
-	d.AddMember(StringRef("container"), Value(StringRef(container.c_str())), alloc);
-	d.AddMember(StringRef("subtitles"), Value(StringRef(subtitles.c_str())), alloc);
-	d.AddMember(StringRef("threads"), Value(StringRef(threads.c_str())), alloc);
-	d.AddMember(StringRef("extraParams"), Value(StringRef(extraParams.c_str())), alloc);
-
-	string newPath;
-	if (name.find(":/") == name.npos && name.find(":\\") == name.npos) {
-		newPath += PRESET_DIR + "\\";
-	}
-	newPath += name;
-	if (name.capacity() > PRESET_EXTENSION.capacity() && name.substr(name.capacity() - 7).compare(PRESET_EXTENSION) != 0) {
-		newPath += PRESET_EXTENSION;
-	}
-	FILE *fp = fopen(newPath.c_str(), "wb");
-	char writeBuffer[65536];
-	FileWriteStream os(fp, writeBuffer, sizeof(writeBuffer));
-	PrettyWriter<FileWriteStream> writer(os);
-	d.Accept(writer);
-	fclose(fp);
-
-	presetPath = newPath.c_str();
-	presetName = bf::path(newPath).filename().replace_extension().string();
-
-	refreshPresets();
-}
-
-void Settings::refreshPresets() {
-	presetPathList.clear();
-	presetNameList.clear();
-	for (bf::directory_entry &x : bf::directory_iterator(PRESET_DIR)) {
-		if (x.path().extension().compare(PRESET_EXTENSION) == 0) {
-			presetPathList.push_back(x.path().string());
-			presetNameList.push_back(x.path().filename().replace_extension().string());
-		}
-	}
+string Settings::parsePath(string path) {
 }
 
 void Settings::loadConfig() {
@@ -217,6 +119,106 @@ void Settings::loadConfig() {
 	fclose(fp);
 }
 
+void Settings::saveConfig() {
+	string json = "{}";
+	StringStream s(json.c_str());
+
+	Document d;
+	Document::AllocatorType &alloc = d.GetAllocator();
+	d.ParseStream(s);
+
+	d.AddMember(StringRef("preset"), Value(StringRef(presetPath.c_str())), alloc);
+	d.AddMember(StringRef("libraryDir"), Value(StringRef(libraryDir.c_str())), alloc);
+	d.AddMember(StringRef("tempDir"), Value(StringRef(tempDir.c_str())), alloc);
+	d.AddMember(StringRef("outputDir"), Value(StringRef(outputDir.c_str())), alloc);
+	d.AddMember(StringRef("preserveLog"), Value(preserveLog), alloc);
+	d.AddMember(StringRef("vCodecs"), Value(), alloc);
+	d["vCodecs"].SetArray();
+	d.AddMember(StringRef("aCodecs"), Value(), alloc);
+	d["aCodecs"].SetArray();
+	d.AddMember(StringRef("containers"), Value(), alloc);
+	d["containers"].SetArray();
+
+	for (int i = 0; i < vCodecList.size(); i++) {
+		Value a(kArrayType);
+		for (int j = 0; j < vCodecList[i].size(); j++) {
+			a.PushBack(Value().SetString(StringRef(vCodecList[i][j].c_str())), alloc);
+		}
+		d["vCodecs"].PushBack(a, alloc);
+	}
+
+	for (int i = 0; i < aCodecList.size(); i++) {
+		Value a(kArrayType);
+		for (int j = 0; j < aCodecList[i].size(); j++) {
+			a.PushBack(Value().SetString(StringRef(aCodecList[i][j].c_str())), alloc);
+		}
+		d["aCodecs"].PushBack(a, alloc);
+	}
+
+	for (int i = 0; i < containerList.size(); i++) {
+		d["containers"].PushBack(Value().SetString(StringRef(containerList[i].c_str())), alloc);
+	}
+
+	FILE *fp = fopen(CONFIG_FILE.c_str(), "wb");
+	char writeBuffer[65536];
+	FileWriteStream os(fp, writeBuffer, sizeof(writeBuffer));
+	PrettyWriter<FileWriteStream> writer(os);
+	d.Accept(writer);
+	fclose(fp);
+}
+
+void Settings::createDefaultConfig() {
+	string json = "{}";
+	StringStream s(json.c_str());
+
+	Document d;
+	Document::AllocatorType &alloc = d.GetAllocator();
+	d.ParseStream(s);
+
+	if (d.HasParseError()) {
+		cout << "faq";
+	}
+
+	d.AddMember(StringRef("preset"), Value(StringRef(DEFAULT_PRESET.c_str())), alloc);
+	d.AddMember(StringRef("libraryDir"), Value(StringRef(DEFAULT_LIBRARY_DIR.c_str())), alloc);
+	d.AddMember(StringRef("tempDir"), Value(StringRef(DEFAULT_TEMP_DIR.c_str())), alloc);
+	d.AddMember(StringRef("outputDir"), Value(StringRef(DEFAULT_OUTPUT_DIR.c_str())), alloc);
+	d.AddMember(StringRef("preserveLog"), Value(DEFAULT_PRESERVE_LOG), alloc);
+	d.AddMember(StringRef("vCodecs"), Value(), alloc);
+	d["vCodecs"].SetArray();
+	d.AddMember(StringRef("aCodecs"), Value(), alloc);
+	d["aCodecs"].SetArray();
+	d.AddMember(StringRef("containers"), Value(), alloc);
+	d["containers"].SetArray();
+
+	for (int i = 0; i < DEFAULT_VCODECS.size(); i++) {
+		Value a(kArrayType);
+		for (int j = 0; j < DEFAULT_VCODECS[i].size(); j++) {
+			a.PushBack(Value().SetString(StringRef(DEFAULT_VCODECS[i][j].c_str())), alloc);
+		}
+		d["vCodecs"].PushBack(a, alloc);
+	}
+
+	for (int i = 0; i < DEFAULT_ACODECS.size(); i++) {
+		Value a(kArrayType);
+		for (int j = 0; j < DEFAULT_ACODECS[i].size(); j++) {
+			a.PushBack(Value().SetString(StringRef(DEFAULT_ACODECS[i][j].c_str())), alloc);
+		}
+		d["aCodecs"].PushBack(a, alloc);
+	}
+
+	for (int i = 0; i < DEFAULT_CONTAINERS.size(); i++) {
+		d["containers"].PushBack(Value().SetString(StringRef(DEFAULT_CONTAINERS[i].c_str())), alloc);
+	}
+
+	FILE *fp = fopen(CONFIG_FILE.c_str(), "wb");
+	char writeBuffer[65536];
+	FileWriteStream os(fp, writeBuffer, sizeof(writeBuffer));
+	PrettyWriter<FileWriteStream> writer(os);
+	d.Accept(writer);
+	fclose(fp);
+}
+
 void Settings::loadPreset() {
 	loadPresetFile(presetPath);
 }
@@ -227,7 +229,8 @@ void Settings::loadPreset(std::string name) {
 		newPath += PRESET_DIR + "\\";
 	}
 	newPath += name;
-	if (name.capacity() > PRESET_EXTENSION.capacity() && name.substr(name.capacity() - 7).compare(PRESET_EXTENSION) != 0) {
+	if (name.capacity() > PRESET_EXTENSION.capacity() &&
+		name.substr(name.capacity() - 7).compare(PRESET_EXTENSION) != 0) {
 		newPath += PRESET_EXTENSION;
 	}
 	loadPresetFile(newPath);
@@ -294,7 +297,12 @@ void Settings::loadPresetFile(std::string path) {
 		}
 	}
 }
-void Settings::createDefaultConfig() {
+
+void Settings::savePreset() {
+	savePresetAs(presetName);
+}
+
+void Settings::savePresetAs(std::string name) {
 	string json = "{}";
 	StringStream s(json.c_str());
 
@@ -302,48 +310,46 @@ void Settings::createDefaultConfig() {
 	Document::AllocatorType &alloc = d.GetAllocator();
 	d.ParseStream(s);
 
-	if (d.HasParseError()) {
-		cout << "faq";
+	d.AddMember(StringRef("vCodec"), Value(StringRef(vCodec.c_str())), alloc);
+	d.AddMember(StringRef("vQuality"), Value(StringRef(vQuality.c_str())), alloc);
+	d.AddMember(StringRef("aCodec"), Value(StringRef(aCodec.c_str())), alloc);
+	d.AddMember(StringRef("aQuality"), Value(StringRef(aQuality.c_str())), alloc);
+	d.AddMember(StringRef("container"), Value(StringRef(container.c_str())), alloc);
+	d.AddMember(StringRef("subtitles"), Value(StringRef(subtitles.c_str())), alloc);
+	d.AddMember(StringRef("threads"), Value(StringRef(threads.c_str())), alloc);
+	d.AddMember(StringRef("extraParams"), Value(StringRef(extraParams.c_str())), alloc);
+
+	string newPath;
+	if (name.find(":/") == name.npos && name.find(":\\") == name.npos) {
+		newPath += PRESET_DIR + "\\";
 	}
-
-	d.AddMember(StringRef("preset"), Value(StringRef(DEFAULT_PRESET.c_str())), alloc);
-	d.AddMember(StringRef("libraryDir"), Value(StringRef(DEFAULT_LIBRARY_DIR.c_str())), alloc);
-	d.AddMember(StringRef("tempDir"), Value(StringRef(DEFAULT_TEMP_DIR.c_str())), alloc);
-	d.AddMember(StringRef("outputDir"), Value(StringRef(DEFAULT_OUTPUT_DIR.c_str())), alloc);
-	d.AddMember(StringRef("preserveLog"), Value(DEFAULT_PRESERVE_LOG), alloc);
-	d.AddMember(StringRef("vCodecs"), Value(), alloc);
-	d["vCodecs"].SetArray();
-	d.AddMember(StringRef("aCodecs"), Value(), alloc);
-	d["aCodecs"].SetArray();
-	d.AddMember(StringRef("containers"), Value(), alloc);
-	d["containers"].SetArray();
-
-	for (int i = 0; i < DEFAULT_VCODECS.size(); i++) {
-		Value a(kArrayType);
-		for (int j = 0; j < DEFAULT_VCODECS[i].size(); j++) {
-			a.PushBack(Value().SetString(StringRef(DEFAULT_VCODECS[i][j].c_str())), alloc);
-		}
-		d["vCodecs"].PushBack(a, alloc);
+	newPath += name;
+	if (name.capacity() > PRESET_EXTENSION.capacity() &&
+		name.substr(name.capacity() - 7).compare(PRESET_EXTENSION) != 0) {
+		newPath += PRESET_EXTENSION;
 	}
-
-	for (int i = 0; i < DEFAULT_ACODECS.size(); i++) {
-		Value a(kArrayType);
-		for (int j = 0; j < DEFAULT_ACODECS[i].size(); j++) {
-			a.PushBack(Value().SetString(StringRef(DEFAULT_ACODECS[i][j].c_str())), alloc);
-		}
-		d["aCodecs"].PushBack(a, alloc);
-	}
-
-	for (int i = 0; i < DEFAULT_CONTAINERS.size(); i++) {
-		d["containers"].PushBack(Value().SetString(StringRef(DEFAULT_CONTAINERS[i].c_str())), alloc);
-	}
-
-	FILE *fp = fopen(CONFIG_FILE.c_str(), "wb");
+	FILE *fp = fopen(newPath.c_str(), "wb");
 	char writeBuffer[65536];
 	FileWriteStream os(fp, writeBuffer, sizeof(writeBuffer));
 	PrettyWriter<FileWriteStream> writer(os);
 	d.Accept(writer);
 	fclose(fp);
+
+	presetPath = newPath.c_str();
+	presetName = bf::path(newPath).filename().replace_extension().string();
+
+	refreshPresets();
+}
+
+void Settings::refreshPresets() {
+	presetPathList.clear();
+	presetNameList.clear();
+	for (bf::directory_entry &x : bf::directory_iterator(PRESET_DIR)) {
+		if (x.path().extension().compare(PRESET_EXTENSION) == 0) {
+			presetPathList.push_back(x.path().string());
+			presetNameList.push_back(x.path().filename().replace_extension().string());
+		}
+	}
 }
 
 void Settings::createDefaultPreset() {

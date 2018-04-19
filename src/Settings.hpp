@@ -53,17 +53,19 @@ class Settings {
 
 	Settings();
 
-	void saveConfig();
-	void savePreset();
-	void savePresetAs(std::string presetName);
+	std::string parsePath(std::string path);
+	std::string parsePathPreset(std::string path);
 
 	void loadConfig();
+	void saveConfig();
+	void createDefaultConfig();
+
 	void loadPreset();
 	void loadPreset(std::string presetName);
 	void loadPresetFile(std::string presetFilePath);
+	void savePreset();
+	void savePresetAs(std::string presetName);
 	void refreshPresets();
-
-	void createDefaultConfig();
 	void createDefaultPreset();
 };
 } // namespace SuperEpicFuntime
