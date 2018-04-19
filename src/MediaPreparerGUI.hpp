@@ -62,6 +62,7 @@ class MediaPreparerGUI : public QWidget {
 	void loadSettings_gui();
 	void loadSettings_config();
 	void loadSettings_preset(QString preset);
+	void loadSettings_presets();
 
 	void saveSettings_config();
 	void saveSettings_preset(QString preset);
@@ -87,6 +88,7 @@ class MediaPreparerGUI : public QWidget {
 	void signal_loadSettings_gui();
 	void signal_loadSettings_config();
 	void signal_loadSettings_preset(QString preset);
+	void signal_loadSettings_presets();
 
 	void signal_saveSettings_config();
 	void signal_saveSettings_preset(QString preset);

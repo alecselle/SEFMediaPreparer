@@ -89,7 +89,6 @@ void MediaPreparerGUI::loadSettings_config() {
 	ui->setting_vCodec->clear();
 	ui->setting_aCodec->clear();
 	ui->setting_container->clear();
-	ui->setting_preset->clear();
 
 	ui->setting_directory->setText(settings->libraryDir.c_str());
 	ui->setting_dirOutput->setText(settings->outputDir.c_str());
@@ -103,26 +102,32 @@ void MediaPreparerGUI::loadSettings_config() {
 	for (int i = 0; i < (int)settings->containerList.size(); i++) {
 		ui->setting_container->addItem(settings->containerList[i].c_str());
 	}
-	for (int i = 0; i < (int)settings->presetNameList.size(); i++) {
-		ui->setting_preset->addItem(settings->presetNameList[i].c_str());
-	}
 	blockSignals(false);
 }
 
 void MediaPreparerGUI::loadSettings_preset(QString preset) {
 	blockSignals(true);
+	loadSettings_presets();
 	settings->loadPreset(preset.toStdString());
-	ui->setting_preset->setCurrentText(QString(settings->presetName.c_str()));
-	ui->setting_preset->setToolTip(QString(settings->presetPath.c_str()));
-	ui->setting_vCodec->setCurrentText(QString(settings->vCodec.c_str()));
-	ui->setting_aCodec->setCurrentText(QString(settings->aCodec.c_str()));
-	ui->setting_vQuality->setValue(stoi(settings->vQuality.c_str()));
-	ui->setting_aQuality->setValue(stoi(settings->aQuality.c_str()));
-	ui->setting_container->setCurrentText(QString(settings->container.c_str()));
-	ui->setting_subtitles->setCurrentText(QString(settings->subtitles.c_str()));
-	ui->setting_threads->setText(QString(settings->threads.c_str()));
-	ui->setting_extraParams->setText(QString(settings->extraParams.c_str()));
+	ui->setting_preset->setCurrentText(settings->presetName.c_str());
+	ui->setting_preset->setToolTip(settings->presetPath.c_str());
+	ui->setting_vCodec->setCurrentText(settings->vCodec.c_str());
+	ui->setting_aCodec->setCurrentText(settings->aCodec.c_str());
+	ui->setting_vQuality->setValue(stoi(settings->vQuality));
+	ui->setting_aQuality->setValue(stoi(settings->aQuality));
+	ui->setting_container->setCurrentText(settings->container.c_str());
+	ui->setting_subtitles->setCurrentText(settings->subtitles.c_str());
+	ui->setting_threads->setText(settings->threads.c_str());
+	ui->setting_extraParams->setText(settings->extraParams.c_str());
 	blockSignals(false);
+}
+
+void MediaPreparerGUI::loadSettings_presets() {
+	ui->setting_preset->clear();
+	settings->refreshPresets();
+	for (int i = 0; i < (int)settings->presetNameList.size(); i++) {
+		ui->setting_preset->addItem(settings->presetNameList[i].c_str());
+	}
 }
 
 void MediaPreparerGUI::saveSettings_config() {
@@ -133,7 +138,6 @@ void MediaPreparerGUI::saveSettings_config() {
 void MediaPreparerGUI::saveSettings_preset(QString preset) {
 	loadSettings_gui();
 	settings->savePresetAs(preset.toStdString());
-	loadSettings_config();
 	loadSettings_preset(preset);
 }
 
@@ -194,6 +198,8 @@ void MediaPreparerGUI::log(QString msg) {
 }
 
 void MediaPreparerGUI::blockSignals(bool b) {
+	QList<QWidget *> widgets = ui->container_main->findChildren<QWidget *>();
+	foreach (QWidget *x, widgets) { x->blockSignals(b); }
 }
 
 void MediaPreparerGUI::closeEvent(QCloseEvent *e) {

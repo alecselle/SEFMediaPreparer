@@ -215,49 +215,41 @@ void Settings::loadPresetFile(std::string path) {
 		} else {
 			vCodec = DEFAULT_VCODEC;
 		}
-		cout << vCodec << endl;
 		if (d.HasMember("vQuality") && d["vQuality"].IsString()) {
 			vQuality = d["vQuality"].GetString();
 		} else {
 			vQuality = DEFAULT_VQUALITY;
 		}
-		cout << vQuality << endl;
 		if (d.HasMember("aCodec") && d["aCodec"].IsString()) {
 			aCodec = d["aCodec"].GetString();
 		} else {
 			aCodec = DEFAULT_ACODEC;
 		}
-		cout << aCodec << endl;
 		if (d.HasMember("aQuality") && d["aQuality"].IsString()) {
 			aQuality = d["aQuality"].GetString();
 		} else {
 			aQuality = DEFAULT_AQUALITY;
 		}
-		cout << aQuality << endl;
 		if (d.HasMember("container") && d["container"].IsString()) {
 			container = d["container"].GetString();
 		} else {
 			container = DEFAULT_CONTAINER;
 		}
-		cout << container << endl;
 		if (d.HasMember("subtitles") && d["subtitles"].IsString()) {
 			subtitles = d["subtitles"].GetString();
 		} else {
 			subtitles = DEFAULT_SUBTITLES;
 		}
-		cout << subtitles << endl;
 		if (d.HasMember("threads") && d["threads"].IsString()) {
 			threads = d["threads"].GetString();
 		} else {
 			threads = DEFAULT_THREADS;
 		}
-		cout << threads << endl;
 		if (d.HasMember("extraParams") && d["extraParams"].IsString()) {
 			extraParams = d["extraParams"].GetString();
 		} else {
 			extraParams = DEFAULT_EXTRA_PARAMS;
 		}
-		cout << extraParams << endl;
 		presetPath = parsePresetPath(path);
 		presetName = parsePresetName(path);
 	} else {
