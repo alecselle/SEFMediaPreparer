@@ -13,6 +13,4 @@
 #define PRODUCT_LOGO "../seflogo.ico"
 #define PRODUCT_DESCRIPTION "SuperEpicFuntime Media Preparer"
 
-#define PRODUCT_INSTALL_PATH "%APPDATA%/SuperEpicFuntime/SEFMediaPreparer"
-
 #endif // PRODUCT_INFO

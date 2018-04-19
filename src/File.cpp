@@ -68,12 +68,14 @@ int File::duration() {
 	if (_loaded) {
 		return _duration;
 	}
+	return 0;
 }
 
 int File::subtitles() {
 	if (_loaded) {
 		return _subtitles;
 	}
+	return -1;
 }
 
 string File::subtitlesStr() {
