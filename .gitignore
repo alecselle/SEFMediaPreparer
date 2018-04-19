@@ -9,6 +9,7 @@ SEFMediaPreparer.pro.user
 
 build/
 bin/
+version.txt
 
 SEFMediaPreparer-*-Setup.exe
 
