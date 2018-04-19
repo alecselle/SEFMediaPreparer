@@ -2,9 +2,11 @@
 #define MEDIAPREPARERGUI_HPP
 #pragma once
 
+#include "src/EventHandler.hpp"
 #include "src/File.hpp"
 #include "src/Library.hpp"
 #include "src/Settings.hpp"
+#include "src/Worker.hpp"
 #include "src/product_info.hpp"
 
 #include <QtConcurrent/QtConcurrent>
@@ -27,6 +29,7 @@ class MediaPreparerGUI : public QWidget {
 	Q_OBJECT
   private:
 	Ui::MediaPreparer *ui;
+
 	QSignalMapper *signalMapper = new QSignalMapper(this);
 	QTimer *updateTimer = new QTimer(this);
 	QWidget *containerEncode;
@@ -52,8 +55,9 @@ class MediaPreparerGUI : public QWidget {
 	void closeEvent(QCloseEvent *e);
 
   public:
-	SuperEpicFuntime::Settings *settings = new SuperEpicFuntime::Settings();
-	SuperEpicFuntime::Library *library = new SuperEpicFuntime::Library(settings);
+	Settings *settings = new Settings();
+	Library *library = new Library(settings);
+	EventHandler *eventHandler = new EventHandler();
 
 	explicit MediaPreparerGUI(QWidget *parent = 0);
 	~MediaPreparerGUI();
@@ -73,6 +77,8 @@ class MediaPreparerGUI : public QWidget {
 	void runWorker_scan();
 	void runWorker_encode();
 	void runWorker_cleanup();
+
+	void eventListener(Event event);
 
 	void updateProgress_primary(int progress = 0, QString msg = NULL);
 	void updateProgress_secondary(int progress = 0, QString msg = NULL);

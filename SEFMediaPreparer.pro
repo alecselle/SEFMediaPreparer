@@ -18,7 +18,9 @@ SOURCES += \
     $$PWD/src/File.cpp \
     $$PWD/src/Library.cpp \
     $$PWD/src/MediaPreparer.cpp \
-    src/MediaPreparerGUI.cpp
+    src/MediaPreparerGUI.cpp \
+    src/Worker.cpp \
+    src/EventHandler.cpp
 
 HEADERS += \
     $$PWD/src/Settings.hpp \
@@ -26,7 +28,9 @@ HEADERS += \
     $$PWD/src/Library.hpp \
     $$PWD/src/MediaPreparer.hpp \
     $$PWD/src/product_info.hpp \
-    src/MediaPreparerGUI.hpp
+    src/MediaPreparerGUI.hpp \
+    src/Worker.hpp \
+    src/EventHandler.hpp
 
 FORMS += \
     $$PWD/src/MediaPreparer.ui
@@ -60,4 +64,4 @@ DEFINES += \
 
 RC_FILE = $$PWD/src/SEFMediaPreparer.exe.rc
 system(echo|set /p="$${VERSION}" >"$$PWD/version.txt")
-system($$PWD/.jenkins/version.bat)
+system($$PWD/.jenkins/version.bat 2>&1 nul)

@@ -7,6 +7,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/container/vector.hpp>
 #include <boost/filesystem.hpp>
+#include <iostream>
 
 namespace bf = boost::filesystem;
 namespace bc = boost::container;
@@ -69,6 +70,9 @@ void MediaPreparerGUI::initSignals() {
 	connect(ui->setting_aCodec, SIGNAL(currentIndexChanged(int)), this, SLOT(loadSettings_gui()));
 	connect(ui->setting_container, SIGNAL(currentIndexChanged(int)), this, SLOT(loadSettings_gui()));
 	connect(ui->setting_preset, SIGNAL(currentTextChanged(QString)), this, SLOT(loadSettings_preset(QString)));
+
+	// connect(new EventHandler, SIGNAL(eventAdded(Event)), this, SLOT(eventListener(Event)));
+	connect(eventHandler, SIGNAL(eventAdded(Event)), this, SLOT(eventListener(Event)));
 }
 
 void MediaPreparerGUI::loadSettings_gui() {
@@ -154,6 +158,56 @@ void MediaPreparerGUI::runWorker_encode() {
 }
 
 void MediaPreparerGUI::runWorker_cleanup() {
+}
+
+void MediaPreparerGUI::eventListener(Event e) {
+	cout << e.getType() << endl;
+	cout << e.getData() << endl;
+	cout << e.getMessage() << endl;
+	switch (e.getType()) {
+	case PROGRESS_UPDATED:
+		switch (e.getData()) {
+		case 1:
+
+			break;
+		case 2:
+
+			break;
+		default:
+
+			break;
+		}
+		break;
+	case WORKER_STARTED:
+		switch ((WorkerType)e.getData()) {
+		case SCAN:
+
+			break;
+		case ENCODE:
+
+			break;
+		default:
+
+			break;
+		}
+		break;
+	case WORKER_FINISHED:
+		switch ((WorkerType)e.getData()) {
+		case SCAN:
+
+			break;
+		case ENCODE:
+
+			break;
+		default:
+
+			break;
+		}
+		break;
+	default:
+
+		break;
+	}
 }
 
 void MediaPreparerGUI::updateProgress_primary(int progress, QString msg) {
