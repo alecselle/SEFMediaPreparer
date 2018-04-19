@@ -47,20 +47,9 @@ class MediaPreparerGUI : public QWidget {
 
 	void init();
 	void initGUI();
-
-	void loadSettings_config();
-	void loadSettings_preset(std::string preset);
-
-	void saveSettings_config();
-	void saveSettings_preset(std::string preset);
+	void initSignals();
 
 	void closeEvent(QCloseEvent *e);
-
-  private slots:
-	void on_updateGUI_settings();
-	void on_updateGUI_timers();
-
-	void on_blockSignals(bool b);
 
   public:
 	SuperEpicFuntime::Settings *settings = new SuperEpicFuntime::Settings();
@@ -70,20 +59,15 @@ class MediaPreparerGUI : public QWidget {
 	~MediaPreparerGUI();
 
   public slots:
-	void on_runWorker_scan();
-	void on_runWorker_encode();
-	void on_runWorker_cleanup();
+	void loadSettings_gui();
+	void loadSettings_config();
+	void loadSettings_preset(std::string preset);
 
-	void on_updateProgress_primary(int progress = NULL, std::string msg = NULL);
-	void on_updateProgress_secondary(int progress = NULL, std::string msg = NULL);
+	void saveSettings_config();
+	void saveSettings_preset(std::string preset);
 
-	void on_log(std::string msg);
-
-  signals:
 	void updateGUI_settings();
 	void updateGUI_timers();
-
-	void blockSignals(bool b);
 
 	void runWorker_scan();
 	void runWorker_encode();
@@ -93,6 +77,28 @@ class MediaPreparerGUI : public QWidget {
 	void updateProgress_secondary(int progress = NULL, std::string msg = NULL);
 
 	void log(std::string msg);
+	void blockSignals(bool b);
+
+  signals:
+	void signal_loadSettings_gui();
+	void signal_loadSettings_config();
+	void signal_loadSettings_preset(std::string preset);
+
+	void signal_saveSettings_config();
+	void signal_saveSettings_preset(std::string preset);
+
+	void signal_updateGUI_settings();
+	void signal_updateGUI_timers();
+
+	void signal_runWorker_scan();
+	void signal_runWorker_encode();
+	void signal_runWorker_cleanup();
+
+	void signal_updateProgress_primary(int progress = NULL, std::string msg = NULL);
+	void signal_updateProgress_secondary(int progress = NULL, std::string msg = NULL);
+
+	void signal_log(std::string msg);
+	void signal_blockSignals(bool b);
 };
 
 } // namespace SuperEpicFuntime
