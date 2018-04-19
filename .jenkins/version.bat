@@ -34,7 +34,7 @@ call "%~dp0/env.bat"
 :: ~~ FUNCTION DECLARATIONS
 :CHECK_VARIABLES
 	if "!WORKSPACE!" EQU "" cd "%~dp0"& cd ..& set WORKSPACE=!CD!
-	if not exist "!WORKSPACE!/version.txt" call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "version.txt"
+	if not exist "!WORKSPACE!/version.txt" call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "version.txt" "Try building the program first"
 	if not exist "!WORKSPACE!/.jenkins/.data" mkdir "!WORKSPACE!/.jenkins/.data" & attrib +h "!WORKSPACE!/.jenkins/.data" /s /d
 	exit /b !ERROR_LEVEL!
 	goto EOF
@@ -55,8 +55,9 @@ call "%~dp0/env.bat"
 	)
 	if %errorlevel% NEQ 0 call :ERROR_PARSE_FAILED "PARSE_VERSION"
 	if !ERROR_LEVEL! NEQ 0 exit /b !ERROR_LEVEL! && goto EOF
-	set "VERSION=!MAJOR!.!MINOR!.!PATCH!"
-	set VERSION=!VERSION!
+	set VERSION=!MAJOR!.!MINOR!.!PATCH!
+	for /f "tokens=* delims= " %%a in ("!VERSION!") do set VERSION=%%a
+	for /l %%a in (1,1,100) do if "!VERSION:~-1!"==" " set input=!VERSION:~0,-1!
 	exit /b !ERROR_LEVEL!
 	goto EOF
 :DISPLAY
@@ -68,17 +69,17 @@ call "%~dp0/env.bat"
 :: ~~ ERROR DECLARATIONS
 :ERROR_FILE_NOT_FOUND
 :: call :ERROR_FILE_NOT_FOUND "<IDENTIFIER>" "<FILE>"
-	call :ERROR "ERROR_FILE_NOT_FOUND" "%~1" "File not found '%~2'"
+	call :ERROR "ERROR_FILE_NOT_FOUND" "%~1" "File not found '%~2'" "%~3"
 	exit /b 1
 	goto EOF
 :ERROR_CREATE_DIR_FAILED
 :: call :ERROR_CREATE_DIR_FAILED "<IDENTIFIER>" "<DIRECTORY>"
-	call :ERROR "ERROR_CREATE_DIR_FAILED" "%~1" "Could not create directory '%~2'"
+	call :ERROR "ERROR_CREATE_DIR_FAILED" "%~1" "Could not create directory '%~2'" "%~3"
 	exit /b 1
 	goto EOF
 :ERROR_PARSE_FAILED
 :: call :ERROR_PARSE_FAILED "<IDENTIFIER>"
-	call :ERROR "ERROR_PARSE_FAILED" "%~1" "Failed to parse version"
+	call :ERROR "ERROR_PARSE_FAILED" "%~1" "Failed to parse version" "%~2"
 	exit /b 1
 	goto EOF
 :ERROR_SAVE_FAILED

@@ -49,21 +49,21 @@ call "%~dp0/env.bat"
 	goto EOF
 :ERROR_CREATE_DIR_FAILED
 :: call :ERROR_CREATE_DIR_FAILED "<IDENTIFIER>" "<DIRECTORY>"
-	call :ERROR "ERROR_CREATE_DIR_FAILED" %~1 "Could not create directory '%~2'"
+	call :ERROR "ERROR_CREATE_DIR_FAILED" %~1 "Could not create directory '%~2'" "%~3"
 	exit /b 1
 	goto EOF
 :ERROR_BUILD_FAILED
 :: call :ERROR_BUILD_FAILED "<IDENTIFIER>" "<EXECUTABLE>"
-	call :ERROR "ERROR_BUILD_FAILED" "%~1" "%~2 returned an error" "Check log for details"
+	call :ERROR "ERROR_BUILD_FAILED" "%~1" "%~2 returned an error" "Check log for details" "%~3"
 	if exist "!WORKSPACE!/.jenkins/.data/%~2.log" echo>"!WORKSPACE!/.jenkins/.data/%~2.log"
 	exit /b 1
 	goto EOF
 :ERROR_COPY_FAILED
-	call :ERROR "ERROR_COPY_FAILED" %~1 "Could not copy files"
+	call :ERROR "ERROR_COPY_FAILED" %~1 "Could not copy files" "%~2"
 	exit /b 1
 	goto EOF
 :ERROR_SYMLINK_FAILED
-	call :ERROR "ERROR_SYMLINK_FAILED" %~1 "Could create directory junction"
+	call :ERROR "ERROR_SYMLINK_FAILED" %~1 "Could create directory junction" "%~2"
 	exit /b 1
 	goto EOF
 :: ~~

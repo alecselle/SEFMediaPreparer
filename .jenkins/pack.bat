@@ -51,20 +51,20 @@ call env.bat
 :: ~~ ERROR DECLARATIONS
 :ERROR_FILE_NOT_FOUND
 :: call :ERROR_FILE_NOT_FOUND "<IDENTIFIER>" "<FILE>"
-	call :ERROR "ERROR_FILE_NOT_FOUND" %~1 "File not found '%~2'"
+	call :ERROR "ERROR_FILE_NOT_FOUND" %~1 "File not found '%~2'" "%~3"
 	exit /b 1
 	goto EOF
 :ERROR_CREATE_DIR_FAILED
 :: call :ERROR_CREATE_DIR_FAILED "<IDENTIFIER>" "<DIRECTORY>"
-	call :ERROR "ERROR_CREATE_DIR_FAILED" %~1 "Could not create directory '%~2'"
+	call :ERROR "ERROR_CREATE_DIR_FAILED" %~1 "Could not create directory '%~2'" "%~3"
 	exit /b 1
 	goto EOF
 :ERROR_COPY_FAILED
-	call :ERROR "ERROR_COPY_FAILED" %~1 "Could not copy files"
+	call :ERROR "ERROR_COPY_FAILED" %~1 "Could not copy files" "%~2"
 	exit /b 1
 	goto EOF
 :ERROR_ARCHIVE_FAILED
-	call :ERROR "ERROR_ARCHIVE_FAILED" %~1 "Could not create archive '%~2'"
+	call :ERROR "ERROR_ARCHIVE_FAILED" %~1 "Could not create archive '%~2'" "%~3"
 	exit /b 1
 	got EOF
 :: ~~

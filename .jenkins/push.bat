@@ -54,7 +54,7 @@ call "%~dp0/env.bat"
 :: ~~ ERROR DECLARATIONS
 :ERROR_FILE_NOT_FOUND
 :: call :ERROR_FILE_NOT_FOUND "<IDENTIFIER>" "<FILE>"
-	call :ERROR "ERROR_FILE_NOT_FOUND" %~1 "File not found '%~2'"
+	call :ERROR "ERROR_FILE_NOT_FOUND" %~1 "File not found '%~2'" "%~3"
 	exit /b 1
 	goto EOF
 :ERROR_PULL_FAILED

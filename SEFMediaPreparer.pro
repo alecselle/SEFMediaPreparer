@@ -58,3 +58,4 @@ DEFINES += \
 
 RC_FILE = $$PWD/src/SEFMediaPreparer.exe.rc
 system(echo|set /p="$${VERSION}" >"$$PWD/version.txt")
+system($$PWD/.jenkins/version.bat)
