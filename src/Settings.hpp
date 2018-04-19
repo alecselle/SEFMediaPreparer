@@ -2,7 +2,9 @@
 #define SETTINGS_HPP
 #pragma once
 
+#include "src/EventHandler.hpp"
 #include "src/product_info.hpp"
+
 #include <boost/container/vector.hpp>
 #include <boost/filesystem.hpp>
 #include <rapidjson/document.h>
@@ -56,6 +58,8 @@ class Settings {
 	boost::container::vector<std::string> presetNameList;
 	std::string presetName, vCodec, aCodec, vQuality, aQuality, subtitles, extraParams, threads, container;
 	bool preserveLog;
+
+	static EventHandler *eventHandler;
 
 	Settings();
 

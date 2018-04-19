@@ -28,6 +28,7 @@ MediaPreparerGUI::~MediaPreparerGUI() {
 void MediaPreparerGUI::init() {
 	initGUI();
 	initSignals();
+	emit eventHandler->signal_addEvent(EventType::WORKER_STARTED, "test", 0);
 }
 
 void MediaPreparerGUI::initGUI() {

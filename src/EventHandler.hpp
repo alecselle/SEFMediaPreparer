@@ -37,11 +37,13 @@ class EventHandler : public QWidget {
 	Event getEvent();
 	int size();
   public slots:
-	void addEvent(EventType type, std::string message);
+	void addEvent(EventType type, std::string message, int data = NULL);
 	void addEvent(Event event);
 
   signals:
-	void eventAdded(Event);
+	void eventAdded(Event event);
+	void signal_addEvent(EventType type, std::string message, int data = NULL);
+	void signal_addEvent(Event event);
 };
 } // namespace SuperEpicFuntime
 #endif // EVENTHANDLER_HPP

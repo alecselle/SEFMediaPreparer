@@ -32,14 +32,17 @@ int Event::getData() {
 }
 
 EventHandler::EventHandler() {
+	connect(this, SIGNAL(signal_addEvent(EventType, std::string, int)), this,
+			SLOT(addEvent(EventType, std::string, int)));
+	connect(this, SIGNAL(signal_addEvent(Event)), this, SLOT(addEvent(Event)));
 }
 
 void EventHandler::clearEvents() {
 	events.clear();
 }
 
-void EventHandler::addEvent(EventType type, string message) {
-	events.insert(events.begin(), Event(type, message));
+void EventHandler::addEvent(EventType type, string message, int data) {
+	events.insert(events.begin(), Event(type, message, data));
 	emit eventAdded(getEvent());
 }
 

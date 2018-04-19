@@ -22,6 +22,11 @@
 #include <string>
 
 namespace SuperEpicFuntime {
+
+static SuperEpicFuntime::EventHandler *eventHandler = new SuperEpicFuntime::EventHandler();
+static SuperEpicFuntime::Settings *settings = new SuperEpicFuntime::Settings();
+static SuperEpicFuntime::Library *library = new SuperEpicFuntime::Library(settings);
+
 namespace Ui {
 class MediaPreparer;
 }
@@ -55,9 +60,8 @@ class MediaPreparerGUI : public QWidget {
 	void closeEvent(QCloseEvent *e);
 
   public:
-	Settings *settings = new Settings();
-	Library *library = new Library(settings);
-	EventHandler *eventHandler = new EventHandler();
+	// Settings *settings = new Settings();
+	// Library *library = new Library(settings);
 
 	explicit MediaPreparerGUI(QWidget *parent = 0);
 	~MediaPreparerGUI();
