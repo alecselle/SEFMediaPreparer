@@ -44,8 +44,10 @@ void MediaPreparerGUI::initSignals() {
 	connect(this, SIGNAL(signal_runWorker_encode()), this, SLOT(runWorker_encode()));
 	connect(this, SIGNAL(signal_runWorker_cleanup()), this, SLOT(runWorker_cleanup()));
 	connect(this, SIGNAL(signal_updateProgress_primary(int, string)), this, SLOT(updateProgress_primary(int, string)));
-	connect(this, SIGNAL(signal_runWorker_scan()), this, SLOT(runWorker_scan()));
-	connect(this, SIGNAL(signal_runWorker_scan()), this, SLOT(runWorker_scan()));
+	connect(this, SIGNAL(signal_updateProgress_secondary(int, string)), this,
+			SLOT(updateProgress_secondary(int, string)));
+	connect(this, SIGNAL(signal_log()), this, SLOT(log()));
+	connect(this, SIGNAL(signal_blockSignals()), this, SLOT(blockSignals()));
 }
 
 void MediaPreparerGUI::loadSettings_gui() {
