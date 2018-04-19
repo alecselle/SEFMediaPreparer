@@ -17,14 +17,16 @@ SOURCES += \
     $$PWD/src/Settings.cpp \
     $$PWD/src/File.cpp \
     $$PWD/src/Library.cpp \
-    $$PWD/src/MediaPreparer.cpp
+    $$PWD/src/MediaPreparer.cpp \
+    src/MediaPreparerGUI.cpp
 
 HEADERS += \
     $$PWD/src/Settings.hpp \
     $$PWD/src/File.hpp \
     $$PWD/src/Library.hpp \
     $$PWD/src/MediaPreparer.hpp \
-    $$PWD/src/product_info.hpp
+    $$PWD/src/product_info.hpp \
+    src/MediaPreparerGUI.hpp
 
 FORMS += \
     $$PWD/src/MediaPreparer.ui
