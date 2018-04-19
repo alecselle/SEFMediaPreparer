@@ -39,7 +39,7 @@ string Settings::parsePath(string path) {
 	string t = path;
 	ba::ireplace_all(path, "%APPDATA%", APPDATA.c_str());
 	ba::ireplace_all(path, "%USERPROFILE%", USERPROFILE.c_str());
-	ba::ireplace_all(path, "/", "\\");
+	ba::ireplace_all(path, "\\\\", "/");
 	return t;
 }
 
@@ -47,7 +47,7 @@ string Settings::parsePresetPath(string path) {
 	string p = parsePath(path);
 	string t = "";
 	if (p.find(":/") == p.npos && p.find(":\\") == p.npos) {
-		t += PRESET_DIR + "\\";
+		t += PRESET_DIR + "/";
 	}
 	t += p;
 	if (p.capacity() > PRESET_EXTENSION.capacity() && p.substr(p.capacity() - 7).compare(PRESET_EXTENSION) != 0) {
@@ -72,7 +72,7 @@ void Settings::loadConfig() {
 	if (d.HasMember("preset") && d["preset"].IsString()) {
 		presetPath = parsePresetPath(d["preset"].GetString());
 	} else {
-		presetPath = DEFAULT_PRESET;
+		presetPath = parsePresetPath(DEFAULT_PRESET);
 	}
 	presetName = bf::path(presetPath).filename().replace_extension().string();
 	if (d.HasMember("tempDir") && d["tempDir"].IsString()) {
@@ -81,17 +81,17 @@ void Settings::loadConfig() {
 			bf::create_directories(tempDir);
 		}
 	} else {
-		tempDir = DEFAULT_TEMP_DIR;
+		tempDir = parsePath(DEFAULT_TEMP_DIR);
 	}
 	if (d.HasMember("libraryDir") && d["libraryDir"].IsString()) {
 		libraryDir = parsePath(d["libraryDir"].GetString());
 	} else {
-		libraryDir = DEFAULT_LIBRARY_DIR;
+		libraryDir = parsePath(DEFAULT_LIBRARY_DIR);
 	}
 	if (d.HasMember("outputDir") && d["outputDir"].IsString()) {
 		outputDir = parsePath(d["outputDir"].GetString());
 	} else {
-		outputDir = libraryDir + DEFAULT_OUTPUT_FOLDER;
+		outputDir = parsePath(libraryDir + DEFAULT_OUTPUT_FOLDER);
 	}
 	if (d.HasMember("preserveLog") && d["preserveLog"].IsBool()) {
 		preserveLog = d["preserveLog"].GetBool();
@@ -139,10 +139,10 @@ void Settings::saveConfig() {
 	Document::AllocatorType &alloc = d.GetAllocator();
 	d.ParseStream(s);
 
-	d.AddMember(StringRef("preset"), Value(StringRef(parsePresetPath(presetPath).c_str())), alloc);
-	d.AddMember(StringRef("libraryDir"), Value(StringRef(parsePath(libraryDir).c_str())), alloc);
-	d.AddMember(StringRef("tempDir"), Value(StringRef(parsePath(tempDir).c_str())), alloc);
-	d.AddMember(StringRef("outputDir"), Value(StringRef(parsePath(outputDir).c_str())), alloc);
+	d.AddMember(StringRef("preset"), Value(StringRef(presetPath.c_str())), alloc);
+	d.AddMember(StringRef("libraryDir"), Value(StringRef(libraryDir.c_str())), alloc);
+	d.AddMember(StringRef("tempDir"), Value(StringRef(tempDir.c_str())), alloc);
+	d.AddMember(StringRef("outputDir"), Value(StringRef(outputDir.c_str())), alloc);
 	d.AddMember(StringRef("preserveLog"), Value(preserveLog), alloc);
 	d.AddMember(StringRef("vCodecs"), Value(), alloc);
 	d["vCodecs"].SetArray();

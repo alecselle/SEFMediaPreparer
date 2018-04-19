@@ -21,7 +21,6 @@ MediaPreparerGUI::MediaPreparerGUI(QWidget *parent) : QWidget(parent), ui(new Ui
 }
 
 MediaPreparerGUI::~MediaPreparerGUI() {
-	loadSettings_gui();
 	saveSettings_config();
 }
 
@@ -167,11 +166,11 @@ void MediaPreparerGUI::dialogBrowse(int type) {
 		QStringList dir = dialog.selectedFiles();
 		switch (type) {
 		case 0:
-			ui->setting_directory->setText(ba::replace_all_copy(dir[0].toStdString(), "/", "\\").c_str());
+			ui->setting_directory->setText(dir[0]);
 			runWorker_scan();
 			break;
 		case 1:
-			ui->setting_dirOutput->setText(ba::replace_all_copy(dir[0].toStdString(), "/", "\\").c_str());
+			ui->setting_dirOutput->setText(dir[0]);
 			break;
 		default:
 			break;
