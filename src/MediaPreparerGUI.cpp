@@ -68,7 +68,7 @@ void MediaPreparerGUI::initSignals() {
 	connect(ui->setting_vCodec, SIGNAL(currentIndexChanged(int)), this, SLOT(loadSettings_gui()));
 	connect(ui->setting_aCodec, SIGNAL(currentIndexChanged(int)), this, SLOT(loadSettings_gui()));
 	connect(ui->setting_container, SIGNAL(currentIndexChanged(int)), this, SLOT(loadSettings_gui()));
-	connect(ui->setting_preset, SIGNAL(currentTextChanged(const QString)), this, SLOT(loadSettings_preset(QString)));
+	connect(ui->setting_preset, SIGNAL(currentTextChanged(QString)), this, SLOT(loadSettings_preset(QString)));
 }
 
 void MediaPreparerGUI::loadSettings_gui() {
@@ -133,6 +133,8 @@ void MediaPreparerGUI::saveSettings_config() {
 void MediaPreparerGUI::saveSettings_preset(QString preset) {
 	loadSettings_gui();
 	settings->savePresetAs(preset.toStdString());
+	loadSettings_config();
+	loadSettings_preset(preset);
 }
 
 void MediaPreparerGUI::updateGUI_settings() {
@@ -160,7 +162,7 @@ void MediaPreparerGUI::dialogBrowse(int type) {
 	QFileDialog dialog(this);
 	dialog.setFileMode(QFileDialog::DirectoryOnly);
 	dialog.setViewMode(QFileDialog::Detail);
-	dialog.setDirectory(QDir(QString(ui->setting_directory->text())));
+	dialog.setDirectory(QDir(ui->setting_directory->text()));
 	dialog.exec();
 	if (dialog.result() == QDialog::Accepted) {
 		QStringList dir = dialog.selectedFiles();
@@ -171,8 +173,6 @@ void MediaPreparerGUI::dialogBrowse(int type) {
 			break;
 		case 1:
 			ui->setting_dirOutput->setText(dir[0]);
-			break;
-		default:
 			break;
 		}
 	}

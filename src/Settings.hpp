@@ -14,17 +14,17 @@ class Settings {
 	const std::string APPDATA = getenv("APPDATA");
 	const std::string USERPROFILE = getenv("USERPROFILE");
 
-	const std::string BASE_DIR = APPDATA + "/SuperEpicFuntime/SEFMediaPreparer";
-	const std::string PRESET_DIR = BASE_DIR + "/presets";
+	const std::string BASE_DIR = APPDATA + "\\SuperEpicFuntime\\SEFMediaPreparer";
+	const std::string PRESET_DIR = BASE_DIR + "\\presets";
 
-	const std::string CONFIG_FILE = BASE_DIR + "/config.cfg";
-	const std::string LOG_FILE = BASE_DIR + "/log.txt";
+	const std::string CONFIG_FILE = BASE_DIR + "\\config.cfg";
+	const std::string LOG_FILE = BASE_DIR + "\\log.txt";
 	const std::string PRESET_EXTENSION = ".preset";
-	const std::string DEFAULT_PRESET = PRESET_DIR + "/SEF Standard" + PRESET_EXTENSION;
+	const std::string DEFAULT_PRESET = PRESET_DIR + "\\SEF Standard" + PRESET_EXTENSION;
 
-	const std::string DEFAULT_TEMP_DIR = BASE_DIR + "/temp";
-	const std::string DEFAULT_LIBRARY_DIR = USERPROFILE + "/Videos";
-	const std::string DEFAULT_OUTPUT_FOLDER = "/Converted";
+	const std::string DEFAULT_TEMP_DIR = BASE_DIR + "\\temp";
+	const std::string DEFAULT_LIBRARY_DIR = USERPROFILE + "\\Videos";
+	const std::string DEFAULT_OUTPUT_FOLDER = "\\Converted";
 	const std::string DEFAULT_OUTPUT_DIR = DEFAULT_LIBRARY_DIR + DEFAULT_OUTPUT_FOLDER;
 	const bool DEFAULT_PRESERVE_LOG = false;
 

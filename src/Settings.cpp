@@ -39,7 +39,6 @@ string Settings::parsePath(string path) {
 	string t = path;
 	ba::ireplace_all(path, "%APPDATA%", APPDATA.c_str());
 	ba::ireplace_all(path, "%USERPROFILE%", USERPROFILE.c_str());
-	ba::ireplace_all(path, "\\\\", "/");
 	return t;
 }
 
@@ -47,7 +46,7 @@ string Settings::parsePresetPath(string path) {
 	string p = parsePath(path);
 	string t = "";
 	if (p.find(":/") == p.npos && p.find(":\\") == p.npos) {
-		t += PRESET_DIR + "/";
+		t += PRESET_DIR + "\\";
 	}
 	t += p;
 	if (p.capacity() > PRESET_EXTENSION.capacity() && p.substr(p.capacity() - 7).compare(PRESET_EXTENSION) != 0) {
@@ -72,7 +71,7 @@ void Settings::loadConfig() {
 	if (d.HasMember("preset") && d["preset"].IsString()) {
 		presetPath = parsePresetPath(d["preset"].GetString());
 	} else {
-		presetPath = parsePresetPath(DEFAULT_PRESET);
+		presetPath = DEFAULT_PRESET;
 	}
 	presetName = bf::path(presetPath).filename().replace_extension().string();
 	if (d.HasMember("tempDir") && d["tempDir"].IsString()) {
@@ -81,17 +80,17 @@ void Settings::loadConfig() {
 			bf::create_directories(tempDir);
 		}
 	} else {
-		tempDir = parsePath(DEFAULT_TEMP_DIR);
+		tempDir = DEFAULT_TEMP_DIR;
 	}
 	if (d.HasMember("libraryDir") && d["libraryDir"].IsString()) {
 		libraryDir = parsePath(d["libraryDir"].GetString());
 	} else {
-		libraryDir = parsePath(DEFAULT_LIBRARY_DIR);
+		libraryDir = DEFAULT_LIBRARY_DIR;
 	}
 	if (d.HasMember("outputDir") && d["outputDir"].IsString()) {
 		outputDir = parsePath(d["outputDir"].GetString());
 	} else {
-		outputDir = parsePath(libraryDir + DEFAULT_OUTPUT_FOLDER);
+		outputDir = libraryDir + DEFAULT_OUTPUT_FOLDER;
 	}
 	if (d.HasMember("preserveLog") && d["preserveLog"].IsBool()) {
 		preserveLog = d["preserveLog"].GetBool();
@@ -100,9 +99,9 @@ void Settings::loadConfig() {
 	}
 	if (d.HasMember("vCodecs") && d["vCodecs"].IsArray()) {
 		vCodecList.clear();
-		for (int i = 0; i < d["vCodecs"].GetArray().Size(); i++) {
+		for (int i = 0; i < (int)d["vCodecs"].GetArray().Size(); i++) {
 			vCodecList.push_back({});
-			for (int j = 0; j < d["vCodecs"].GetArray()[i].GetArray().Size(); j++) {
+			for (int j = 0; j < (int)d["vCodecs"].GetArray()[i].GetArray().Size(); j++) {
 				vCodecList[i].push_back(d["vCodecs"].GetArray()[i].GetArray()[j].GetString());
 			}
 		}
@@ -111,9 +110,9 @@ void Settings::loadConfig() {
 	}
 	if (d.HasMember("aCodecs") && d["aCodecs"].IsArray()) {
 		aCodecList.clear();
-		for (int i = 0; i < d["aCodecs"].GetArray().Size(); i++) {
+		for (int i = 0; i < (int)d["aCodecs"].GetArray().Size(); i++) {
 			aCodecList.push_back({});
-			for (int j = 0; j < d["aCodecs"].GetArray()[i].GetArray().Size(); j++) {
+			for (int j = 0; j < (int)d["aCodecs"].GetArray()[i].GetArray().Size(); j++) {
 				aCodecList[i].push_back(d["aCodecs"].GetArray()[i].GetArray()[j].GetString());
 			}
 		}
@@ -121,7 +120,7 @@ void Settings::loadConfig() {
 		aCodecList = DEFAULT_ACODECS;
 	}
 	if (d.HasMember("containers") && d["containers"].IsArray()) {
-		for (int i = 0; i < d["containers"].GetArray().Size(); i++) {
+		for (int i = 0; i < (int)d["containers"].GetArray().Size(); i++) {
 			containerList.push_back(d["containers"].GetArray()[i].GetString());
 		}
 	} else {
@@ -151,23 +150,23 @@ void Settings::saveConfig() {
 	d.AddMember(StringRef("containers"), Value(), alloc);
 	d["containers"].SetArray();
 
-	for (int i = 0; i < vCodecList.size(); i++) {
+	for (int i = 0; i < (int)vCodecList.size(); i++) {
 		Value a(kArrayType);
-		for (int j = 0; j < vCodecList[i].size(); j++) {
+		for (int j = 0; j < (int)vCodecList[i].size(); j++) {
 			a.PushBack(Value().SetString(StringRef(vCodecList[i][j].c_str())), alloc);
 		}
 		d["vCodecs"].PushBack(a, alloc);
 	}
 
-	for (int i = 0; i < aCodecList.size(); i++) {
+	for (int i = 0; i < (int)aCodecList.size(); i++) {
 		Value a(kArrayType);
-		for (int j = 0; j < aCodecList[i].size(); j++) {
+		for (int j = 0; j < (int)aCodecList[i].size(); j++) {
 			a.PushBack(Value().SetString(StringRef(aCodecList[i][j].c_str())), alloc);
 		}
 		d["aCodecs"].PushBack(a, alloc);
 	}
 
-	for (int i = 0; i < containerList.size(); i++) {
+	for (int i = 0; i < (int)containerList.size(); i++) {
 		d["containers"].PushBack(Value().SetString(StringRef(containerList[i].c_str())), alloc);
 	}
 
@@ -202,6 +201,7 @@ void Settings::loadPreset(std::string name) {
 
 void Settings::loadPresetFile(std::string path) {
 	bf::path p(parsePresetPath(path).c_str());
+	cout << p.string() << endl;
 	if (bf::exists(p) && bf::is_regular_file(p)) {
 
 		FILE *fp = fopen(p.string().c_str(), "rb");
@@ -215,41 +215,49 @@ void Settings::loadPresetFile(std::string path) {
 		} else {
 			vCodec = DEFAULT_VCODEC;
 		}
+		cout << vCodec << endl;
 		if (d.HasMember("vQuality") && d["vQuality"].IsString()) {
 			vQuality = d["vQuality"].GetString();
 		} else {
 			vQuality = DEFAULT_VQUALITY;
 		}
+		cout << vQuality << endl;
 		if (d.HasMember("aCodec") && d["aCodec"].IsString()) {
 			aCodec = d["aCodec"].GetString();
 		} else {
 			aCodec = DEFAULT_ACODEC;
 		}
+		cout << aCodec << endl;
 		if (d.HasMember("aQuality") && d["aQuality"].IsString()) {
 			aQuality = d["aQuality"].GetString();
 		} else {
 			aQuality = DEFAULT_AQUALITY;
 		}
+		cout << aQuality << endl;
 		if (d.HasMember("container") && d["container"].IsString()) {
 			container = d["container"].GetString();
 		} else {
 			container = DEFAULT_CONTAINER;
 		}
+		cout << container << endl;
 		if (d.HasMember("subtitles") && d["subtitles"].IsString()) {
 			subtitles = d["subtitles"].GetString();
 		} else {
 			subtitles = DEFAULT_SUBTITLES;
 		}
+		cout << subtitles << endl;
 		if (d.HasMember("threads") && d["threads"].IsString()) {
 			threads = d["threads"].GetString();
 		} else {
 			threads = DEFAULT_THREADS;
 		}
+		cout << threads << endl;
 		if (d.HasMember("extraParams") && d["extraParams"].IsString()) {
 			extraParams = d["extraParams"].GetString();
 		} else {
 			extraParams = DEFAULT_EXTRA_PARAMS;
 		}
+		cout << extraParams << endl;
 		presetPath = parsePresetPath(path);
 		presetName = parsePresetName(path);
 	} else {
