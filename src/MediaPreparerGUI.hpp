@@ -73,8 +73,12 @@ class MediaPreparerGUI : public QWidget {
 	void runWorker_encode();
 	void runWorker_cleanup();
 
-	void updateProgress_primary(int progress = NULL, QString msg = NULL);
-	void updateProgress_secondary(int progress = NULL, QString msg = NULL);
+	void updateProgress_primary(int progress = 0, QString msg = NULL);
+	void updateProgress_secondary(int progress = 0, QString msg = NULL);
+
+	void dialogBrowse(int type = 0);
+	void dialogSave();
+	void dialogCancel();
 
 	void log(QString msg);
 	void blockSignals(bool b);
@@ -94,8 +98,12 @@ class MediaPreparerGUI : public QWidget {
 	void signal_runWorker_encode();
 	void signal_runWorker_cleanup();
 
-	void signal_updateProgress_primary(int progress = NULL, QString msg = NULL);
-	void signal_updateProgress_secondary(int progress = NULL, QString msg = NULL);
+	void signal_updateProgress_primary(int progress = 0, QString msg = NULL);
+	void signal_updateProgress_secondary(int progress = 0, QString msg = NULL);
+
+	void signal_dialogBrowse(int type = 0);
+	void signal_dialogSave();
+	void signal_dialogCancel();
 
 	void signal_log(QString msg);
 	void signal_blockSignals(bool b);

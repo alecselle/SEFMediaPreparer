@@ -139,10 +139,10 @@ void Settings::saveConfig() {
 	Document::AllocatorType &alloc = d.GetAllocator();
 	d.ParseStream(s);
 
-	d.AddMember(StringRef("preset"), Value(StringRef(presetPath.c_str())), alloc);
-	d.AddMember(StringRef("libraryDir"), Value(StringRef(libraryDir.c_str())), alloc);
-	d.AddMember(StringRef("tempDir"), Value(StringRef(tempDir.c_str())), alloc);
-	d.AddMember(StringRef("outputDir"), Value(StringRef(outputDir.c_str())), alloc);
+	d.AddMember(StringRef("preset"), Value(StringRef(parsePresetPath(presetPath).c_str())), alloc);
+	d.AddMember(StringRef("libraryDir"), Value(StringRef(parsePath(libraryDir).c_str())), alloc);
+	d.AddMember(StringRef("tempDir"), Value(StringRef(parsePath(tempDir).c_str())), alloc);
+	d.AddMember(StringRef("outputDir"), Value(StringRef(parsePath(outputDir).c_str())), alloc);
 	d.AddMember(StringRef("preserveLog"), Value(preserveLog), alloc);
 	d.AddMember(StringRef("vCodecs"), Value(), alloc);
 	d["vCodecs"].SetArray();

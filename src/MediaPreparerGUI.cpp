@@ -21,6 +21,8 @@ MediaPreparerGUI::MediaPreparerGUI(QWidget *parent) : QWidget(parent), ui(new Ui
 }
 
 MediaPreparerGUI::~MediaPreparerGUI() {
+	loadSettings_gui();
+	saveSettings_config();
 }
 
 void MediaPreparerGUI::init() {
@@ -48,9 +50,25 @@ void MediaPreparerGUI::initSignals() {
 			SLOT(updateProgress_primary(int, QString)));
 	connect(this, SIGNAL(signal_updateProgress_secondary(int, QString)), this,
 			SLOT(updateProgress_secondary(int, QString)));
+	connect(this, SIGNAL(signal_dialogSave()), this, SLOT(dialogSave()));
+	connect(this, SIGNAL(signal_dialogCancel()), this, SLOT(dialogCancel()));
 	connect(this, SIGNAL(signal_log(QString)), this, SLOT(log(QString)));
 	connect(this, SIGNAL(signal_blockSignals(bool)), this, SLOT(blockSignals(bool)));
 
+	connect(ui->button_scan_directory, SIGNAL(clicked()), this, SLOT(runWorker_scan()));
+	connect(ui->setting_directory, SIGNAL(returnPressed()), this, SLOT(runWorker_scan()));
+
+	connect(ui->button_savePreset, SIGNAL(clicked()), this, SLOT(dialogSave()));
+
+	connect(ui->button_browse_directory, SIGNAL(clicked()), signalMapper, SLOT(map()));
+	signalMapper->setMapping(ui->button_browse_directory, 0);
+	connect(ui->button_browse_dirOutput, SIGNAL(clicked()), signalMapper, SLOT(map()));
+	signalMapper->setMapping(ui->button_browse_dirOutput, 1);
+	connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(dialogBrowse(int)));
+
+	connect(ui->setting_vCodec, SIGNAL(currentIndexChanged(int)), this, SLOT(loadSettings_gui()));
+	connect(ui->setting_aCodec, SIGNAL(currentIndexChanged(int)), this, SLOT(loadSettings_gui()));
+	connect(ui->setting_container, SIGNAL(currentIndexChanged(int)), this, SLOT(loadSettings_gui()));
 	connect(ui->setting_preset, SIGNAL(currentTextChanged(const QString)), this, SLOT(loadSettings_preset(QString)));
 }
 
@@ -137,6 +155,40 @@ void MediaPreparerGUI::updateProgress_primary(int progress, QString msg) {
 }
 
 void MediaPreparerGUI::updateProgress_secondary(int progress, QString msg) {
+}
+
+void MediaPreparerGUI::dialogBrowse(int type) {
+	QFileDialog dialog(this);
+	dialog.setFileMode(QFileDialog::DirectoryOnly);
+	dialog.setViewMode(QFileDialog::Detail);
+	dialog.setDirectory(QDir(QString(ui->setting_directory->text())));
+	dialog.exec();
+	if (dialog.result() == QDialog::Accepted) {
+		QStringList dir = dialog.selectedFiles();
+		switch (type) {
+		case 0:
+			ui->setting_directory->setText(ba::replace_all_copy(dir[0].toStdString(), "/", "\\").c_str());
+			runWorker_scan();
+			break;
+		case 1:
+			ui->setting_dirOutput->setText(ba::replace_all_copy(dir[0].toStdString(), "/", "\\").c_str());
+			break;
+		default:
+			break;
+		}
+	}
+}
+
+void MediaPreparerGUI::dialogSave() {
+	QString fileName =
+		QFileDialog::getSaveFileName(this, "Save Preset - Will only be loaded from preset directory",
+									 (settings->baseDir + "//presets//Custom").c_str(), "SEF Preset (*.preset)");
+	if (!fileName.isEmpty()) {
+		saveSettings_preset(fileName);
+	}
+}
+
+void MediaPreparerGUI::dialogCancel() {
 }
 
 void MediaPreparerGUI::log(QString msg) {
