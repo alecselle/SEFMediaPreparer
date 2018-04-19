@@ -56,8 +56,8 @@ string Settings::parsePresetPath(string path) {
 	return t;
 }
 
-string Settings::parsePresetName(string path) {
-	bf::path p = path;
+string Settings::parsePresetName(string name) {
+	bf::path p = parsePresetPath(name);
 	string t = p.filename().replace_extension().string();
 	return t;
 }
@@ -70,7 +70,7 @@ void Settings::loadConfig() {
 	d.ParseStream(is);
 
 	if (d.HasMember("preset") && d["preset"].IsString()) {
-		presetPath = parsePath(d["preset"].GetString());
+		presetPath = parsePresetPath(d["preset"].GetString());
 	} else {
 		presetPath = DEFAULT_PRESET;
 	}
@@ -251,7 +251,7 @@ void Settings::loadPresetFile(std::string path) {
 			extraParams = DEFAULT_EXTRA_PARAMS;
 		}
 		presetPath = parsePresetPath(path);
-		presetName = parsePresetName(presetPath);
+		presetName = parsePresetName(path);
 	} else {
 		if (!bf::exists(DEFAULT_PRESET)) {
 			createDefaultPreset();
@@ -291,7 +291,7 @@ void Settings::savePresetAs(std::string name) {
 	fclose(fp);
 
 	presetPath = parsePresetPath(name);
-	presetName = parsePresetName(presetPath);
+	presetName = parsePresetName(name);
 
 	refreshPresets();
 }
@@ -302,7 +302,7 @@ void Settings::refreshPresets() {
 	for (bf::directory_entry &x : bf::directory_iterator(PRESET_DIR)) {
 		if (x.path().extension().compare(PRESET_EXTENSION) == 0) {
 			presetPathList.push_back(parsePresetPath(x.path().string()));
-			presetNameList.push_back(parsePresetName(parsePresetPath(x.path().string())));
+			presetNameList.push_back(parsePresetName(x.path().string()));
 		}
 	}
 }
