@@ -54,7 +54,8 @@ class Settings {
 	Settings();
 
 	std::string parsePath(std::string path);
-	std::string parsePathPreset(std::string path);
+	std::string parsePresetPath(std::string path);
+	std::string parsePresetName(std::string path);
 
 	void loadConfig();
 	void saveConfig();

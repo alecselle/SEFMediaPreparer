@@ -36,6 +36,30 @@ Settings::Settings() {
 }
 
 string Settings::parsePath(string path) {
+	string t = path;
+	ba::ireplace_all(path, "%APPDATA%", APPDATA.c_str());
+	ba::ireplace_all(path, "%USERPROFILE%", USERPROFILE.c_str());
+	ba::ireplace_all(path, "/", "\\");
+	return t;
+}
+
+string Settings::parsePresetPath(string path) {
+	string p = parsePath(path);
+	string t = "";
+	if (p.find(":/") == p.npos && p.find(":\\") == p.npos) {
+		t += PRESET_DIR + "\\";
+	}
+	t += p;
+	if (p.capacity() > PRESET_EXTENSION.capacity() && p.substr(p.capacity() - 7).compare(PRESET_EXTENSION) != 0) {
+		t += PRESET_EXTENSION;
+	}
+	return t;
+}
+
+string Settings::parsePresetName(string path) {
+	bf::path p = path;
+	string t = p.filename().replace_extension().string();
+	return t;
 }
 
 void Settings::loadConfig() {
@@ -46,19 +70,13 @@ void Settings::loadConfig() {
 	d.ParseStream(is);
 
 	if (d.HasMember("preset") && d["preset"].IsString()) {
-		string presetStr = d["preset"].GetString();
-		ba::ireplace_all(presetStr, "%APPDATA%", APPDATA.c_str());
-		ba::ireplace_all(presetStr, "%USERPROFILE%", USERPROFILE.c_str());
-		presetPath = presetStr.c_str();
+		presetPath = parsePath(d["preset"].GetString());
 	} else {
 		presetPath = DEFAULT_PRESET;
 	}
 	presetName = bf::path(presetPath).filename().replace_extension().string();
 	if (d.HasMember("tempDir") && d["tempDir"].IsString()) {
-		string tempDirStr = d["tempDir"].GetString();
-		ba::ireplace_all(tempDirStr, "%APPDATA%", APPDATA.c_str());
-		ba::ireplace_all(tempDirStr, "%USERPROFILE%", USERPROFILE.c_str());
-		tempDir = tempDirStr.c_str();
+		tempDir = parsePath(d["tempDir"].GetString());
 		if (!bf::exists(tempDir)) {
 			bf::create_directories(tempDir);
 		}
@@ -66,18 +84,12 @@ void Settings::loadConfig() {
 		tempDir = DEFAULT_TEMP_DIR;
 	}
 	if (d.HasMember("libraryDir") && d["libraryDir"].IsString()) {
-		string libraryDirStr = d["libraryDir"].GetString();
-		ba::ireplace_all(libraryDirStr, "%APPDATA%", APPDATA.c_str());
-		ba::ireplace_all(libraryDirStr, "%USERPROFILE%", USERPROFILE.c_str());
-		libraryDir = libraryDirStr.c_str();
+		libraryDir = parsePath(d["libraryDir"].GetString());
 	} else {
 		libraryDir = DEFAULT_LIBRARY_DIR;
 	}
 	if (d.HasMember("outputDir") && d["outputDir"].IsString()) {
-		string outputDirStr = d["outputDir"].GetString();
-		ba::ireplace_all(outputDirStr, "%APPDATA%", APPDATA.c_str());
-		ba::ireplace_all(outputDirStr, "%USERPROFILE%", USERPROFILE.c_str());
-		outputDir = outputDirStr.c_str();
+		outputDir = parsePath(d["outputDir"].GetString());
 	} else {
 		outputDir = DEFAULT_OUTPUT_DIR;
 	}
@@ -168,55 +180,61 @@ void Settings::saveConfig() {
 }
 
 void Settings::createDefaultConfig() {
-	string json = "{}";
-	StringStream s(json.c_str());
+	presetName = parsePresetName(DEFAULT_PRESET);
+	presetPath = DEFAULT_PRESET;
+	libraryDir = DEFAULT_LIBRARY_DIR;
+	tempDir = DEFAULT_TEMP_DIR;
+	outputDir = DEFAULT_OUTPUT_DIR;
+	preserveLog = DEFAULT_PRESERVE_LOG;
+	vCodecList = DEFAULT_VCODECS;
+	aCodecList = DEFAULT_ACODECS;
+	containerList = DEFAULT_CONTAINERS;
+	saveConfig();
+	//		string json = "{}";
+	//	StringStream s(json.c_str());
 
-	Document d;
-	Document::AllocatorType &alloc = d.GetAllocator();
-	d.ParseStream(s);
+	//	Document d;
+	//	Document::AllocatorType &alloc = d.GetAllocator();
+	//	d.ParseStream(s);
 
-	if (d.HasParseError()) {
-		cout << "faq";
-	}
+	//	d.AddMember(StringRef("preset"), Value(StringRef(DEFAULT_PRESET.c_str())), alloc);
+	//	d.AddMember(StringRef("libraryDir"), Value(StringRef(DEFAULT_LIBRARY_DIR.c_str())), alloc);
+	//	d.AddMember(StringRef("tempDir"), Value(StringRef(DEFAULT_TEMP_DIR.c_str())), alloc);
+	//	d.AddMember(StringRef("outputDir"), Value(StringRef(DEFAULT_OUTPUT_DIR.c_str())), alloc);
+	//	d.AddMember(StringRef("preserveLog"), Value(DEFAULT_PRESERVE_LOG), alloc);
+	//	d.AddMember(StringRef("vCodecs"), Value(), alloc);
+	//	d["vCodecs"].SetArray();
+	//	d.AddMember(StringRef("aCodecs"), Value(), alloc);
+	//	d["aCodecs"].SetArray();
+	//	d.AddMember(StringRef("containers"), Value(), alloc);
+	//	d["containers"].SetArray();
 
-	d.AddMember(StringRef("preset"), Value(StringRef(DEFAULT_PRESET.c_str())), alloc);
-	d.AddMember(StringRef("libraryDir"), Value(StringRef(DEFAULT_LIBRARY_DIR.c_str())), alloc);
-	d.AddMember(StringRef("tempDir"), Value(StringRef(DEFAULT_TEMP_DIR.c_str())), alloc);
-	d.AddMember(StringRef("outputDir"), Value(StringRef(DEFAULT_OUTPUT_DIR.c_str())), alloc);
-	d.AddMember(StringRef("preserveLog"), Value(DEFAULT_PRESERVE_LOG), alloc);
-	d.AddMember(StringRef("vCodecs"), Value(), alloc);
-	d["vCodecs"].SetArray();
-	d.AddMember(StringRef("aCodecs"), Value(), alloc);
-	d["aCodecs"].SetArray();
-	d.AddMember(StringRef("containers"), Value(), alloc);
-	d["containers"].SetArray();
+	//	for (int i = 0; i < DEFAULT_VCODECS.size(); i++) {
+	//		Value a(kArrayType);
+	//		for (int j = 0; j < DEFAULT_VCODECS[i].size(); j++) {
+	//			a.PushBack(Value().SetString(StringRef(DEFAULT_VCODECS[i][j].c_str())), alloc);
+	//		}
+	//		d["vCodecs"].PushBack(a, alloc);
+	//	}
 
-	for (int i = 0; i < DEFAULT_VCODECS.size(); i++) {
-		Value a(kArrayType);
-		for (int j = 0; j < DEFAULT_VCODECS[i].size(); j++) {
-			a.PushBack(Value().SetString(StringRef(DEFAULT_VCODECS[i][j].c_str())), alloc);
-		}
-		d["vCodecs"].PushBack(a, alloc);
-	}
+	//	for (int i = 0; i < DEFAULT_ACODECS.size(); i++) {
+	//		Value a(kArrayType);
+	//		for (int j = 0; j < DEFAULT_ACODECS[i].size(); j++) {
+	//			a.PushBack(Value().SetString(StringRef(DEFAULT_ACODECS[i][j].c_str())), alloc);
+	//		}
+	//		d["aCodecs"].PushBack(a, alloc);
+	//	}
 
-	for (int i = 0; i < DEFAULT_ACODECS.size(); i++) {
-		Value a(kArrayType);
-		for (int j = 0; j < DEFAULT_ACODECS[i].size(); j++) {
-			a.PushBack(Value().SetString(StringRef(DEFAULT_ACODECS[i][j].c_str())), alloc);
-		}
-		d["aCodecs"].PushBack(a, alloc);
-	}
+	//	for (int i = 0; i < DEFAULT_CONTAINERS.size(); i++) {
+	//		d["containers"].PushBack(Value().SetString(StringRef(DEFAULT_CONTAINERS[i].c_str())), alloc);
+	//	}
 
-	for (int i = 0; i < DEFAULT_CONTAINERS.size(); i++) {
-		d["containers"].PushBack(Value().SetString(StringRef(DEFAULT_CONTAINERS[i].c_str())), alloc);
-	}
-
-	FILE *fp = fopen(CONFIG_FILE.c_str(), "wb");
-	char writeBuffer[65536];
-	FileWriteStream os(fp, writeBuffer, sizeof(writeBuffer));
-	PrettyWriter<FileWriteStream> writer(os);
-	d.Accept(writer);
-	fclose(fp);
+	//	FILE *fp = fopen(CONFIG_FILE.c_str(), "wb");
+	//	char writeBuffer[65536];
+	//	FileWriteStream os(fp, writeBuffer, sizeof(writeBuffer));
+	//	PrettyWriter<FileWriteStream> writer(os);
+	//	d.Accept(writer);
+	//	fclose(fp);
 }
 
 void Settings::loadPreset() {
@@ -224,20 +242,11 @@ void Settings::loadPreset() {
 }
 
 void Settings::loadPreset(std::string name) {
-	string newPath;
-	if (name.find(":/") == name.npos && name.find(":\\") == name.npos) {
-		newPath += PRESET_DIR + "\\";
-	}
-	newPath += name;
-	if (name.capacity() > PRESET_EXTENSION.capacity() &&
-		name.substr(name.capacity() - 7).compare(PRESET_EXTENSION) != 0) {
-		newPath += PRESET_EXTENSION;
-	}
-	loadPresetFile(newPath);
+	loadPresetFile(parsePresetPath(name));
 }
 
 void Settings::loadPresetFile(std::string path) {
-	bf::path p(path.c_str());
+	bf::path p(parsePresetPath(path).c_str());
 	if (bf::exists(p) && bf::is_regular_file(p)) {
 
 		FILE *fp = fopen(p.string().c_str(), "rb");
