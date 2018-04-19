@@ -3,7 +3,6 @@ setlocal EnableDelayedExpansion
 set ERROR_LEVEL=0
 set DEBUG=0
 call "%~dp0/env.bat"
-call "%~dp0/version.bat" 2>&1 nul
 ::=============================================================================
 :: ~~ FUNCTION CALLS
 :RUN

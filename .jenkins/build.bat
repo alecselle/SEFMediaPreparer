@@ -3,7 +3,6 @@ setlocal EnableDelayedExpansion
 set ERROR_LEVEL=0
 set PROJECT_DEFAULT=SEFMediaPreparer.pro
 call "%~dp0/env.bat"
-call "%~dp0/version.bat" 2>&1 nul
 :VARIABLES
 	if "%~1" NEQ "" (
 		if "%~1" EQU "-static" set LINK=static
