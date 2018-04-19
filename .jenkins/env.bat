@@ -33,7 +33,7 @@ set ZIP=C:\Program Files\7-ZIP\7z.exe
 set GIT=C:\Program Files\Git\cmd\git.exe
 
 cd "%~dp0"&& cd ".."
-if "!WORKSPACE!" EQU "" set WORKSPACE="%CD%"
+if "!WORKSPACE!" EQU "" set WORKSPACE=%CD%
 
 set /p VERSION=<"%WORKSPACE%/version.txt"
 

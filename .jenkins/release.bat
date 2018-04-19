@@ -3,6 +3,14 @@ setlocal EnableDelayedExpansion
 set ERROR_LEVEL=0
 set DEBUG=0
 call "%~dp0/env.bat"
+call "%~dp0/version.bat"> nul 2>&1
+:VARIABLES
+	if "%~1" NEQ "" (
+		if "%~1" EQU "-install" set INSTALL=TRUE
+		if "%~1" EQU "install" set INSTALL=TRUE
+		shift
+	)
+	if "%~1" NEQ "" goto VARIABLES
 ::=============================================================================
 :: ~~ FUNCTION CALLS
 :RUN
@@ -16,6 +24,12 @@ call "%~dp0/env.bat"
 	call :INNOSETUP
 	if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
 	
+	if "!INSTALL!" EQU "TRUE" (
+		echo.[Release] Running Installer
+		call :INSTALLER
+		if !ERROR_LEVEL! NEQ 0 goto END_FAILURE
+	)
+	
 	goto END_SUCCESS
 	goto EOF
 :: ~~
@@ -24,6 +38,7 @@ call "%~dp0/env.bat"
 :CHECK_VARIABLES
 	if "!WORKSPACE!" EQU "" cd "%~dp0"& cd ..& set WORKSPACE=!CD!
 	if not exist "!WORKSPACE!/.jenkins/.data" mkdir "!WORKSPACE!/.jenkins/.data" & attrib +h "!WORKSPACE!/.jenkins/.data" /s /d
+	if "!INSTALL!" EQU "" set INSTALL=FALSE
 	if "!INNOSETUP!" EQU "" (
 		call where /q ISCC.exe 2>&1nul
 		if %errorlevel% NEQ 0 call :ERROR_FILE_NOT_FOUND "CHECK_VARIABLES" "ISCC.exe"
@@ -37,6 +52,12 @@ call "%~dp0/env.bat"
 	echo.[Release] "!INNOSETUP!"
 	call "!INNOSETUP!" "!WORKSPACE!/SEFMediaPreparer.iss"> "%~dp0/.data/iscc.log" 2>&1
 	if %errorlevel% NEQ 0 call :ERROR_BUILD_FAILED "INNOSETUP" "ISCC returned an error" "Check output for details" 
+	exit /b !ERROR_LEVEL!
+	goto EOF
+:INSTALLER
+	echo.[Release] "SEFMediaPreparer-Setup-!VERSION!.exe"
+	call "!WORKSPACE!/SEFMediaPreparer-!VERSION!-Setup.exe"
+	if %errorlevel% NEQ 0 call :ERROR_BUILD_FAILED "INSTALLER" "Installer returned an error"
 	exit /b !ERROR_LEVEL!
 	goto EOF
 :: ~~
