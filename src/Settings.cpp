@@ -201,7 +201,6 @@ void Settings::loadPreset(std::string name) {
 
 void Settings::loadPresetFile(std::string path) {
 	bf::path p(parsePresetPath(path).c_str());
-	cout << p.string() << endl;
 	if (bf::exists(p) && bf::is_regular_file(p)) {
 
 		FILE *fp = fopen(p.string().c_str(), "rb");
