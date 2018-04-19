@@ -1,8 +1,9 @@
 #include "src/MediaPreparerGUI.hpp"
 #include "ui_MediaPreparer.h"
 
-#include <QObject>
-#include <QWidget>
+#include <QtCore>
+#include <QtGui>
+#include <QtWidgets>
 #include <boost/algorithm/string.hpp>
 #include <boost/container/vector.hpp>
 #include <boost/filesystem.hpp>
@@ -28,26 +29,29 @@ void MediaPreparerGUI::init() {
 }
 
 void MediaPreparerGUI::initGUI() {
-	emit signal_loadSettings_config();
-	emit signal_loadSettings_preset(settings->presetPath);
+	loadSettings_config();
+	loadSettings_preset(settings->presetPath.c_str());
 }
 
 void MediaPreparerGUI::initSignals() {
 	connect(this, SIGNAL(signal_loadSettings_gui()), this, SLOT(loadSettings_gui()));
-	connect(this, SIGNAL(signal_loadSettings_config), this, SLOT(loadSettings_config()));
-	connect(this, SIGNAL(signal_loadSettings_preset(string)), this, SLOT(loadSettings_preset(string)));
+	connect(this, SIGNAL(signal_loadSettings_config()), this, SLOT(loadSettings_config()));
+	connect(this, SIGNAL(signal_loadSettings_preset(QString)), this, SLOT(loadSettings_preset(QString)));
 	connect(this, SIGNAL(signal_saveSettings_config()), this, SLOT(saveSettings_config()));
-	connect(this, SIGNAL(signal_saveSettings_preset(string)), this, SLOT(saveSettings_preset(string)));
+	connect(this, SIGNAL(signal_saveSettings_preset(QString)), this, SLOT(saveSettings_preset(QString)));
 	connect(this, SIGNAL(signal_updateGUI_settings()), this, SLOT(updateGUI_settings()));
 	connect(this, SIGNAL(signal_updateGUI_timers()), this, SLOT(updateGUI_timers()));
 	connect(this, SIGNAL(signal_runWorker_scan()), this, SLOT(runWorker_scan()));
 	connect(this, SIGNAL(signal_runWorker_encode()), this, SLOT(runWorker_encode()));
 	connect(this, SIGNAL(signal_runWorker_cleanup()), this, SLOT(runWorker_cleanup()));
-	connect(this, SIGNAL(signal_updateProgress_primary(int, string)), this, SLOT(updateProgress_primary(int, string)));
-	connect(this, SIGNAL(signal_updateProgress_secondary(int, string)), this,
-			SLOT(updateProgress_secondary(int, string)));
-	connect(this, SIGNAL(signal_log()), this, SLOT(log()));
-	connect(this, SIGNAL(signal_blockSignals()), this, SLOT(blockSignals()));
+	connect(this, SIGNAL(signal_updateProgress_primary(int, QString)), this,
+			SLOT(updateProgress_primary(int, QString)));
+	connect(this, SIGNAL(signal_updateProgress_secondary(int, QString)), this,
+			SLOT(updateProgress_secondary(int, QString)));
+	connect(this, SIGNAL(signal_log(QString)), this, SLOT(log(QString)));
+	connect(this, SIGNAL(signal_blockSignals(bool)), this, SLOT(blockSignals(bool)));
+
+	connect(ui->setting_preset, SIGNAL(currentTextChanged(const QString)), this, SLOT(loadSettings_preset(QString)));
 }
 
 void MediaPreparerGUI::loadSettings_gui() {
@@ -61,11 +65,6 @@ void MediaPreparerGUI::loadSettings_gui() {
 	settings->outputDir = ba::trim_copy(ui->setting_dirOutput->text().toStdString());
 	settings->threads = ba::trim_copy(ui->setting_threads->text().toStdString());
 	settings->extraParams = ba::trim_copy(ui->setting_extraParams->text().toStdString());
-
-	if (library->isValid()) {
-		library->scanEncode();
-	}
-	ui->button_encode->setText(("Encode [" + std::to_string(library->sizeEncode()) + "]").c_str());
 }
 
 void MediaPreparerGUI::loadSettings_config() {
@@ -93,9 +92,9 @@ void MediaPreparerGUI::loadSettings_config() {
 	blockSignals(false);
 }
 
-void MediaPreparerGUI::loadSettings_preset(string preset) {
+void MediaPreparerGUI::loadSettings_preset(QString preset) {
 	blockSignals(true);
-	settings->loadPreset(preset);
+	settings->loadPreset(preset.toStdString());
 	ui->setting_preset->setCurrentText(QString(settings->presetName.c_str()));
 	ui->setting_preset->setToolTip(QString(settings->presetPath.c_str()));
 	ui->setting_vCodec->setCurrentText(QString(settings->vCodec.c_str()));
@@ -110,9 +109,13 @@ void MediaPreparerGUI::loadSettings_preset(string preset) {
 }
 
 void MediaPreparerGUI::saveSettings_config() {
+	loadSettings_gui();
+	settings->saveConfig();
 }
 
-void MediaPreparerGUI::saveSettings_preset(string preset) {
+void MediaPreparerGUI::saveSettings_preset(QString preset) {
+	loadSettings_gui();
+	settings->savePresetAs(preset.toStdString());
 }
 
 void MediaPreparerGUI::updateGUI_settings() {
@@ -130,13 +133,13 @@ void MediaPreparerGUI::runWorker_encode() {
 void MediaPreparerGUI::runWorker_cleanup() {
 }
 
-void MediaPreparerGUI::updateProgress_primary(int progress, string msg) {
+void MediaPreparerGUI::updateProgress_primary(int progress, QString msg) {
 }
 
-void MediaPreparerGUI::updateProgress_secondary(int progress, string msg) {
+void MediaPreparerGUI::updateProgress_secondary(int progress, QString msg) {
 }
 
-void MediaPreparerGUI::log(string msg) {
+void MediaPreparerGUI::log(QString msg) {
 }
 
 void MediaPreparerGUI::blockSignals(bool b) {

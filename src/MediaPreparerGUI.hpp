@@ -61,10 +61,10 @@ class MediaPreparerGUI : public QWidget {
   public slots:
 	void loadSettings_gui();
 	void loadSettings_config();
-	void loadSettings_preset(std::string preset);
+	void loadSettings_preset(QString preset);
 
 	void saveSettings_config();
-	void saveSettings_preset(std::string preset);
+	void saveSettings_preset(QString preset);
 
 	void updateGUI_settings();
 	void updateGUI_timers();
@@ -73,19 +73,19 @@ class MediaPreparerGUI : public QWidget {
 	void runWorker_encode();
 	void runWorker_cleanup();
 
-	void updateProgress_primary(int progress = NULL, std::string msg = NULL);
-	void updateProgress_secondary(int progress = NULL, std::string msg = NULL);
+	void updateProgress_primary(int progress = NULL, QString msg = NULL);
+	void updateProgress_secondary(int progress = NULL, QString msg = NULL);
 
-	void log(std::string msg);
+	void log(QString msg);
 	void blockSignals(bool b);
 
   signals:
 	void signal_loadSettings_gui();
 	void signal_loadSettings_config();
-	void signal_loadSettings_preset(std::string preset);
+	void signal_loadSettings_preset(QString preset);
 
 	void signal_saveSettings_config();
-	void signal_saveSettings_preset(std::string preset);
+	void signal_saveSettings_preset(QString preset);
 
 	void signal_updateGUI_settings();
 	void signal_updateGUI_timers();
@@ -94,10 +94,10 @@ class MediaPreparerGUI : public QWidget {
 	void signal_runWorker_encode();
 	void signal_runWorker_cleanup();
 
-	void signal_updateProgress_primary(int progress = NULL, std::string msg = NULL);
-	void signal_updateProgress_secondary(int progress = NULL, std::string msg = NULL);
+	void signal_updateProgress_primary(int progress = NULL, QString msg = NULL);
+	void signal_updateProgress_secondary(int progress = NULL, QString msg = NULL);
 
-	void signal_log(std::string msg);
+	void signal_log(QString msg);
 	void signal_blockSignals(bool b);
 };
 
