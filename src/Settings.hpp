@@ -24,7 +24,8 @@ class Settings {
 
 	const std::string DEFAULT_TEMP_DIR = BASE_DIR + "\\temp";
 	const std::string DEFAULT_LIBRARY_DIR = USERPROFILE + "\\Videos";
-	const std::string DEFAULT_OUTPUT_DIR = DEFAULT_LIBRARY_DIR + "\\Converted";
+	const std::string DEFAULT_OUTPUT_FOLDER = "\\Converted";
+	const std::string DEFAULT_OUTPUT_DIR = DEFAULT_LIBRARY_DIR + DEFAULT_OUTPUT_FOLDER;
 	const bool DEFAULT_PRESERVE_LOG = false;
 
 	const boost::container::vector<boost::container::vector<std::string>> DEFAULT_VCODECS = {
@@ -42,6 +43,11 @@ class Settings {
 	const std::string DEFAULT_THREADS = "4";
 	const std::string DEFAULT_EXTRA_PARAMS = "-x265-params pools=3";
 
+	std::string parsePath(std::string path);
+	std::string parsePresetPath(std::string path);
+	std::string parsePresetName(std::string path);
+	std::string parsePresetNameFull(std::string name);
+
   public:
 	std::string baseDir, logPath, presetPath, tempDir, libraryDir, outputDir;
 	boost::container::vector<boost::container::vector<std::string>> vCodecList, aCodecList;
@@ -52,10 +58,6 @@ class Settings {
 	bool preserveLog;
 
 	Settings();
-
-	std::string parsePath(std::string path);
-	std::string parsePresetPath(std::string path);
-	std::string parsePresetName(std::string path);
 
 	void loadConfig();
 	void saveConfig();

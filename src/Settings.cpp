@@ -63,7 +63,7 @@ string Settings::parsePresetName(string path) {
 }
 
 void Settings::loadConfig() {
-	FILE *fp = fopen(CONFIG_FILE.c_str(), "rb");
+	FILE *fp = fopen(parsePath(CONFIG_FILE).c_str(), "rb");
 	char readBuffer[65536];
 	FileReadStream is(fp, readBuffer, sizeof(readBuffer));
 	Document d;
@@ -91,7 +91,7 @@ void Settings::loadConfig() {
 	if (d.HasMember("outputDir") && d["outputDir"].IsString()) {
 		outputDir = parsePath(d["outputDir"].GetString());
 	} else {
-		outputDir = DEFAULT_OUTPUT_DIR;
+		outputDir = libraryDir + DEFAULT_OUTPUT_FOLDER;
 	}
 	if (d.HasMember("preserveLog") && d["preserveLog"].IsBool()) {
 		preserveLog = d["preserveLog"].GetBool();
@@ -171,7 +171,7 @@ void Settings::saveConfig() {
 		d["containers"].PushBack(Value().SetString(StringRef(containerList[i].c_str())), alloc);
 	}
 
-	FILE *fp = fopen(CONFIG_FILE.c_str(), "wb");
+	FILE *fp = fopen(parsePath(CONFIG_FILE).c_str(), "wb");
 	char writeBuffer[65536];
 	FileWriteStream os(fp, writeBuffer, sizeof(writeBuffer));
 	PrettyWriter<FileWriteStream> writer(os);
@@ -190,51 +190,6 @@ void Settings::createDefaultConfig() {
 	aCodecList = DEFAULT_ACODECS;
 	containerList = DEFAULT_CONTAINERS;
 	saveConfig();
-	//		string json = "{}";
-	//	StringStream s(json.c_str());
-
-	//	Document d;
-	//	Document::AllocatorType &alloc = d.GetAllocator();
-	//	d.ParseStream(s);
-
-	//	d.AddMember(StringRef("preset"), Value(StringRef(DEFAULT_PRESET.c_str())), alloc);
-	//	d.AddMember(StringRef("libraryDir"), Value(StringRef(DEFAULT_LIBRARY_DIR.c_str())), alloc);
-	//	d.AddMember(StringRef("tempDir"), Value(StringRef(DEFAULT_TEMP_DIR.c_str())), alloc);
-	//	d.AddMember(StringRef("outputDir"), Value(StringRef(DEFAULT_OUTPUT_DIR.c_str())), alloc);
-	//	d.AddMember(StringRef("preserveLog"), Value(DEFAULT_PRESERVE_LOG), alloc);
-	//	d.AddMember(StringRef("vCodecs"), Value(), alloc);
-	//	d["vCodecs"].SetArray();
-	//	d.AddMember(StringRef("aCodecs"), Value(), alloc);
-	//	d["aCodecs"].SetArray();
-	//	d.AddMember(StringRef("containers"), Value(), alloc);
-	//	d["containers"].SetArray();
-
-	//	for (int i = 0; i < DEFAULT_VCODECS.size(); i++) {
-	//		Value a(kArrayType);
-	//		for (int j = 0; j < DEFAULT_VCODECS[i].size(); j++) {
-	//			a.PushBack(Value().SetString(StringRef(DEFAULT_VCODECS[i][j].c_str())), alloc);
-	//		}
-	//		d["vCodecs"].PushBack(a, alloc);
-	//	}
-
-	//	for (int i = 0; i < DEFAULT_ACODECS.size(); i++) {
-	//		Value a(kArrayType);
-	//		for (int j = 0; j < DEFAULT_ACODECS[i].size(); j++) {
-	//			a.PushBack(Value().SetString(StringRef(DEFAULT_ACODECS[i][j].c_str())), alloc);
-	//		}
-	//		d["aCodecs"].PushBack(a, alloc);
-	//	}
-
-	//	for (int i = 0; i < DEFAULT_CONTAINERS.size(); i++) {
-	//		d["containers"].PushBack(Value().SetString(StringRef(DEFAULT_CONTAINERS[i].c_str())), alloc);
-	//	}
-
-	//	FILE *fp = fopen(CONFIG_FILE.c_str(), "wb");
-	//	char writeBuffer[65536];
-	//	FileWriteStream os(fp, writeBuffer, sizeof(writeBuffer));
-	//	PrettyWriter<FileWriteStream> writer(os);
-	//	d.Accept(writer);
-	//	fclose(fp);
 }
 
 void Settings::loadPreset() {
@@ -295,8 +250,8 @@ void Settings::loadPresetFile(std::string path) {
 		} else {
 			extraParams = DEFAULT_EXTRA_PARAMS;
 		}
-		presetPath = path;
-		presetName = bf::path(presetPath).filename().replace_extension().string();
+		presetPath = parsePresetPath(path);
+		presetName = parsePresetName(presetPath);
 	} else {
 		if (!bf::exists(DEFAULT_PRESET)) {
 			createDefaultPreset();
@@ -328,24 +283,15 @@ void Settings::savePresetAs(std::string name) {
 	d.AddMember(StringRef("threads"), Value(StringRef(threads.c_str())), alloc);
 	d.AddMember(StringRef("extraParams"), Value(StringRef(extraParams.c_str())), alloc);
 
-	string newPath;
-	if (name.find(":/") == name.npos && name.find(":\\") == name.npos) {
-		newPath += PRESET_DIR + "\\";
-	}
-	newPath += name;
-	if (name.capacity() > PRESET_EXTENSION.capacity() &&
-		name.substr(name.capacity() - 7).compare(PRESET_EXTENSION) != 0) {
-		newPath += PRESET_EXTENSION;
-	}
-	FILE *fp = fopen(newPath.c_str(), "wb");
+	FILE *fp = fopen(parsePresetPath(name).c_str(), "wb");
 	char writeBuffer[65536];
 	FileWriteStream os(fp, writeBuffer, sizeof(writeBuffer));
 	PrettyWriter<FileWriteStream> writer(os);
 	d.Accept(writer);
 	fclose(fp);
 
-	presetPath = newPath.c_str();
-	presetName = bf::path(newPath).filename().replace_extension().string();
+	presetPath = parsePresetPath(name);
+	presetName = parsePresetName(presetPath);
 
 	refreshPresets();
 }
@@ -355,35 +301,21 @@ void Settings::refreshPresets() {
 	presetNameList.clear();
 	for (bf::directory_entry &x : bf::directory_iterator(PRESET_DIR)) {
 		if (x.path().extension().compare(PRESET_EXTENSION) == 0) {
-			presetPathList.push_back(x.path().string());
-			presetNameList.push_back(x.path().filename().replace_extension().string());
+			presetPathList.push_back(parsePresetPath(x.path().string()));
+			presetNameList.push_back(parsePresetName(parsePresetPath(x.path().string())));
 		}
 	}
 }
 
 void Settings::createDefaultPreset() {
-	string json = "{}";
-	StringStream s(json.c_str());
-
-	Document d;
-	Document::AllocatorType &alloc = d.GetAllocator();
-	d.ParseStream(s);
-
-	d.AddMember(StringRef("vCodec"), Value(StringRef(DEFAULT_VCODEC.c_str())), alloc);
-	d.AddMember(StringRef("vQuality"), Value(StringRef(DEFAULT_VQUALITY.c_str())), alloc);
-	d.AddMember(StringRef("aCodec"), Value(StringRef(DEFAULT_ACODEC.c_str())), alloc);
-	d.AddMember(StringRef("aQuality"), Value(StringRef(DEFAULT_AQUALITY.c_str())), alloc);
-	d.AddMember(StringRef("container"), Value(StringRef(DEFAULT_CONTAINER.c_str())), alloc);
-	d.AddMember(StringRef("subtitles"), Value(StringRef(DEFAULT_SUBTITLES.c_str())), alloc);
-	d.AddMember(StringRef("threads"), Value(StringRef(DEFAULT_THREADS.c_str())), alloc);
-	d.AddMember(StringRef("extraParams"), Value(StringRef(DEFAULT_EXTRA_PARAMS.c_str())), alloc);
-
-	FILE *fp = fopen(DEFAULT_PRESET.c_str(), "wb");
-	char writeBuffer[65536];
-	FileWriteStream os(fp, writeBuffer, sizeof(writeBuffer));
-	PrettyWriter<FileWriteStream> writer(os);
-	d.Accept(writer);
-	fclose(fp);
-	refreshPresets();
+	vCodec = DEFAULT_VCODEC;
+	vQuality = DEFAULT_VQUALITY;
+	aCodec = DEFAULT_ACODEC;
+	aQuality = DEFAULT_AQUALITY;
+	container = DEFAULT_CONTAINER;
+	subtitles = DEFAULT_SUBTITLES;
+	threads = DEFAULT_THREADS;
+	extraParams = DEFAULT_EXTRA_PARAMS;
+	savePresetAs(DEFAULT_PRESET);
 }
 } // namespace SuperEpicFuntime
