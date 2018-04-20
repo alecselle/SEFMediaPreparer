@@ -40,7 +40,7 @@ class MediaPreparerGUI : public QWidget {
 	QTimer *updateTimer = new QTimer(this);
 	QWidget *containerEncode;
 	QWidget *containerEncodeList;
-	QThread *workerThread = new QThread();
+	QFuture<void> work;
 
 	Worker *worker;
 

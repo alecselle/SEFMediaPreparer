@@ -27,39 +27,16 @@ Worker::~Worker() {
 void Worker::process() {
 	cout << "Worker Started " << type << endl;
 	timeStamp = QTime();
-	if (type == SCAN) {
-		cout << "Worker Scanning " << library->size() << endl;
-		emit eventHandler->addEvent(WORKER_STARTED, "Scanning Library", SCAN);
-		library->scan();
-		for (int i = 0; i < (int)library->size(); i++) {
-			File &f = library->getFile(i);
-			emit eventHandler->addEvent(PROGRESS_UPDATED, "Scanning File: " + f.name(), 1);
-			emit eventHandler->addEvent(WORKER_ITEM_CHANGED, "SCAN", library->findFile(f));
-			QProcess process;
-			QList<QString> params = {
-				"-v",  "quiet", "-show_entries", "format=duration:stream=codec_type:stream=codec_name",
-				"-of", "json",  f.path().c_str()};
-
-			if (bf::exists("../lib/ffprobe.exe")) {
-				process.setProgram("../lib/ffprobe");
-			} else {
-				process.setProgram("ffprobe");
-			}
-
-			process.setArguments((QStringList)params);
-
-			process.start();
-			process.waitForFinished();
-
-			StringStream out(process.readAllStandardOutput());
-			f.loadFileInfo(out);
-		}
-		library->scanEncode();
-		emit eventHandler->addEvent(WORKER_FINISHED, "Finished Scanning Library", SCAN);
-		emit finished();
-	} else if (type == ENCODE) {
-
-	} else {
+	switch (type) {
+	case SCAN:
+		worker = QtConcurrent::run(this, &Worker::scanLibrary);
+		break;
+	case ENCODE:
+		encodeLibrary();
+		break;
+	case CLOSE:
+		close();
+		break;
 	}
 }
 
@@ -90,16 +67,15 @@ void Worker::scanFile(File &f) {
 
 void Worker::scanLibrary() {
 	cout << "Worker Scanning " << library->size() << endl;
+	cout << "Worker Scanning " << library->size() << endl;
 	emit eventHandler->addEvent(WORKER_STARTED, "Scanning Library", SCAN);
 	library->scan();
 	for (int i = 0; i < (int)library->size(); i++) {
-		cout << "Worker File" << endl;
 		File &f = library->getFile(i);
 		scanFile(f);
 	}
 	library->scanEncode();
 	emit eventHandler->addEvent(WORKER_FINISHED, "Finished Scanning Library", SCAN);
-	emit finished();
 }
 
 /** ================================================================================================
@@ -157,7 +133,6 @@ void Worker::encodeLibrary() {
 		encodeFile(f);
 	}
 	emit eventHandler->addEvent(WORKER_FINISHED, "Finished Encoding Library", ENCODE);
-	emit finished();
 }
 
 /** ================================================================================================

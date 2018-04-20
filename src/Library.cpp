@@ -16,13 +16,14 @@ namespace SuperEpicFuntime {
 /** ================================================================================================
  * (Class) Library
  */
-Library::Library() {
+Library::Library(Settings *s) {
+	_settings = s;
 }
 
 void Library::scan(bool scanRecursive) {
 	_Library.clear();
 	if (!scanRecursive) {
-		for (bf::directory_entry &x : bf::directory_iterator(settings->libraryDir)) {
+		for (bf::directory_entry &x : bf::directory_iterator(_settings->libraryDir)) {
 			for (int i = 0; i < _extensions.size(); i++) {
 				if (x.path().extension().string() == _extensions[i]) {
 					File file = File(x.path().string());
@@ -31,7 +32,7 @@ void Library::scan(bool scanRecursive) {
 			}
 		}
 	} else {
-		for (bf::directory_entry &x : bf::recursive_directory_iterator(settings->libraryDir)) {
+		for (bf::directory_entry &x : bf::recursive_directory_iterator(_settings->libraryDir)) {
 			if (x.path().parent_path().filename().string().compare("Converted") != 0) {
 				for (int i = 0; i < _extensions.size(); i++) {
 					if (x.path().extension().string().compare(_extensions[i]) == 0) {
@@ -102,26 +103,26 @@ bool Library::addFile(std::string file) {
 bool Library::checkEncode(SuperEpicFuntime::File file) {
 	if (file.isLoaded()) {
 		bool matches[3] = {false, false, false};
-		for (int j = 0; j < settings->vCodecList.size(); j++) {
-			if (settings->vCodecList[j][0].compare(settings->vCodec) == 0) {
-				for (int k = 0; k < settings->vCodecList[j].size(); k++) {
-					if (file.vcodec().compare(settings->vCodecList[j][k]) == 0) {
+		for (int j = 0; j < _settings->vCodecList.size(); j++) {
+			if (_settings->vCodecList[j][0].compare(_settings->vCodec) == 0) {
+				for (int k = 0; k < _settings->vCodecList[j].size(); k++) {
+					if (file.vcodec().compare(_settings->vCodecList[j][k]) == 0) {
 						matches[0] = true;
 					}
 				}
 			}
 		}
-		for (int l = 0; l < settings->aCodecList.size(); l++) {
-			if (settings->aCodecList[l][0].compare(settings->aCodec) == 0) {
-				for (int m = 0; m < settings->aCodecList[l].size(); m++) {
-					if (file.acodec().compare(settings->aCodecList[l][m]) == 0) {
+		for (int l = 0; l < _settings->aCodecList.size(); l++) {
+			if (_settings->aCodecList[l][0].compare(_settings->aCodec) == 0) {
+				for (int m = 0; m < _settings->aCodecList[l].size(); m++) {
+					if (file.acodec().compare(_settings->aCodecList[l][m]) == 0) {
 						matches[1] = true;
 					}
 				}
 			}
 		}
 
-		if (file.extension().compare("." + settings->container) == 0) {
+		if (file.extension().compare("." + _settings->container) == 0) {
 			matches[2] = true;
 		}
 
@@ -138,26 +139,26 @@ void Library::scanEncode() {
 		File &f = getFile(i);
 		if (f.isLoaded()) {
 			bool matches[3] = {false, false, false};
-			for (int j = 0; j < settings->vCodecList.size(); j++) {
-				if (settings->vCodecList[j][0].compare(settings->vCodec) == 0) {
-					for (int k = 0; k < settings->vCodecList[j].size(); k++) {
-						if (f.vcodec().compare(settings->vCodecList[j][k]) == 0) {
+			for (int j = 0; j < _settings->vCodecList.size(); j++) {
+				if (_settings->vCodecList[j][0].compare(_settings->vCodec) == 0) {
+					for (int k = 0; k < _settings->vCodecList[j].size(); k++) {
+						if (f.vcodec().compare(_settings->vCodecList[j][k]) == 0) {
 							matches[0] = true;
 						}
 					}
 				}
 			}
-			for (int l = 0; l < settings->aCodecList.size(); l++) {
-				if (settings->aCodecList[l][0].compare(settings->aCodec) == 0) {
-					for (int m = 0; m < settings->aCodecList[l].size(); m++) {
-						if (f.acodec().compare(settings->aCodecList[l][m]) == 0) {
+			for (int l = 0; l < _settings->aCodecList.size(); l++) {
+				if (_settings->aCodecList[l][0].compare(_settings->aCodec) == 0) {
+					for (int m = 0; m < _settings->aCodecList[l].size(); m++) {
+						if (f.acodec().compare(_settings->aCodecList[l][m]) == 0) {
 							matches[1] = true;
 						}
 					}
 				}
 			}
 
-			if (f.extension().compare("." + settings->container) == 0) {
+			if (f.extension().compare("." + _settings->container) == 0) {
 				matches[2] = true;
 			}
 			if ((!matches[0] || !matches[1] || !matches[2]) && findFileEncode(f) == -1) {

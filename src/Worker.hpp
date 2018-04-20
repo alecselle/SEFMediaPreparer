@@ -27,6 +27,7 @@ class Worker : public QObject {
   private:
 	WorkerType type;
 	QTime timeStamp;
+	QFuture<void> worker;
 
 	void scanFile(File &file);
 	void scanLibrary();
@@ -39,11 +40,8 @@ class Worker : public QObject {
   public:
 	Worker();
 	Worker(WorkerType type);
-	~Worker();
-  public slots:
 	void process();
-  signals:
-	void finished();
+	~Worker();
 };
 
 } // namespace SuperEpicFuntime

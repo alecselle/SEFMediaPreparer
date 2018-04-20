@@ -17,6 +17,7 @@ namespace SuperEpicFuntime {
  */
 class Library {
   private:
+	Settings *_settings;
 	boost::container::vector<File> _Library = {};
 	boost::container::vector<File> _LibraryEncode = {};
 	boost::container::vector<std::string> _extensions = {".wmv", ".avi",  ".divx", ".mkv", ".mka", ".mks", ".webm",
@@ -24,7 +25,7 @@ class Library {
 	int _duration = -1;
 
   public:
-	Library();
+	Library(Settings *settings);
 	void scan(bool scanRecursive = false);
 	int size();
 	int duration();

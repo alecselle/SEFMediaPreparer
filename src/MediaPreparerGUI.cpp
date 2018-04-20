@@ -8,10 +8,14 @@
 #include <boost/container/vector.hpp>
 #include <boost/filesystem.hpp>
 #include <iostream>
+#include <rapidjson/document.h>
+#include <rapidjson/stream.h>
+#include <string>
 
 namespace bf = boost::filesystem;
 namespace bc = boost::container;
 namespace ba = boost::algorithm;
+using namespace rapidjson;
 using namespace std;
 
 namespace SuperEpicFuntime {
@@ -23,7 +27,7 @@ MediaPreparerGUI::MediaPreparerGUI(QWidget *parent) : QWidget(parent), ui(new Ui
 	ui->setupUi(this);
 	eventHandler = new EventHandler();
 	settings = new Settings();
-	library = new Library();
+	library = new Library(settings);
 	init();
 }
 
@@ -158,14 +162,33 @@ void MediaPreparerGUI::updateGUI_timers() {
 }
 
 void MediaPreparerGUI::runWorker(WorkerType t) {
-	worker = new Worker(t);
-	worker->moveToThread(workerThread);
+	cout << "Worker Scanning " << library->size() << endl;
+	emit eventHandler->addEvent(WORKER_STARTED, "Scanning Library", SCAN);
+	library->scan();
+	for (int i = 0; i < (int)library->size(); i++) {
+		File &f = library->getFile(i);
+		emit eventHandler->addEvent(PROGRESS_UPDATED, "Scanning File: " + f.name(), 1);
+		emit eventHandler->addEvent(WORKER_ITEM_CHANGED, "SCAN", library->findFile(f));
+		QProcess process;
+		QList<QString> params = {"-v",  "quiet", "-show_entries", "format=duration:stream=codec_type:stream=codec_name",
+								 "-of", "json",  f.path().c_str()};
 
-	connect(workerThread, SIGNAL(started()), worker, SLOT(process()));
-	connect(worker, SIGNAL(finished()), workerThread, SLOT(quit()));
-	connect(workerThread, SIGNAL(finished()), worker, SLOT(deleteLater()));
-	connect(workerThread, SIGNAL(finished()), workerThread, SLOT(deleteLater()));
-	workerThread->start();
+		if (bf::exists("../lib/ffprobe.exe")) {
+			process.setProgram("../lib/ffprobe");
+		} else {
+			process.setProgram("ffprobe");
+		}
+
+		process.setArguments((QStringList)params);
+
+		process.start();
+		process.waitForFinished();
+
+		StringStream out(process.readAllStandardOutput());
+		f.loadFileInfo(out);
+	}
+	library->scanEncode();
+	emit eventHandler->addEvent(WORKER_FINISHED, "Finished Scanning Library", SCAN);
 }
 
 void MediaPreparerGUI::runWorker_scan() {
