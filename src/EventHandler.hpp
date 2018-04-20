@@ -54,7 +54,7 @@ class EventHandler : public QObject {
 
 	void clearEvents();
 	int size();
-	Event getEvent(int pos = -1);
+	Event getEvent(int pos = 0);
 	Event getLastEvent();
 	static bool compare(Event a, Event b);
 

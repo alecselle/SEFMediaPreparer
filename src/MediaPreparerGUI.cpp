@@ -250,7 +250,6 @@ void MediaPreparerGUI::encodeLibrary() {
  * (Section) Event Listener
  */
 void MediaPreparerGUI::eventListener(int pos) {
-	// if (!eventHandler->checkRepeat()) {
 	Event p = eventHandler->getLastEvent();
 	Event e = eventHandler->getEvent();
 	EventType t = e.getType();
@@ -259,6 +258,7 @@ void MediaPreparerGUI::eventListener(int pos) {
 	int d = e.getData();
 	File f;
 
+	// if (!eventHandler->compare(p, e)) {
 	cout << "[" << t << " | " << eventHandler->size() << "] " << m << " : " << d << endl;
 	switch (t) {
 	case PROGRESS_UPDATED:
