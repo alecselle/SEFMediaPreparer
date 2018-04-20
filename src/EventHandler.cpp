@@ -8,6 +8,13 @@ namespace SuperEpicFuntime {
 /** ================================================================================================
  * (Class) Event
  */
+Event::Event() {
+	type = ERROR;
+	timeStamp = QTime();
+	message = "ERROR";
+	data = NULL;
+}
+
 Event::Event(EventType t, string m, int d) {
 	type = t;
 	timeStamp = QTime();
@@ -55,12 +62,15 @@ int EventHandler::size() {
 }
 
 Event EventHandler::getEvent(int pos) {
-	try {
-		return eventContainer.at(pos);
-	} catch (const std::out_of_range) {
-		cout << "[ERROR] [OUT_OF_RANGE] getEvent(" << pos << ");" << endl;
-		return Event(EventType::ERROR, "ERROR");
+	if (pos < size()) {
+		lastProcessed = eventContainer.at(pos);
+		return lastProcessed;
 	}
+	return Event();
+}
+
+Event EventHandler::getLastEvent() {
+	return lastProcessed;
 }
 
 } // namespace SuperEpicFuntime

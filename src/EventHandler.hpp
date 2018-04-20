@@ -32,6 +32,7 @@ class Event {
 	int data;
 
   public:
+	Event();
 	Event(EventType type, std::string message, int data = NULL);
 	EventType getType();
 	QTime getTimeStamp();
@@ -46,6 +47,7 @@ class EventHandler : public QObject {
 	Q_OBJECT
   private:
 	boost::container::vector<Event> eventContainer;
+	Event lastProcessed = Event();
 
   public:
 	EventHandler();
@@ -53,6 +55,7 @@ class EventHandler : public QObject {
 	void clearEvents();
 	int size();
 	Event getEvent(int pos = 0);
+	Event getLastEvent();
 
   public slots:
 	void newEvent(EventType type, std::string message, int data = NULL);

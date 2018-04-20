@@ -246,7 +246,9 @@ void MediaPreparerGUI::encodeLibrary() {
  * (Section) Event Listener
  */
 void MediaPreparerGUI::eventListener(int pos) {
+	Event p = eventHandler->getLastEvent();
 	Event e = eventHandler->getEvent();
+	if (p != e) {}
 	EventType t = e.getType();
 	QTime ts = e.getTimeStamp();
 	string m = e.getMessage();

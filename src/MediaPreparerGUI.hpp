@@ -60,10 +60,8 @@ class MediaPreparerGUI : public QWidget {
 	void initGUI();
 	void initSignals();
 
-	void scanFile(int pos);
 	void scanLibrary();
 
-	void encodeFile(int pos);
 	void encodeLibrary();
 
 	void closeEvent(QCloseEvent *e);
