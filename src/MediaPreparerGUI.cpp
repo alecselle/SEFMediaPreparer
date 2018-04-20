@@ -158,19 +158,26 @@ void MediaPreparerGUI::updateGUI_timers() {
 }
 
 void MediaPreparerGUI::runWorker(WorkerType t) {
-	Worker *w = new Worker(t);
+	worker = new Worker(t);
+	worker->moveToThread(workerThread);
+
+	connect(workerThread, SIGNAL(started()), worker, SLOT(process()));
+	connect(worker, SIGNAL(finished()), workerThread, SLOT(quit()));
+	connect(workerThread, SIGNAL(finished()), worker, SLOT(deleteLater()));
+	connect(workerThread, SIGNAL(finished()), workerThread, SLOT(deleteLater()));
+	workerThread->start();
 }
 
 void MediaPreparerGUI::runWorker_scan() {
-	QtConcurrent::run(this, &MediaPreparerGUI::runWorker, SCAN);
+	runWorker(SCAN);
 }
 
 void MediaPreparerGUI::runWorker_encode() {
-	worker = new Worker(ENCODE);
+	runWorker(ENCODE);
 }
 
 void MediaPreparerGUI::runWorker_cleanup() {
-	worker = new Worker(CLOSE);
+	runWorker(CLOSE);
 }
 
 void MediaPreparerGUI::eventListener(Event e) {

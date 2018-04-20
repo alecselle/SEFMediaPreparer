@@ -22,7 +22,8 @@ enum WorkerType { SCAN = 1, ENCODE = 2, CLOSE = 0 };
 /** ================================================================================================
  * (Class) Worker
  */
-class Worker {
+class Worker : public QObject {
+	Q_OBJECT
   private:
 	WorkerType type;
 	QTime timeStamp;
@@ -41,6 +42,8 @@ class Worker {
 	~Worker();
   public slots:
 	void process();
+  signals:
+	void finished();
 };
 
 } // namespace SuperEpicFuntime

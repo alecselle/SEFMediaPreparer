@@ -16,7 +16,7 @@ Worker::Worker() {
 }
 
 Worker::Worker(WorkerType t) {
-	cout << "yay" << endl;
+	cout << "Worker Created" << endl;
 	type = t;
 }
 
@@ -25,6 +25,7 @@ Worker::~Worker() {
 }
 
 void Worker::process() {
+	cout << "Worker Started" << endl;
 	timeStamp = QTime();
 	switch (type) {
 	case SCAN:
@@ -71,6 +72,7 @@ void Worker::scanLibrary() {
 		scanFile(f);
 	}
 	emit eventHandler->addEvent(WORKER_FINISHED, "Finished Scanning Library", SCAN);
+	emit finished();
 }
 
 /** ================================================================================================
@@ -126,6 +128,7 @@ void Worker::encodeLibrary() {
 		encodeFile(f);
 	}
 	emit eventHandler->addEvent(WORKER_FINISHED, "Finished Encoding Library", ENCODE);
+	emit finished();
 }
 
 /** ================================================================================================

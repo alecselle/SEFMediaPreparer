@@ -14,6 +14,7 @@
 #include <QtCore/QFuture>
 #include <QtCore/QObject>
 #include <QtCore/QProcess>
+#include <QtCore/QThread>
 #include <QtCore/QTime>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QLineEdit>
