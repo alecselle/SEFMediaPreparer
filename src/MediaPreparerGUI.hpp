@@ -60,10 +60,10 @@ class MediaPreparerGUI : public QWidget {
 	void initGUI();
 	void initSignals();
 
-	void scanFile(File &file);
+	void scanFile(int pos);
 	void scanLibrary();
 
-	void encodeFile(File &file);
+	void encodeFile(int pos);
 	void encodeLibrary();
 
 	void closeEvent(QCloseEvent *e);
@@ -90,9 +90,6 @@ class MediaPreparerGUI : public QWidget {
 
 	void eventListener(int pos = 0);
 
-	void updateProgress_primary(int progress = 0, QString msg = NULL);
-	void updateProgress_secondary(int progress = 0, QString msg = NULL);
-
 	void dialogBrowse(int type = 0);
 	void dialogSave();
 	void dialogCancel();
@@ -115,9 +112,6 @@ class MediaPreparerGUI : public QWidget {
 	void signal_runWorker_scan();
 	void signal_runWorker_encode();
 	void signal_runWorker_cleanup();
-
-	void signal_updateProgress_primary(int progress = 0, QString msg = NULL);
-	void signal_updateProgress_secondary(int progress = 0, QString msg = NULL);
 
 	void signal_dialogBrowse(int type = 0);
 	void signal_dialogSave();

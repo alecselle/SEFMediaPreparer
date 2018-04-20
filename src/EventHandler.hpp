@@ -13,9 +13,10 @@ namespace SuperEpicFuntime {
 enum EventType {
 	ERROR = 0,
 	PROGRESS_UPDATED = 1,
-	WORKER_STARTED = 2,
-	WORKER_FINISHED = 3,
-	WORKER_ITEM_CHANGED = 4,
+	PROGRESS_MAXIMUM = 2,
+	WORKER_STARTED = 3,
+	WORKER_FINISHED = 4,
+	WORKER_ITEM_CHANGED = 5,
 	DIALOG_ERROR = 99
 };
 enum WorkerType { SCAN = 1, ENCODE = 2, CLOSE = 0 };
@@ -55,10 +56,12 @@ class EventHandler : public QObject {
 
   public slots:
 	void newEvent(EventType type, std::string message, int data = NULL);
+	void newEvent(EventType type, int data = NULL);
 
   signals:
 	void addedEvent(int pos);
 	void addEvent(EventType type, std::string message, int data = NULL);
+	void addEvent(EventType type, int data = NULL);
 };
 
 static EventHandler *eventHandler;

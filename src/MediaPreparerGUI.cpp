@@ -16,7 +16,7 @@ MediaPreparerGUI::MediaPreparerGUI(QWidget *parent) : QWidget(parent), ui(new Ui
 	ui->setupUi(this);
 	eventHandler = new EventHandler();
 	settings = new Settings();
-	library = new Library();
+	library = new Library(settings);
 	init();
 }
 
@@ -48,10 +48,6 @@ void MediaPreparerGUI::initSignals() {
 	connect(this, SIGNAL(signal_runWorker_scan()), this, SLOT(runWorker_scan()));
 	connect(this, SIGNAL(signal_runWorker_encode()), this, SLOT(runWorker_encode()));
 	connect(this, SIGNAL(signal_runWorker_cleanup()), this, SLOT(runWorker_cleanup()));
-	connect(this, SIGNAL(signal_updateProgress_primary(int, QString)), this,
-			SLOT(updateProgress_primary(int, QString)));
-	connect(this, SIGNAL(signal_updateProgress_secondary(int, QString)), this,
-			SLOT(updateProgress_secondary(int, QString)));
 	connect(this, SIGNAL(signal_dialogSave()), this, SLOT(dialogSave()));
 	connect(this, SIGNAL(signal_dialogCancel()), this, SLOT(dialogCancel()));
 	connect(this, SIGNAL(signal_log(QString)), this, SLOT(log(QString)));
@@ -161,20 +157,6 @@ void MediaPreparerGUI::updateGUI_settings() {
 void MediaPreparerGUI::updateGUI_timers() {
 }
 
-void MediaPreparerGUI::updateProgress_primary(int progress, QString msg) {
-	ui->progress_primary->setValue(progress);
-	if (msg != NULL) {
-		ui->progress_primary->setFormat(msg);
-	}
-}
-
-void MediaPreparerGUI::updateProgress_secondary(int progress, QString msg) {
-	ui->progress_secondary->setValue(progress);
-	if (msg != NULL) {
-		ui->progress_secondary->setFormat(msg);
-	}
-}
-
 /** ================================================================================================
  * (Section) Workers
  */
@@ -192,8 +174,9 @@ void MediaPreparerGUI::runWorker_cleanup() {
 /** ================================================================================================
  * (Section) Scan Worker
  */
-void MediaPreparerGUI::scanFile(File &f) {
-	eventHandler->newEvent(WORKER_ITEM_CHANGED, "SCAN", library->findFile(f));
+void MediaPreparerGUI::scanFile(int pos) {
+	File &f = library->getFile(pos);
+	eventHandler->newEvent(PROGRESS_UPDATED, "Scanning File: " + f.name(), pos);
 	QProcess process;
 	QList<QString> params = {"-v",  "quiet", "-show_entries", "format=duration:stream=codec_type:stream=codec_name",
 							 "-of", "json",  f.path().c_str()};
@@ -216,11 +199,20 @@ void MediaPreparerGUI::scanFile(File &f) {
 void MediaPreparerGUI::scanLibrary() {
 	eventHandler->newEvent(WORKER_STARTED, "Scanning Library", SCAN);
 	library->scan();
-	cout << library->size() << endl;
+	eventHandler->newEvent(PROGRESS_MAXIMUM, library->size());
 	for (int i = 0; i < library->size(); i++) {
 		File &f = library->getFile(i);
+		eventHandler->newEvent(WORKER_ITEM_CHANGED, "SCAN", i);
 		eventHandler->newEvent(PROGRESS_UPDATED, "Scanning File: " + f.name(), i);
-		scanFile(f);
+		QList<QString> params = {"-v",  "quiet", "-show_entries", "format=duration:stream=codec_type:stream=codec_name",
+								 "-of", "json",  f.path().c_str()};
+		QProcess process;
+		process.setProgram("ffprobe");
+		process.setArguments((QStringList)params);
+		process.start();
+		process.waitForFinished();
+		StringStream out(process.readAllStandardOutput());
+		f.loadFileInfo(out);
 	}
 	library->scanEncode();
 	eventHandler->newEvent(WORKER_FINISHED, "Finished Scanning Library", SCAN);
@@ -229,9 +221,9 @@ void MediaPreparerGUI::scanLibrary() {
 /** ================================================================================================
  * (Section) Encode Worker
  */
-void MediaPreparerGUI::encodeFile(File &f) {
-	eventHandler->newEvent(PROGRESS_UPDATED, "Encoding File: " + f.name(), 1);
-	eventHandler->newEvent(WORKER_ITEM_CHANGED, "ENCODE", library->findFileEncode(f));
+void MediaPreparerGUI::encodeFile(int pos) {
+	File &f = library->getFileEncode(pos);
+	eventHandler->newEvent(PROGRESS_UPDATED, "Encoding File: " + f.name(), pos);
 	QProcess process;
 	QList<QString> params = {"-y",		 "-v",
 							 "quiet",	"-stats",
@@ -274,9 +266,10 @@ void MediaPreparerGUI::encodeFile(File &f) {
 
 void MediaPreparerGUI::encodeLibrary() {
 	eventHandler->newEvent(WORKER_STARTED, "Encoding Library", ENCODE);
+	library->scanEncode();
 	for (int i = 0; i < (int)library->sizeEncode(); i++) {
-		File &f = library->getFileEncode(i);
-		encodeFile(f);
+		eventHandler->newEvent(WORKER_ITEM_CHANGED, "ENCODE", i);
+		encodeFile(i);
 	}
 	eventHandler->newEvent(WORKER_FINISHED, "Finished Encoding Library", ENCODE);
 }
@@ -292,9 +285,18 @@ void MediaPreparerGUI::eventListener(int pos) {
 	int d = e.getData();
 	File f;
 
+	cout << "[" << t << " | " << eventHandler->size() << "] " << m << " : " << d << endl;
+
 	switch (t) {
 	case PROGRESS_UPDATED:
-		updateProgress_primary(d, m.c_str());
+		ui->progress_primary->setValue(d);
+		if (!m.empty()) {
+			ui->progress_primary->setFormat(m.c_str());
+		}
+		break;
+
+	case PROGRESS_MAXIMUM:
+		ui->progress_primary->setMaximum(d);
 		break;
 
 	case WORKER_STARTED:
