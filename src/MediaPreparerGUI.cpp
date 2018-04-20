@@ -70,7 +70,7 @@ void MediaPreparerGUI::initSignals() {
 	connect(ui->setting_container, SIGNAL(currentIndexChanged(int)), this, SLOT(loadSettings_gui()));
 	connect(ui->setting_preset, SIGNAL(currentTextChanged(QString)), this, SLOT(loadSettings_preset(QString)));
 
-	connect(eventHandler, SIGNAL(createdEvent()), this, SLOT(eventListener()));
+	connect(eventHandler, SIGNAL(createdEvent()), this, SLOT(eventListener()), Qt::UniqueConnection);
 }
 
 /** ================================================================================================
