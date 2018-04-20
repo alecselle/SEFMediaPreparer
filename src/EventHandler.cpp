@@ -49,9 +49,8 @@ void EventHandler::clearEvents() {
 }
 
 void EventHandler::newEvent(EventType type, string message, int data) {
-	cout << "[" << type << " | " << size() << "] " << message << " : " << data << endl;
 	Event e(type, message, data);
-	if (eventContainer.size() == 0 || compare(eventContainer.at(0), e)) {
+	if (eventContainer.size() == 0 || !compare(eventContainer.at(size() - 1), e)) {
 		eventContainer.push_back(e);
 		emit addedEvent(size() - 1);
 	}

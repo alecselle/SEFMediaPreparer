@@ -21,6 +21,7 @@ MediaPreparerGUI::MediaPreparerGUI(QWidget *parent) : QWidget(parent), ui(new Ui
 }
 
 MediaPreparerGUI::~MediaPreparerGUI() {
+	cancelWorker = true;
 	saveSettings_config();
 }
 
@@ -177,8 +178,8 @@ void MediaPreparerGUI::runWorker_cleanup() {
 void MediaPreparerGUI::scanLibrary() {
 	eventHandler->newEvent(WORKER_STARTED, "Scanning Library", SCAN);
 	library->scan();
-	eventHandler->newEvent(PROGRESS_MAXIMUM, library->size());
-	for (int i = 0; i < library->size(); i++) {
+	eventHandler->newEvent(PROGRESS_MAXIMUM, "Library Size: ", library->size());
+	for (int i = 0; !cancelWorker && i < library->size(); i++) {
 		File &f = library->getFile(i);
 		eventHandler->newEvent(WORKER_ITEM_CHANGED, "SCAN", i);
 		eventHandler->newEvent(PROGRESS_UPDATED, "Scanning File: " + f.name(), i);
@@ -186,7 +187,7 @@ void MediaPreparerGUI::scanLibrary() {
 								 "-of", "json",  f.path().c_str()};
 		QProcess process;
 		bool r = false;
-		for (int j = 0; !r && j < RETRY_COUNT; j++) {
+		for (int j = 0; !cancelWorker && !r && j < RETRY_COUNT; j++) {
 			process.start("ffprobe", params);
 			process.waitForFinished();
 			StringStream out(process.readAllStandardOutput());
@@ -203,7 +204,7 @@ void MediaPreparerGUI::scanLibrary() {
 void MediaPreparerGUI::encodeLibrary() {
 	eventHandler->newEvent(WORKER_STARTED, "Encoding Library", ENCODE);
 	library->scanEncode();
-	for (int i = 0; i < (int)library->sizeEncode(); i++) {
+	for (int i = 0; !cancelWorker && i < (int)library->sizeEncode(); i++) {
 		File &f = library->getFileEncode(i);
 		eventHandler->newEvent(WORKER_ITEM_CHANGED, "ENCODE", i);
 		eventHandler->newEvent(PROGRESS_UPDATED, "Encoding File: " + f.name(), i);
@@ -259,7 +260,6 @@ void MediaPreparerGUI::eventListener(int pos) {
 	File f;
 
 	cout << "[" << t << " | " << eventHandler->size() << "] " << m << " : " << d << endl;
-
 	switch (t) {
 	case PROGRESS_UPDATED:
 		ui->progress_primary->setValue(d);

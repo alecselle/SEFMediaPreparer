@@ -49,9 +49,7 @@ class MediaPreparerGUI : public QWidget {
 	QWidget *containerEncodeList;
 
 	QFuture<void> worker;
-
-	bool cancelScan = false;
-	bool cancelEncode = false;
+	bool cancelWorker = false;
 
 	const std::string productName = PRODUCT_NAME;
 	const std::string productVersion = PRODUCT_VERSION;
