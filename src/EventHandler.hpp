@@ -24,7 +24,8 @@ enum WorkerType { SCAN = 1, ENCODE = 2, CLOSE = 0 };
 /** ================================================================================================
  * (Class) Event
  */
-class Event {
+class Event : public QObject {
+	Q_OBJECT
   private:
 	EventType type;
 	QTime timeStamp;
@@ -46,21 +47,24 @@ class Event {
 class EventHandler : public QObject {
 	Q_OBJECT
   private:
-	Event current = Event();
-	Event previous = Event();
+	boost::container::vector<Event *> events;
+	Event *current = new Event();
+	Event *previous = new Event();
 
   public:
 	EventHandler();
 
-	Event getEvent();
-	Event getEventPrevious();
+	Event *getEvent(int pos = 0);
+	Event *getEventPrevious();
+
+	int size();
 
   public slots:
 	void newEvent(EventType type, std::string message, int data = NULL);
 	void newEvent(EventType type, int data = NULL);
 
   signals:
-	void createdEvent();
+	void createdEvent(Event *);
 };
 
 static EventHandler *eventHandler;

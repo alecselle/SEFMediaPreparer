@@ -46,16 +46,18 @@ void MediaPreparerGUI::initSignals() {
 	connect(this, SIGNAL(signal_saveSettings_preset(QString)), this, SLOT(saveSettings_preset(QString)));
 	connect(this, SIGNAL(signal_updateGUI_settings()), this, SLOT(updateGUI_settings()));
 	connect(this, SIGNAL(signal_updateGUI_timers()), this, SLOT(updateGUI_timers()));
-	connect(this, SIGNAL(signal_runWorker_scan()), this, SLOT(runWorker_scan()));
-	connect(this, SIGNAL(signal_runWorker_encode()), this, SLOT(runWorker_encode()));
-	connect(this, SIGNAL(signal_runWorker_cleanup()), this, SLOT(runWorker_cleanup()));
+	connect(this, SIGNAL(signal_runWorker_scan()), this, SLOT(runWorker_scan()), Qt::UniqueConnection);
+	connect(this, SIGNAL(signal_runWorker_encode()), this, SLOT(runWorker_encode()), Qt::UniqueConnection);
+	connect(this, SIGNAL(signal_runWorker_cleanup()), this, SLOT(runWorker_cleanup()), Qt::UniqueConnection);
 	connect(this, SIGNAL(signal_dialogSave()), this, SLOT(dialogSave()));
 	connect(this, SIGNAL(signal_dialogCancel()), this, SLOT(dialogCancel()));
 	connect(this, SIGNAL(signal_log(QString)), this, SLOT(log(QString)));
 	connect(this, SIGNAL(signal_blockSignals(bool)), this, SLOT(blockSignals(bool)));
 
-	connect(ui->button_scan_directory, SIGNAL(clicked()), this, SLOT(runWorker_scan()));
-	connect(ui->setting_directory, SIGNAL(returnPressed()), this, SLOT(runWorker_scan()));
+	connect(ui->button_scan_directory, SIGNAL(clicked()), this, SLOT(runWorker_scan()), Qt::UniqueConnection);
+	connect(ui->setting_directory, SIGNAL(returnPressed()), this, SLOT(runWorker_scan()), Qt::UniqueConnection);
+
+	connect(ui->button_encode, SIGNAL(clicked()), this, SLOT(runWorker_encode()), Qt::UniqueConnection);
 
 	connect(ui->button_savePreset, SIGNAL(clicked()), this, SLOT(dialogSave()));
 
@@ -70,7 +72,7 @@ void MediaPreparerGUI::initSignals() {
 	connect(ui->setting_container, SIGNAL(currentIndexChanged(int)), this, SLOT(loadSettings_gui()));
 	connect(ui->setting_preset, SIGNAL(currentTextChanged(QString)), this, SLOT(loadSettings_preset(QString)));
 
-	connect(eventHandler, SIGNAL(createdEvent()), this, SLOT(eventListener()), Qt::UniqueConnection);
+	connect(eventHandler, SIGNAL(createdEvent(Event *)), this, SLOT(eventListener(Event *)), Qt::UniqueConnection);
 }
 
 /** ================================================================================================
@@ -168,7 +170,9 @@ void MediaPreparerGUI::runWorker_scan() {
 }
 
 void MediaPreparerGUI::runWorker_encode() {
-	encodeLibrary();
+	if (!worker.isRunning()) {
+		worker = QtConcurrent::run(this, &MediaPreparerGUI::encodeLibrary);
+	}
 }
 
 void MediaPreparerGUI::runWorker_cleanup() {
@@ -178,13 +182,14 @@ void MediaPreparerGUI::runWorker_cleanup() {
  * (Section) Scan Worker
  */
 void MediaPreparerGUI::scanLibrary() {
-	eventHandler->newEvent(WORKER_STARTED, "Scanning Library", SCAN);
+	eventHandler->newEvent(WORKER_STARTED, SCAN);
 	library->scan();
-	eventHandler->newEvent(PROGRESS_MAXIMUM, "Library Size: ", library->size());
+	eventHandler->newEvent(PROGRESS_UPDATED, "Scanning Library", 0);
+	eventHandler->newEvent(PROGRESS_MAXIMUM, library->size());
 	for (int i = 0; !cancelWorker && i < library->size(); i++) {
 		File &f = library->getFile(i);
-		eventHandler->newEvent(WORKER_ITEM_CHANGED, "SCAN", i);
-		eventHandler->newEvent(PROGRESS_UPDATED, "Scanning File: " + f.name(), i);
+		// eventHandler->newEvent(WORKER_ITEM_CHANGED, "SCAN", i);
+		eventHandler->newEvent(PROGRESS_UPDATED, "Scanning File: " + f.name(), i + 1);
 		QList<QString> params = {"-v",  "quiet", "-show_entries", "format=duration:stream=codec_type:stream=codec_name",
 								 "-of", "json",  f.path().c_str()};
 		QProcess process;
@@ -197,19 +202,22 @@ void MediaPreparerGUI::scanLibrary() {
 		}
 	}
 	library->scanEncode();
-	eventHandler->newEvent(WORKER_FINISHED, "Finished Scanning Library", SCAN);
+	eventHandler->newEvent(PROGRESS_UPDATED, "Finished Scanning Library", library->size());
+	eventHandler->newEvent(WORKER_FINISHED, SCAN);
 }
 
 /** ================================================================================================
  * (Section) Encode Worker
  */
 void MediaPreparerGUI::encodeLibrary() {
-	eventHandler->newEvent(WORKER_STARTED, "Encoding Library", ENCODE);
+	eventHandler->newEvent(WORKER_STARTED, ENCODE);
 	library->scanEncode();
+	eventHandler->newEvent(PROGRESS_UPDATED, "Encoding Library", 0);
+	eventHandler->newEvent(PROGRESS_MAXIMUM, library->sizeEncode());
 	for (int i = 0; !cancelWorker && i < (int)library->sizeEncode(); i++) {
 		File &f = library->getFileEncode(i);
-		eventHandler->newEvent(WORKER_ITEM_CHANGED, "ENCODE", i);
-		eventHandler->newEvent(PROGRESS_UPDATED, "Encoding File: " + f.name(), i);
+		// eventHandler->newEvent(WORKER_ITEM_CHANGED, "ENCODE", i);
+		eventHandler->newEvent(PROGRESS_UPDATED, "Encoding File: " + f.name(), i + 1);
 		QList<QString> params = {"-y",		 "-v",
 								 "quiet",	"-stats",
 								 "-hwaccel", "dxva2",
@@ -245,74 +253,76 @@ void MediaPreparerGUI::encodeLibrary() {
 		process.start("ffmpeg", params);
 		process.waitForFinished(-1);
 	}
-	eventHandler->newEvent(WORKER_FINISHED, "Finished Encoding Library", ENCODE);
+	eventHandler->newEvent(PROGRESS_UPDATED, "Finished Scanning Library", library->sizeEncode());
+	eventHandler->newEvent(WORKER_FINISHED, ENCODE);
 }
 
 /** ================================================================================================
  * (Section) Event Listener
  */
-void MediaPreparerGUI::eventListener() {
-	Event e = eventHandler->getEvent(), p = eventHandler->getEventPrevious();
-	EventType t = e.getType();
-	QTime ts = e.getTimeStamp();
-	string m = e.getMessage();
-	int d = e.getData();
+void MediaPreparerGUI::eventListener(Event *e) {
+	EventType t = e->getType();
+	QTime ts = e->getTimeStamp();
+	string m = e->getMessage();
+	int d = e->getData();
 	File f;
 
-	if (e.getType() != p.getType() || e.getData() != p.getData()) {
-		cout << "[" << t << "] " << m << " : " << d << endl;
-		switch (t) {
-		case PROGRESS_UPDATED:
-			ui->progress_primary->setValue(d);
-			if (!m.empty()) {
-				ui->progress_primary->setFormat(m.c_str());
-			}
+	cout << "[" << t << "] " << m << " : " << d << endl;
+	switch (t) {
+	case PROGRESS_UPDATED:
+		ui->progress_primary->setValue(d);
+		if (!m.empty()) {
+			ui->progress_primary->setFormat(m.c_str());
+		}
+		break;
+
+	case PROGRESS_MAXIMUM:
+		ui->progress_primary->setMaximum(d);
+		break;
+
+	case WORKER_STARTED:
+		switch ((WorkerType)d) {
+		case SCAN:
+
 			break;
+		case ENCODE:
 
-		case PROGRESS_MAXIMUM:
-			ui->progress_primary->setMaximum(d);
 			break;
-
-		case WORKER_STARTED:
-			switch ((WorkerType)d) {
-			case SCAN:
-
-				break;
-			case ENCODE:
-
-				break;
-			case CLOSE:
-
-				break;
-			}
-			break;
-
-		case WORKER_FINISHED:
-			switch ((WorkerType)d) {
-			case SCAN:
-
-				break;
-			case ENCODE:
-
-				break;
-			case CLOSE:
-
-				break;
-			}
-			break;
-
-		case WORKER_ITEM_CHANGED:
-			if (m.compare("SCAN") == 0) {
-				f = library->getFile(d);
-			} else if (m.compare("ENCODE") == 0) {
-				f = library->getFileEncode(d);
-			}
-			break;
-
-		default:
+		case CLOSE:
 
 			break;
 		}
+		break;
+
+	case WORKER_FINISHED:
+		switch ((WorkerType)d) {
+		case SCAN:
+			ui->label_fileCount->setText(
+				("<html><head/><body><p>" + std::to_string(library->size()) + " file(s) found</p></body></html>")
+					.c_str());
+			ui->button_encode->setText(("Encode [" + to_string(library->sizeEncode()) + "]").c_str());
+			ui->button_encode->setEnabled((library->sizeEncode() > 0));
+			break;
+		case ENCODE:
+
+			break;
+		case CLOSE:
+
+			break;
+		}
+		break;
+
+	case WORKER_ITEM_CHANGED:
+		if (m.compare("SCAN") == 0) {
+			f = library->getFile(d);
+		} else if (m.compare("ENCODE") == 0) {
+			f = library->getFileEncode(d);
+		}
+		break;
+
+	default:
+
+		break;
 	}
 }
 
