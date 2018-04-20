@@ -8,9 +8,7 @@
 
 namespace SuperEpicFuntime {
 
-// enum EventType { ERROR = 0, PROGRESS_UPDATED = 1, WORKER_STARTED = 2, WORKER_FINISHED = 3 };
-// enum WorkerType { SCAN = 1, ENCODE = 2, CLOSE = 0 };
-// enum ProgressBar { PRIMARY = 1, SECONDARY = 2 };
+static const int RETRY_COUNT = 5;
 
 } // namespace SuperEpicFuntime
 

@@ -73,4 +73,10 @@ Event EventHandler::getLastEvent() {
 	return lastProcessed;
 }
 
+bool EventHandler::checkRepeat() {
+	Event p = lastProcessed;
+	Event e = eventContainer.at(0);
+	return (e.getType() != p.getType() || e.getData() != p.getData());
+}
+
 } // namespace SuperEpicFuntime
