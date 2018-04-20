@@ -249,70 +249,70 @@ void MediaPreparerGUI::encodeLibrary() {
  * (Section) Event Listener
  */
 void MediaPreparerGUI::eventListener(int pos) {
-	if (eventHandler->checkRepeat()) {
-		Event p = eventHandler->getLastEvent();
-		Event e = eventHandler->getEvent();
-		EventType t = e.getType();
-		QTime ts = e.getTimeStamp();
-		string m = e.getMessage();
-		int d = e.getData();
-		File f;
+	// if (!eventHandler->checkRepeat()) {
+	Event p = eventHandler->getLastEvent();
+	Event e = eventHandler->getEvent();
+	EventType t = e.getType();
+	QTime ts = e.getTimeStamp();
+	string m = e.getMessage();
+	int d = e.getData();
+	File f;
 
-		cout << "[" << t << " | " << eventHandler->size() << "] " << m << " : " << d << endl;
+	cout << "[" << t << " | " << eventHandler->size() << "] " << m << " : " << d << endl;
 
-		switch (t) {
-		case PROGRESS_UPDATED:
-			ui->progress_primary->setValue(d);
-			if (!m.empty()) {
-				ui->progress_primary->setFormat(m.c_str());
-			}
+	switch (t) {
+	case PROGRESS_UPDATED:
+		ui->progress_primary->setValue(d);
+		if (!m.empty()) {
+			ui->progress_primary->setFormat(m.c_str());
+		}
+		break;
+
+	case PROGRESS_MAXIMUM:
+		ui->progress_primary->setMaximum(d);
+		break;
+
+	case WORKER_STARTED:
+		switch ((WorkerType)d) {
+		case SCAN:
+
 			break;
+		case ENCODE:
 
-		case PROGRESS_MAXIMUM:
-			ui->progress_primary->setMaximum(d);
 			break;
-
-		case WORKER_STARTED:
-			switch ((WorkerType)d) {
-			case SCAN:
-
-				break;
-			case ENCODE:
-
-				break;
-			case CLOSE:
-
-				break;
-			}
-			break;
-
-		case WORKER_FINISHED:
-			switch ((WorkerType)d) {
-			case SCAN:
-
-				break;
-			case ENCODE:
-
-				break;
-			case CLOSE:
-
-				break;
-			}
-			break;
-
-		case WORKER_ITEM_CHANGED:
-			if (m.compare("SCAN") == 0) {
-				f = library->getFile(d);
-			} else if (m.compare("ENCODE") == 0) {
-				f = library->getFileEncode(d);
-			}
-			break;
-
-		default:
+		case CLOSE:
 
 			break;
 		}
+		break;
+
+	case WORKER_FINISHED:
+		switch ((WorkerType)d) {
+		case SCAN:
+
+			break;
+		case ENCODE:
+
+			break;
+		case CLOSE:
+
+			break;
+		}
+		break;
+
+	case WORKER_ITEM_CHANGED:
+		if (m.compare("SCAN") == 0) {
+			f = library->getFile(d);
+		} else if (m.compare("ENCODE") == 0) {
+			f = library->getFileEncode(d);
+		}
+		break;
+
+	default:
+
+		break;
 	}
+	//}
 }
 
 /** ================================================================================================

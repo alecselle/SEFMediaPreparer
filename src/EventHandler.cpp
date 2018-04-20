@@ -49,8 +49,12 @@ void EventHandler::clearEvents() {
 }
 
 void EventHandler::newEvent(EventType type, string message, int data) {
-	eventContainer.insert(eventContainer.begin(), Event(type, message, data));
-	emit addedEvent(0);
+	cout << "[" << type << " | " << size() << "] " << message << " : " << data << endl;
+	Event e(type, message, data);
+	if (eventContainer.size() == 0 || compare(eventContainer.at(0), e)) {
+		eventContainer.push_back(e);
+		emit addedEvent(size() - 1);
+	}
 }
 
 void EventHandler::newEvent(EventType type, int data) {
@@ -62,6 +66,9 @@ int EventHandler::size() {
 }
 
 Event EventHandler::getEvent(int pos) {
+	if (pos == -1) {
+		pos = size() - 1;
+	}
 	if (pos < size()) {
 		lastProcessed = eventContainer.at(pos);
 		return lastProcessed;
@@ -73,10 +80,8 @@ Event EventHandler::getLastEvent() {
 	return lastProcessed;
 }
 
-bool EventHandler::checkRepeat() {
-	Event p = lastProcessed;
-	Event e = eventContainer.at(0);
-	return (e.getType() != p.getType() || e.getData() != p.getData());
+bool EventHandler::compare(Event a, Event b) {
+	return (a.getType() == b.getType() && a.getData() == b.getData() && a.getMessage() == b.getMessage());
 }
 
 } // namespace SuperEpicFuntime

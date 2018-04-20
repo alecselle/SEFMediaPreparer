@@ -54,9 +54,9 @@ class EventHandler : public QObject {
 
 	void clearEvents();
 	int size();
-	Event getEvent(int pos = 0);
+	Event getEvent(int pos = -1);
 	Event getLastEvent();
-	bool checkRepeat();
+	static bool compare(Event a, Event b);
 
   public slots:
 	void newEvent(EventType type, std::string message, int data = NULL);
