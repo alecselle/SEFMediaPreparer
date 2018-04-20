@@ -250,16 +250,15 @@ void MediaPreparerGUI::encodeLibrary() {
  * (Section) Event Listener
  */
 void MediaPreparerGUI::eventListener(int pos) {
-	Event p = eventHandler->getLastEvent();
-	Event e = eventHandler->getEvent();
+	Event e = eventHandler->getEvent(), p = eventHandler->getEventPrevious();
 	EventType t = e.getType();
 	QTime ts = e.getTimeStamp();
 	string m = e.getMessage();
 	int d = e.getData();
 	File f;
 
-	// if (!eventHandler->compare(p, e)) {
-	cout << "[" << t << " | " << eventHandler->size() << "] " << m << " : " << d << endl;
+	// if (e.getType() != p.getType() || e.getData() != p.getData()) {
+	cout << "[" << t << "] " << m << " : " << d << endl;
 	switch (t) {
 	case PROGRESS_UPDATED:
 		ui->progress_primary->setValue(d);

@@ -46,17 +46,14 @@ class Event {
 class EventHandler : public QObject {
 	Q_OBJECT
   private:
-	boost::container::vector<Event> eventContainer;
-	Event lastProcessed = Event();
+	Event current = Event();
+	Event previous = Event();
 
   public:
 	EventHandler();
 
-	void clearEvents();
-	int size();
-	Event getEvent(int pos = -1);
-	Event getLastEvent();
-	static bool compare(Event a, Event b);
+	Event getEvent();
+	Event getEventPrevious();
 
   public slots:
 	void newEvent(EventType type, std::string message, int data = NULL);

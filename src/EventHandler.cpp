@@ -44,21 +44,11 @@ int Event::getData() {
 EventHandler::EventHandler() {
 }
 
-void EventHandler::clearEvents() {
-	eventContainer.clear();
-}
-
 void EventHandler::newEvent(EventType type, string message, int data) {
-	Event p, e;
-	if (size() > 0) {
-		p = eventContainer[size() - 1];
-	} else {
-		p = Event();
-	}
-	e = Event(type, message, data);
-	if (!compare(e, p)) {
-		eventContainer.push_back(e);
-		emit addedEvent(size() - 1);
+	Event e = Event(type, message, data);
+	if (e.getType() != current.getType() || e.getData() != current.getData()) {
+		previous = current;
+		current = e;
 	}
 }
 
@@ -66,24 +56,12 @@ void EventHandler::newEvent(EventType type, int data) {
 	newEvent(type, "", data);
 }
 
-int EventHandler::size() {
-	return eventContainer.size();
+Event EventHandler::getEvent() {
+	return current;
 }
 
-Event EventHandler::getEvent(int pos) {
-	if (pos >= 0 && pos < size()) {
-		lastProcessed = eventContainer.at(pos);
-		return lastProcessed;
-	}
-	return Event();
-}
-
-Event EventHandler::getLastEvent() {
-	return lastProcessed;
-}
-
-bool EventHandler::compare(Event a, Event b) {
-	return (a.getType() == b.getType() && a.getData() == b.getData());
+Event EventHandler::getEventPrevious() {
+	return previous;
 }
 
 } // namespace SuperEpicFuntime
