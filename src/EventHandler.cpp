@@ -49,6 +49,7 @@ void EventHandler::newEvent(EventType type, string message, int data) {
 	if (e.getType() != current.getType() || e.getData() != current.getData()) {
 		previous = current;
 		current = e;
+		emit createdEvent();
 	}
 }
 

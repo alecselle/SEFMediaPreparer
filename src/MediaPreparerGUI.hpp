@@ -84,7 +84,7 @@ class MediaPreparerGUI : public QWidget {
 	void runWorker_encode();
 	void runWorker_cleanup();
 
-	void eventListener(int pos = 0);
+	void eventListener();
 
 	void dialogBrowse(int type = 0);
 	void dialogSave();

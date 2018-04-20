@@ -70,7 +70,7 @@ void MediaPreparerGUI::initSignals() {
 	connect(ui->setting_container, SIGNAL(currentIndexChanged(int)), this, SLOT(loadSettings_gui()));
 	connect(ui->setting_preset, SIGNAL(currentTextChanged(QString)), this, SLOT(loadSettings_preset(QString)));
 
-	connect(eventHandler, SIGNAL(addedEvent(int)), this, SLOT(eventListener(int)));
+	connect(eventHandler, SIGNAL(createdEvent()), this, SLOT(eventListener()));
 }
 
 /** ================================================================================================
@@ -249,7 +249,7 @@ void MediaPreparerGUI::encodeLibrary() {
 /** ================================================================================================
  * (Section) Event Listener
  */
-void MediaPreparerGUI::eventListener(int pos) {
+void MediaPreparerGUI::eventListener() {
 	Event e = eventHandler->getEvent(), p = eventHandler->getEventPrevious();
 	EventType t = e.getType();
 	QTime ts = e.getTimeStamp();
@@ -257,61 +257,61 @@ void MediaPreparerGUI::eventListener(int pos) {
 	int d = e.getData();
 	File f;
 
-	// if (e.getType() != p.getType() || e.getData() != p.getData()) {
-	cout << "[" << t << "] " << m << " : " << d << endl;
-	switch (t) {
-	case PROGRESS_UPDATED:
-		ui->progress_primary->setValue(d);
-		if (!m.empty()) {
-			ui->progress_primary->setFormat(m.c_str());
+	if (e.getType() != p.getType() || e.getData() != p.getData()) {
+		cout << "[" << t << "] " << m << " : " << d << endl;
+		switch (t) {
+		case PROGRESS_UPDATED:
+			ui->progress_primary->setValue(d);
+			if (!m.empty()) {
+				ui->progress_primary->setFormat(m.c_str());
+			}
+			break;
+
+		case PROGRESS_MAXIMUM:
+			ui->progress_primary->setMaximum(d);
+			break;
+
+		case WORKER_STARTED:
+			switch ((WorkerType)d) {
+			case SCAN:
+
+				break;
+			case ENCODE:
+
+				break;
+			case CLOSE:
+
+				break;
+			}
+			break;
+
+		case WORKER_FINISHED:
+			switch ((WorkerType)d) {
+			case SCAN:
+
+				break;
+			case ENCODE:
+
+				break;
+			case CLOSE:
+
+				break;
+			}
+			break;
+
+		case WORKER_ITEM_CHANGED:
+			if (m.compare("SCAN") == 0) {
+				f = library->getFile(d);
+			} else if (m.compare("ENCODE") == 0) {
+				f = library->getFileEncode(d);
+			}
+			break;
+
+		default:
+
+			break;
 		}
-		break;
-
-	case PROGRESS_MAXIMUM:
-		ui->progress_primary->setMaximum(d);
-		break;
-
-	case WORKER_STARTED:
-		switch ((WorkerType)d) {
-		case SCAN:
-
-			break;
-		case ENCODE:
-
-			break;
-		case CLOSE:
-
-			break;
-		}
-		break;
-
-	case WORKER_FINISHED:
-		switch ((WorkerType)d) {
-		case SCAN:
-
-			break;
-		case ENCODE:
-
-			break;
-		case CLOSE:
-
-			break;
-		}
-		break;
-
-	case WORKER_ITEM_CHANGED:
-		if (m.compare("SCAN") == 0) {
-			f = library->getFile(d);
-		} else if (m.compare("ENCODE") == 0) {
-			f = library->getFileEncode(d);
-		}
-		break;
-
-	default:
-
-		break;
 	}
-	//}
 }
 
 /** ================================================================================================
