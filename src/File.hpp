@@ -25,6 +25,7 @@ class File {
 	bool _loaded = false;
 
   public:
+	File();
 	File(std::string);
 	std::string path();
 	std::string pathSub();

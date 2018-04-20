@@ -4,11 +4,21 @@
 
 #include <Global.hpp>
 
-#include <QTime>
-#include <QWidget>
+#include <QtConcurrent/QtConcurrent>
+#include <QtCore/QTime>
+#include <QtWidgets/QWidget>
 #include <boost/container/vector.hpp>
+#include <string>
 
 namespace SuperEpicFuntime {
+enum EventType {
+	ERROR = 0,
+	PROGRESS_UPDATED = 1,
+	WORKER_STARTED = 2,
+	WORKER_FINISHED = 3,
+	WORKER_ITEM_CHANGED = 4,
+	DIALOG_ERROR = 99
+};
 
 /** ================================================================================================
  * (Class) Event
@@ -31,7 +41,7 @@ class Event {
 /** ================================================================================================
  * (Class) EventHandler
  */
-class EventHandler : public QObject {
+class EventHandler : public QWidget {
 	Q_OBJECT
   private:
 	boost::container::vector<Event> eventContainer;
@@ -44,23 +54,11 @@ class EventHandler : public QObject {
 	Event getEvent(int pos = 0);
 
   public slots:
+	void newEvent(EventType type, std::string message, int data = NULL);
+
+  signals:
+	void addedEvent(Event event);
 	void addEvent(EventType type, std::string message, int data = NULL);
-
-  signals:
-	void eventAdded(Event event);
-	void signal_addEvent(EventType type, std::string message, int data = NULL);
-};
-
-/** ================================================================================================
- * (Class) EventListener
- */
-class EventListener : public QObject {
-	Q_OBJECT
-  private:
-  public:
-  public slots:
-
-  signals:
 };
 
 static EventHandler *eventHandler;

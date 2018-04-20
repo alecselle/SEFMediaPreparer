@@ -6,14 +6,18 @@
 #include <File.hpp>
 #include <Global.hpp>
 
-#include <QFuture>
-#include <QTime>
 #include <QtConcurrent/QtConcurrent>
+#include <QtCore/QFuture>
+#include <QtCore/QList>
+#include <QtCore/QString>
+#include <QtCore/QStringList>
+#include <QtCore/QTime>
 #include <boost/container/vector.hpp>
 #include <boost/filesystem.hpp>
 #include <rapidjson/document.h>
 
 namespace SuperEpicFuntime {
+enum WorkerType { SCAN = 1, ENCODE = 2, CLOSE = 0 };
 
 /** ================================================================================================
  * (Class) Worker
@@ -21,10 +25,7 @@ namespace SuperEpicFuntime {
 class Worker {
   private:
 	WorkerType type;
-	QFuture<void> worker;
 	QTime timeStamp;
-
-	void run();
 
 	void scanFile(File &file);
 	void scanLibrary();
@@ -35,8 +36,11 @@ class Worker {
 	void close();
 
   public:
+	Worker();
 	Worker(WorkerType type);
 	~Worker();
+  public slots:
+	void process();
 };
 
 } // namespace SuperEpicFuntime

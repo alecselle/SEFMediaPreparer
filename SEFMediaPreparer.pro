@@ -20,7 +20,8 @@ SOURCES += \
     $$PWD/src/MediaPreparer.cpp \
     src/MediaPreparerGUI.cpp \
     src/Worker.cpp \
-    src/EventHandler.cpp
+    src/EventHandler.cpp \
+    src/Global.cpp
 
 HEADERS += \
     $$PWD/src/Settings.hpp \

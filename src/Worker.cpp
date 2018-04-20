@@ -1,5 +1,7 @@
 #include "Worker.hpp"
 
+#include <iostream>
+
 namespace bf = boost::filesystem;
 namespace bc = boost::container;
 using namespace rapidjson;
@@ -10,13 +12,20 @@ namespace SuperEpicFuntime {
 /** ================================================================================================
  * (Class) Worker
  */
-Worker::Worker(WorkerType t) {
-	timeStamp = QTime();
-	type = t;
-	worker = QtConcurrent::run(this, &Worker::run);
+Worker::Worker() {
 }
 
-void Worker::run() {
+Worker::Worker(WorkerType t) {
+	cout << "yay" << endl;
+	type = t;
+}
+
+Worker::~Worker() {
+	cout << "fuq" << endl;
+}
+
+void Worker::process() {
+	timeStamp = QTime();
 	switch (type) {
 	case SCAN:
 		scanLibrary();
@@ -34,20 +43,19 @@ void Worker::run() {
  * (Section) Scan Worker
  */
 void Worker::scanFile(File &f) {
-	eventHandler->addEvent(PROGRESS_UPDATED, "Scanning File: " + f.name(), PRIMARY);
+	emit eventHandler->addEvent(PROGRESS_UPDATED, "Scanning File: " + f.name(), 1);
+	emit eventHandler->addEvent(WORKER_ITEM_CHANGED, "SCAN", library->findFile(f));
 	QProcess process;
-	QStringList params;
+	QList<QString> params = {"-v",  "quiet", "-show_entries", "format=duration:stream=codec_type:stream=codec_name",
+							 "-of", "json",  f.path().c_str()};
 
-	params.push_back("-v");
-	params.push_back("quiet");
-	params.push_back("-show_entries");
-	params.push_back("format=duration:stream=codec_type:stream=codec_name");
-	params.push_back("-of");
-	params.push_back("json");
-	params.push_back(f.path().c_str());
+	if (bf::exists("../lib/ffprobe.exe")) {
+		process.setProgram("../lib/ffprobe");
+	} else {
+		process.setProgram("ffprobe");
+	}
 
-	process.setProgram("ffprobe");
-	process.setArguments(params);
+	process.setArguments((QStringList)params);
 
 	process.start();
 	process.waitForFinished();
@@ -57,27 +65,26 @@ void Worker::scanFile(File &f) {
 }
 
 void Worker::scanLibrary() {
-	eventHandler->addEvent(WORKER_STARTED, "Scanning Library", SCAN);
+	emit eventHandler->addEvent(WORKER_STARTED, "Scanning Library", SCAN);
 	for (int i = 0; i < (int)library->size(); i++) {
 		File &f = library->getFile(i);
 		scanFile(f);
 	}
-	eventHandler->addEvent(WORKER_FINISHED, "Finished Scanning Library", SCAN);
+	emit eventHandler->addEvent(WORKER_FINISHED, "Finished Scanning Library", SCAN);
 }
 
 /** ================================================================================================
  * (Section) Encode Worker
  */
 void Worker::encodeFile(File &f) {
-	eventHandler->addEvent(PROGRESS_UPDATED, "Scanning File: " + f.name(), PRIMARY);
+	emit eventHandler->addEvent(PROGRESS_UPDATED, "Encoding File: " + f.name(), 1);
+	emit eventHandler->addEvent(WORKER_ITEM_CHANGED, "ENCODE", library->findFileEncode(f));
 	QProcess process;
-	QStringList params;
-
-	if (bf::exists((settings->outputDir + "\\" + f.name() + "." + settings->container).c_str())) {
-		params.push_back("-y");
-	}
-	params +=
-		{"-v", "quiet", "-stats", "-hwaccel", "dxva2", "-threads", settings->threads.c_str(), "-i", f.path().c_str()};
+	QList<QString> params = {"-y",		 "-v",
+							 "quiet",	"-stats",
+							 "-hwaccel", "dxva2",
+							 "-threads", settings->threads.c_str(),
+							 "-i",		 f.path().c_str()};
 	if (f.subtitles() == 1 && settings->subtitles.compare("Embed") == 0) {
 		params += {"-i", f.pathSub().c_str()};
 	}
@@ -106,19 +113,19 @@ void Worker::encodeFile(File &f) {
 			   (settings->tempDir + "\\" + f.name() + "." + settings->container).c_str()};
 
 	process.setProgram("ffmpeg");
-	process.setArguments(params);
+	process.setArguments((QStringList)params);
 
 	process.start();
 	process.waitForFinished(-1);
 }
 
 void Worker::encodeLibrary() {
-	eventHandler->addEvent(WORKER_STARTED, "Encoding Library", ENCODE);
+	emit eventHandler->addEvent(WORKER_STARTED, "Encoding Library", ENCODE);
 	for (int i = 0; i < (int)library->sizeEncode(); i++) {
 		File &f = library->getFileEncode(i);
 		encodeFile(f);
 	}
-	eventHandler->addEvent(WORKER_FINISHED, "Finished Encoding Library", ENCODE);
+	emit eventHandler->addEvent(WORKER_FINISHED, "Finished Encoding Library", ENCODE);
 }
 
 /** ================================================================================================

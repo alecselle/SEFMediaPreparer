@@ -17,6 +17,9 @@ namespace SuperEpicFuntime {
 /** ================================================================================================
  * (Class) File
  */
+File::File() {
+}
+
 File::File(std::string file) {
 	if (bf::exists(bf::canonical(file.c_str()))) {
 		bf::path path = bf::canonical(file.c_str());

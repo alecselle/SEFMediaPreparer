@@ -10,17 +10,16 @@
 #include <Worker.hpp>
 #include <product_info.hpp>
 
-#include <QAction>
-#include <QApplication>
-#include <QFuture>
-#include <QLineEdit>
-#include <QMenu>
-#include <QObject>
-#include <QProcess>
-#include <QSystemTrayIcon>
-#include <QTime>
-#include <QWidget>
 #include <QtConcurrent/QtConcurrent>
+#include <QtCore/QFuture>
+#include <QtCore/QObject>
+#include <QtCore/QProcess>
+#include <QtCore/QTime>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QSystemTrayIcon>
+#include <QtWidgets/QWidget>
 #include <string>
 
 namespace SuperEpicFuntime {
@@ -36,19 +35,14 @@ class MediaPreparerGUI : public QWidget {
 	Q_OBJECT
   private:
 	Ui::MediaPreparer *ui;
-
 	QSignalMapper *signalMapper = new QSignalMapper(this);
 	QTimer *updateTimer = new QTimer(this);
 	QWidget *containerEncode;
 	QWidget *containerEncodeList;
+	QThread *workerThread = new QThread();
 
-	QFuture<void> workerScan;
-	QFuture<void> workerEncode;
-	QFuture<void> workercleanUp;
-	QTime workerTimeStamp;
-	QTime fileTimeStamp;
-	int scanIndex;
-	int encodeIndex;
+	Worker *worker;
+
 	bool cancelScan = false;
 	bool cancelEncode = false;
 
@@ -62,9 +56,6 @@ class MediaPreparerGUI : public QWidget {
 	void closeEvent(QCloseEvent *e);
 
   public:
-	// Settings *settings = new Settings();
-	// Library *library = new Library(settings);
-
 	explicit MediaPreparerGUI(QWidget *parent = 0);
 	~MediaPreparerGUI();
 
@@ -80,6 +71,7 @@ class MediaPreparerGUI : public QWidget {
 	void updateGUI_settings();
 	void updateGUI_timers();
 
+	void runWorker(WorkerType type);
 	void runWorker_scan();
 	void runWorker_encode();
 	void runWorker_cleanup();

@@ -34,7 +34,6 @@ MediaPreparerGUI::~MediaPreparerGUI() {
 void MediaPreparerGUI::init() {
 	initGUI();
 	initSignals();
-	eventHandler->addEvent(EventType::WORKER_STARTED, "test", 0);
 }
 
 void MediaPreparerGUI::initGUI() {
@@ -78,8 +77,8 @@ void MediaPreparerGUI::initSignals() {
 	connect(ui->setting_container, SIGNAL(currentIndexChanged(int)), this, SLOT(loadSettings_gui()));
 	connect(ui->setting_preset, SIGNAL(currentTextChanged(QString)), this, SLOT(loadSettings_preset(QString)));
 
-	// connect(new EventHandler, SIGNAL(eventAdded(Event)), this, SLOT(eventListener(Event)));
-	connect(eventHandler, SIGNAL(eventAdded(Event)), this, SLOT(eventListener(Event)));
+	// connect(new EventHandler, SIGNAL(addedEvent(Event)), this, SLOT(eventListener(Event)));
+	connect(eventHandler, SIGNAL(addedEvent(Event)), this, SLOT(eventListener(Event)));
 }
 
 void MediaPreparerGUI::loadSettings_gui() {
@@ -158,32 +157,40 @@ void MediaPreparerGUI::updateGUI_settings() {
 void MediaPreparerGUI::updateGUI_timers() {
 }
 
+void MediaPreparerGUI::runWorker(WorkerType t) {
+	Worker *w = new Worker(t);
+}
+
 void MediaPreparerGUI::runWorker_scan() {
+	QtConcurrent::run(this, &MediaPreparerGUI::runWorker, SCAN);
 }
 
 void MediaPreparerGUI::runWorker_encode() {
+	worker = new Worker(ENCODE);
 }
 
 void MediaPreparerGUI::runWorker_cleanup() {
+	worker = new Worker(CLOSE);
 }
 
 void MediaPreparerGUI::eventListener(Event e) {
 	cout << e.getType() << endl;
 	cout << e.getData() << endl;
 	cout << e.getMessage() << endl;
-	switch (e.getType()) {
+
+	EventType t = e.getType();
+	QTime ts = e.getTimeStamp();
+	string m = e.getMessage();
+	int d = e.getData();
+	File f;
+
+	switch (t) {
 	case PROGRESS_UPDATED:
-		switch ((ProgressBar)e.getData()) {
-		case PRIMARY:
-
-			break;
-		case SECONDARY:
-
-			break;
-		}
+		updateProgress_primary(d, m.c_str());
 		break;
+
 	case WORKER_STARTED:
-		switch ((WorkerType)e.getData()) {
+		switch ((WorkerType)d) {
 		case SCAN:
 
 			break;
@@ -195,8 +202,9 @@ void MediaPreparerGUI::eventListener(Event e) {
 			break;
 		}
 		break;
+
 	case WORKER_FINISHED:
-		switch ((WorkerType)e.getData()) {
+		switch ((WorkerType)d) {
 		case SCAN:
 
 			break;
@@ -208,6 +216,15 @@ void MediaPreparerGUI::eventListener(Event e) {
 			break;
 		}
 		break;
+
+	case WORKER_ITEM_CHANGED:
+		if (m.compare("SCAN") == 0) {
+			f = library->getFile(d);
+		} else if (m.compare("ENCODE") == 0) {
+			f = library->getFileEncode(d);
+		}
+		break;
+
 	default:
 
 		break;

@@ -44,9 +44,9 @@ void EventHandler::clearEvents() {
 	eventContainer.clear();
 }
 
-void EventHandler::addEvent(EventType type, string message, int data) {
+void EventHandler::newEvent(EventType type, string message, int data) {
 	eventContainer.insert(eventContainer.begin(), Event(type, message, data));
-	emit eventAdded(getEvent());
+	emit addedEvent(getEvent());
 }
 
 int EventHandler::size() {
@@ -61,9 +61,5 @@ Event EventHandler::getEvent(int pos) {
 		return Event(EventType::ERROR, "ERROR");
 	}
 }
-
-/** ================================================================================================
- * (Class) EventListener
- */
 
 } // namespace SuperEpicFuntime
