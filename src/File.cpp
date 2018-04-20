@@ -1,12 +1,5 @@
 #include "src/File.hpp"
 
-#include <QtWidgets/QWidget>
-#include <boost/algorithm/string.hpp>
-#include <boost/filesystem.hpp>
-#include <iostream>
-#include <rapidjson/document.h>
-#include <string>
-
 namespace bf = boost::filesystem;
 namespace ba = boost::algorithm;
 using namespace rapidjson;

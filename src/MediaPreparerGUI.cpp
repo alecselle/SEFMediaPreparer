@@ -1,17 +1,6 @@
 #include "src/MediaPreparerGUI.hpp"
 #include "ui_MediaPreparer.h"
 
-#include <QtCore>
-#include <QtGui>
-#include <QtWidgets>
-#include <boost/algorithm/string.hpp>
-#include <boost/container/vector.hpp>
-#include <boost/filesystem.hpp>
-#include <iostream>
-#include <rapidjson/document.h>
-#include <rapidjson/stream.h>
-#include <string>
-
 namespace bf = boost::filesystem;
 namespace bc = boost::container;
 namespace ba = boost::algorithm;
@@ -35,6 +24,9 @@ MediaPreparerGUI::~MediaPreparerGUI() {
 	saveSettings_config();
 }
 
+/** ================================================================================================
+ * (Section) Initilization
+ */
 void MediaPreparerGUI::init() {
 	initGUI();
 	initSignals();
@@ -81,10 +73,12 @@ void MediaPreparerGUI::initSignals() {
 	connect(ui->setting_container, SIGNAL(currentIndexChanged(int)), this, SLOT(loadSettings_gui()));
 	connect(ui->setting_preset, SIGNAL(currentTextChanged(QString)), this, SLOT(loadSettings_preset(QString)));
 
-	// connect(new EventHandler, SIGNAL(addedEvent(Event)), this, SLOT(eventListener(Event)));
 	connect(eventHandler, SIGNAL(addedEvent(Event)), this, SLOT(eventListener(Event)));
 }
 
+/** ================================================================================================
+ * (Section) Load Settings
+ */
 void MediaPreparerGUI::loadSettings_gui() {
 	settings->vCodec = ba::trim_copy(ui->setting_vCodec->currentText().toStdString());
 	settings->aCodec = ba::trim_copy(ui->setting_aCodec->currentText().toStdString());
@@ -144,6 +138,9 @@ void MediaPreparerGUI::loadSettings_presets() {
 	}
 }
 
+/** ================================================================================================
+ * (Section) Save Settings
+ */
 void MediaPreparerGUI::saveSettings_config() {
 	loadSettings_gui();
 	settings->saveConfig();
@@ -155,54 +152,137 @@ void MediaPreparerGUI::saveSettings_preset(QString preset) {
 	loadSettings_preset(preset);
 }
 
+/** ================================================================================================
+ * (Section) Update GUI
+ */
 void MediaPreparerGUI::updateGUI_settings() {
 }
 
 void MediaPreparerGUI::updateGUI_timers() {
 }
 
-void MediaPreparerGUI::runWorker(WorkerType t) {
-	cout << "Worker Scanning " << library->size() << endl;
+void MediaPreparerGUI::updateProgress_primary(int progress, QString msg) {
+	ui->progress_primary->setValue(progress);
+	if (msg != NULL) {
+		ui->progress_primary->setFormat(msg);
+	}
+}
+
+void MediaPreparerGUI::updateProgress_secondary(int progress, QString msg) {
+	ui->progress_secondary->setValue(progress);
+	if (msg != NULL) {
+		ui->progress_secondary->setFormat(msg);
+	}
+}
+
+/** ================================================================================================
+ * (Section) Workers
+ */
+void MediaPreparerGUI::runWorker_scan() {
+	worker = QtConcurrent::run(this, &MediaPreparerGUI::scanLibrary);
+}
+
+void MediaPreparerGUI::runWorker_encode() {
+	encodeLibrary();
+}
+
+void MediaPreparerGUI::runWorker_cleanup() {
+}
+
+/** ================================================================================================
+ * (Section) Scan Worker
+ */
+void MediaPreparerGUI::scanFile(File &f) {
+	emit eventHandler->addEvent(PROGRESS_UPDATED, "Scanning File: " + f.name(), 1);
+	emit eventHandler->addEvent(WORKER_ITEM_CHANGED, "SCAN", library->findFile(f));
+	QProcess process;
+	QList<QString> params = {"-v",  "quiet", "-show_entries", "format=duration:stream=codec_type:stream=codec_name",
+							 "-of", "json",  f.path().c_str()};
+
+	if (bf::exists("../lib/ffprobe.exe")) {
+		process.setProgram("../lib/ffprobe");
+	} else {
+		process.setProgram("ffprobe");
+	}
+
+	process.setArguments((QStringList)params);
+
+	process.start();
+	process.waitForFinished();
+
+	StringStream out(process.readAllStandardOutput());
+	f.loadFileInfo(out);
+}
+
+void MediaPreparerGUI::scanLibrary() {
 	emit eventHandler->addEvent(WORKER_STARTED, "Scanning Library", SCAN);
 	library->scan();
 	for (int i = 0; i < (int)library->size(); i++) {
 		File &f = library->getFile(i);
-		emit eventHandler->addEvent(PROGRESS_UPDATED, "Scanning File: " + f.name(), 1);
-		emit eventHandler->addEvent(WORKER_ITEM_CHANGED, "SCAN", library->findFile(f));
-		QProcess process;
-		QList<QString> params = {"-v",  "quiet", "-show_entries", "format=duration:stream=codec_type:stream=codec_name",
-								 "-of", "json",  f.path().c_str()};
-
-		if (bf::exists("../lib/ffprobe.exe")) {
-			process.setProgram("../lib/ffprobe");
-		} else {
-			process.setProgram("ffprobe");
-		}
-
-		process.setArguments((QStringList)params);
-
-		process.start();
-		process.waitForFinished();
-
-		StringStream out(process.readAllStandardOutput());
-		f.loadFileInfo(out);
+		scanFile(f);
 	}
 	library->scanEncode();
 	emit eventHandler->addEvent(WORKER_FINISHED, "Finished Scanning Library", SCAN);
 }
 
-void MediaPreparerGUI::runWorker_scan() {
-	runWorker(SCAN);
+/** ================================================================================================
+ * (Section) Encode Worker
+ */
+void MediaPreparerGUI::encodeFile(File &f) {
+	emit eventHandler->addEvent(PROGRESS_UPDATED, "Encoding File: " + f.name(), 1);
+	emit eventHandler->addEvent(WORKER_ITEM_CHANGED, "ENCODE", library->findFileEncode(f));
+	QProcess process;
+	QList<QString> params = {"-y",		 "-v",
+							 "quiet",	"-stats",
+							 "-hwaccel", "dxva2",
+							 "-threads", settings->threads.c_str(),
+							 "-i",		 f.path().c_str()};
+	if (f.subtitles() == 1 && settings->subtitles.compare("Embed") == 0) {
+		params += {"-i", f.pathSub().c_str()};
+	}
+	params += {"-map", "0:0", "-map", "0:1?"};
+	if (f.subtitles() == 1 && settings->subtitles.compare("Embed") == 0) {
+		params += {"-map", "1:0"};
+	}
+	if (f.subtitles() > 0 && settings->subtitles.compare("Remove") != 0) {
+		params += {"-map", "0:2?", "-c:s", "srt", "-metadata:s:s:0", "language=eng", "-disposition:s:0", "default"};
+	}
+	params += {"-c:v", settings->vCodec.c_str(), "-crf", settings->vQuality.c_str(),
+			   "-c:a", settings->aCodec.c_str(), "-b:a", (settings->aQuality + "k").c_str()};
+	if (!settings->extraParams.empty()) {
+		char s[2048];
+		strcpy(s, settings->extraParams.c_str());
+		for (char *p = strtok(s, " "); p != NULL; p = strtok(NULL, " ")) {
+			params.push_back(p);
+		}
+	}
+	params += {"-metadata",
+			   ("title=" + f.name()).c_str(),
+			   "-metadata",
+			   "comment=Processed by SuperEpicFuntime Media Preparer",
+			   "-strict",
+			   "-2",
+			   (settings->tempDir + "\\" + f.name() + "." + settings->container).c_str()};
+
+	process.setProgram("ffmpeg");
+	process.setArguments((QStringList)params);
+
+	process.start();
+	process.waitForFinished(-1);
 }
 
-void MediaPreparerGUI::runWorker_encode() {
-	runWorker(ENCODE);
+void MediaPreparerGUI::encodeLibrary() {
+	emit eventHandler->addEvent(WORKER_STARTED, "Encoding Library", ENCODE);
+	for (int i = 0; i < (int)library->sizeEncode(); i++) {
+		File &f = library->getFileEncode(i);
+		encodeFile(f);
+	}
+	emit eventHandler->addEvent(WORKER_FINISHED, "Finished Encoding Library", ENCODE);
 }
 
-void MediaPreparerGUI::runWorker_cleanup() {
-	runWorker(CLOSE);
-}
-
+/** ================================================================================================
+ * (Section) Event Listener
+ */
 void MediaPreparerGUI::eventListener(Event e) {
 	cout << e.getType() << endl;
 	cout << e.getData() << endl;
@@ -261,12 +341,9 @@ void MediaPreparerGUI::eventListener(Event e) {
 	}
 }
 
-void MediaPreparerGUI::updateProgress_primary(int progress, QString msg) {
-}
-
-void MediaPreparerGUI::updateProgress_secondary(int progress, QString msg) {
-}
-
+/** ================================================================================================
+ * (Section) Dialogs
+ */
 void MediaPreparerGUI::dialogBrowse(int type) {
 	QFileDialog dialog(this);
 	dialog.setFileMode(QFileDialog::DirectoryOnly);
@@ -299,6 +376,9 @@ void MediaPreparerGUI::dialogSave() {
 void MediaPreparerGUI::dialogCancel() {
 }
 
+/** ================================================================================================
+ * (Section) Utilities
+ */
 void MediaPreparerGUI::log(QString msg) {
 }
 

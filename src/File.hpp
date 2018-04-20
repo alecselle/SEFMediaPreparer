@@ -2,6 +2,10 @@
 #define FILE_HPP
 #pragma once
 
+#include <QtWidgets/QWidget>
+#include <boost/algorithm/string.hpp>
+#include <boost/filesystem.hpp>
+#include <iostream>
 #include <rapidjson/document.h>
 #include <string>
 

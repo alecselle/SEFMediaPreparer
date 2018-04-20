@@ -3,11 +3,10 @@
 #pragma once
 
 #include <Global.hpp>
-
-#include <QtConcurrent/QtConcurrent>
 #include <QtCore/QTime>
 #include <QtWidgets/QWidget>
 #include <boost/container/vector.hpp>
+#include <iostream>
 #include <string>
 
 namespace SuperEpicFuntime {
@@ -19,6 +18,7 @@ enum EventType {
 	WORKER_ITEM_CHANGED = 4,
 	DIALOG_ERROR = 99
 };
+enum WorkerType { SCAN = 1, ENCODE = 2, CLOSE = 0 };
 
 /** ================================================================================================
  * (Class) Event
@@ -41,7 +41,7 @@ class Event {
 /** ================================================================================================
  * (Class) EventHandler
  */
-class EventHandler : public QWidget {
+class EventHandler : public QObject {
 	Q_OBJECT
   private:
 	boost::container::vector<Event> eventContainer;

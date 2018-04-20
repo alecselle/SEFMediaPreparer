@@ -1,16 +1,5 @@
 #include "src/Settings.hpp"
 
-#include "rapidjson/filereadstream.h"
-#include <boost/algorithm/string.hpp>
-#include <boost/container/vector.hpp>
-#include <boost/filesystem.hpp>
-#include <cstdio>
-#include <iostream>
-#include <rapidjson/document.h>
-#include <rapidjson/filewritestream.h>
-#include <rapidjson/prettywriter.h>
-#include <string>
-
 namespace bf = boost::filesystem;
 namespace bc = boost::container;
 namespace ba = boost::algorithm;

@@ -1,8 +1,5 @@
 #include "EventHandler.hpp"
 
-#include <boost/container/vector.hpp>
-#include <iostream>
-
 namespace bc = boost::container;
 using namespace std;
 
@@ -45,6 +42,7 @@ void EventHandler::clearEvents() {
 }
 
 void EventHandler::newEvent(EventType type, string message, int data) {
+	cout << type << " - " << message << " : " << data << endl;
 	eventContainer.insert(eventContainer.begin(), Event(type, message, data));
 	emit addedEvent(getEvent());
 }

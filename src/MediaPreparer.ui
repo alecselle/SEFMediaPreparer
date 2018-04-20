@@ -182,7 +182,7 @@
         </sizepolicy>
        </property>
        <property name="currentIndex">
-        <number>2</number>
+        <number>3</number>
        </property>
        <widget class="QWidget" name="container_settings_basic">
         <attribute name="title">
@@ -507,7 +507,7 @@
         <attribute name="title">
          <string>Encode</string>
         </attribute>
-        <widget class="QProgressBar" name="progress_encode">
+        <widget class="QProgressBar" name="progress_secondary">
          <property name="enabled">
           <bool>true</bool>
          </property>
@@ -989,7 +989,7 @@
       </widget>
      </item>
      <item row="0" column="0">
-      <widget class="QProgressBar" name="progress_worker">
+      <widget class="QProgressBar" name="progress_primary">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
          <horstretch>0</horstretch>

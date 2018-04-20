@@ -1,11 +1,4 @@
 #include "src/Library.hpp"
-#include <src/File.hpp>
-#include <src/Settings.hpp>
-
-#include <boost/container/vector.hpp>
-#include <boost/filesystem.hpp>
-#include <iostream>
-#include <string>
 
 namespace bf = boost::filesystem;
 namespace bc = boost::container;
