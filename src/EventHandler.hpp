@@ -1,13 +1,18 @@
 #ifndef EVENTHANDLER_HPP
 #define EVENTHANDLER_HPP
+#pragma once
+
+#include <Global.hpp>
 
 #include <QTime>
 #include <QWidget>
 #include <boost/container/vector.hpp>
 
 namespace SuperEpicFuntime {
-enum EventType { ERROR = 0, WORKER_STARTED = 1, WORKER_FINISHED = 2, PROGRESS_UPDATED = 3 };
 
+/** ================================================================================================
+ * (Class) Event
+ */
 class Event {
   private:
 	EventType type;
@@ -23,27 +28,42 @@ class Event {
 	int getData();
 };
 
-class EventHandler : public QWidget {
+/** ================================================================================================
+ * (Class) EventHandler
+ */
+class EventHandler : public QObject {
 	Q_OBJECT
   private:
-	boost::container::vector<Event> events;
+	boost::container::vector<Event> eventContainer;
 
   public:
 	EventHandler();
 
 	void clearEvents();
-
-	Event getEvent(int pos);
-	Event getEvent();
 	int size();
+	Event getEvent(int pos = 0);
+
   public slots:
 	void addEvent(EventType type, std::string message, int data = NULL);
-	void addEvent(Event event);
 
   signals:
 	void eventAdded(Event event);
 	void signal_addEvent(EventType type, std::string message, int data = NULL);
-	void signal_addEvent(Event event);
 };
+
+/** ================================================================================================
+ * (Class) EventListener
+ */
+class EventListener : public QObject {
+	Q_OBJECT
+  private:
+  public:
+  public slots:
+
+  signals:
+};
+
+static EventHandler *eventHandler;
+
 } // namespace SuperEpicFuntime
 #endif // EVENTHANDLER_HPP

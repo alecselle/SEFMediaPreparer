@@ -2,10 +2,10 @@
 #define MEDIAPREPARER_HPP
 #pragma once
 
-#include "src/product_info.hpp"
 #include <src/File.hpp>
 #include <src/Library.hpp>
 #include <src/Settings.hpp>
+#include <src/product_info.hpp>
 
 #include <QtConcurrent/QtConcurrent>
 #include <QtCore/QFuture>
@@ -61,7 +61,7 @@ class MediaPreparer : public QWidget {
 
   public:
 	SuperEpicFuntime::Settings *settings = new SuperEpicFuntime::Settings();
-	SuperEpicFuntime::Library *library = new SuperEpicFuntime::Library(settings);
+	SuperEpicFuntime::Library *library = new SuperEpicFuntime::Library();
 
 	explicit MediaPreparer(QWidget *parent = 0);
 

@@ -16,8 +16,14 @@ using namespace std;
 
 namespace SuperEpicFuntime {
 
+/** ================================================================================================
+ * (Class) MediaPreparer
+ */
 MediaPreparerGUI::MediaPreparerGUI(QWidget *parent) : QWidget(parent), ui(new Ui::MediaPreparer) {
 	ui->setupUi(this);
+	eventHandler = new EventHandler();
+	settings = new Settings();
+	library = new Library();
 	init();
 }
 
@@ -28,7 +34,7 @@ MediaPreparerGUI::~MediaPreparerGUI() {
 void MediaPreparerGUI::init() {
 	initGUI();
 	initSignals();
-	emit eventHandler->signal_addEvent(EventType::WORKER_STARTED, "test", 0);
+	eventHandler->addEvent(EventType::WORKER_STARTED, "test", 0);
 }
 
 void MediaPreparerGUI::initGUI() {
@@ -167,14 +173,11 @@ void MediaPreparerGUI::eventListener(Event e) {
 	cout << e.getMessage() << endl;
 	switch (e.getType()) {
 	case PROGRESS_UPDATED:
-		switch (e.getData()) {
-		case 1:
+		switch ((ProgressBar)e.getData()) {
+		case PRIMARY:
 
 			break;
-		case 2:
-
-			break;
-		default:
+		case SECONDARY:
 
 			break;
 		}
@@ -187,7 +190,7 @@ void MediaPreparerGUI::eventListener(Event e) {
 		case ENCODE:
 
 			break;
-		default:
+		case CLOSE:
 
 			break;
 		}
@@ -200,7 +203,7 @@ void MediaPreparerGUI::eventListener(Event e) {
 		case ENCODE:
 
 			break;
-		default:
+		case CLOSE:
 
 			break;
 		}

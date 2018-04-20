@@ -8,6 +8,9 @@ using namespace std;
 
 namespace SuperEpicFuntime {
 
+/** ================================================================================================
+ * (Class) Event
+ */
 Event::Event(EventType t, string m, int d) {
 	type = t;
 	timeStamp = QTime();
@@ -31,39 +34,36 @@ int Event::getData() {
 	return data;
 }
 
+/** ================================================================================================
+ * (Class) EventHandler
+ */
 EventHandler::EventHandler() {
-	connect(this, SIGNAL(signal_addEvent(EventType, std::string, int)), this,
-			SLOT(addEvent(EventType, std::string, int)));
-	connect(this, SIGNAL(signal_addEvent(Event)), this, SLOT(addEvent(Event)));
 }
 
 void EventHandler::clearEvents() {
-	events.clear();
+	eventContainer.clear();
 }
 
 void EventHandler::addEvent(EventType type, string message, int data) {
-	events.insert(events.begin(), Event(type, message, data));
+	eventContainer.insert(eventContainer.begin(), Event(type, message, data));
 	emit eventAdded(getEvent());
 }
 
-void EventHandler::addEvent(Event event) {
-	events.insert(events.begin(), event);
+int EventHandler::size() {
+	return eventContainer.size();
 }
 
 Event EventHandler::getEvent(int pos) {
 	try {
-		return events.at(pos);
+		return eventContainer.at(pos);
 	} catch (const std::out_of_range) {
 		cout << "[ERROR] [OUT_OF_RANGE] getEvent(" << pos << ");" << endl;
 		return Event(EventType::ERROR, "ERROR");
 	}
 }
 
-Event EventHandler::getEvent() {
-	return getEvent(0);
-}
+/** ================================================================================================
+ * (Class) EventListener
+ */
 
-int EventHandler::size() {
-	return events.size();
-}
 } // namespace SuperEpicFuntime

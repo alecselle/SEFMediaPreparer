@@ -18,6 +18,10 @@ using namespace rapidjson;
 using namespace std;
 
 namespace SuperEpicFuntime {
+
+/** ================================================================================================
+ * (Class) Settings
+ */
 Settings::Settings() {
 	if (!bf::exists(BASE_DIR)) {
 		bf::create_directories(BASE_DIR);

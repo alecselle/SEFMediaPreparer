@@ -2,12 +2,13 @@
 #define MEDIAPREPARERGUI_HPP
 #pragma once
 
-#include "src/EventHandler.hpp"
-#include "src/File.hpp"
-#include "src/Library.hpp"
-#include "src/Settings.hpp"
-#include "src/Worker.hpp"
-#include "src/product_info.hpp"
+#include <EventHandler.hpp>
+#include <File.hpp>
+#include <Global.hpp>
+#include <Library.hpp>
+#include <Settings.hpp>
+#include <Worker.hpp>
+#include <product_info.hpp>
 
 #include <QtConcurrent/QtConcurrent>
 #include <QtCore/QFuture>
@@ -23,13 +24,13 @@
 
 namespace SuperEpicFuntime {
 
-static SuperEpicFuntime::EventHandler *eventHandler = new SuperEpicFuntime::EventHandler();
-static SuperEpicFuntime::Settings *settings = new SuperEpicFuntime::Settings();
-static SuperEpicFuntime::Library *library = new SuperEpicFuntime::Library(settings);
-
 namespace Ui {
 class MediaPreparer;
 }
+
+/** ================================================================================================
+ * (Class) MediaPreparer
+ */
 class MediaPreparerGUI : public QWidget {
 	Q_OBJECT
   private:

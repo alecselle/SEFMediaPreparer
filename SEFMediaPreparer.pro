@@ -30,7 +30,8 @@ HEADERS += \
     $$PWD/src/product_info.hpp \
     src/MediaPreparerGUI.hpp \
     src/Worker.hpp \
-    src/EventHandler.hpp
+    src/EventHandler.hpp \
+    src/Global.hpp
 
 FORMS += \
     $$PWD/src/MediaPreparer.ui
@@ -51,9 +52,13 @@ LIBS += \
     -L$$PWD/lib/
 
 INCLUDEPATH += \
+    $$PWD/src \
+    $$PWD/include \
     $$(INCLUDE)
 
 DEPENDPATH += \
+    $$PWD/src \
+    $$PWD/include \
     $$(INCLUDE)
 
 DEFINES += \

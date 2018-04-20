@@ -2,8 +2,7 @@
 #define SETTINGS_HPP
 #pragma once
 
-#include "src/EventHandler.hpp"
-#include "src/product_info.hpp"
+#include <product_info.hpp>
 
 #include <boost/container/vector.hpp>
 #include <boost/filesystem.hpp>
@@ -11,6 +10,10 @@
 #include <string>
 
 namespace SuperEpicFuntime {
+
+/** ================================================================================================
+ * (Class) Settings
+ */
 class Settings {
   private:
 	const std::string APPDATA = getenv("APPDATA");
@@ -59,8 +62,6 @@ class Settings {
 	std::string presetName, vCodec, aCodec, vQuality, aQuality, subtitles, extraParams, threads, container;
 	bool preserveLog;
 
-	static EventHandler *eventHandler;
-
 	Settings();
 
 	void loadConfig();
@@ -75,5 +76,8 @@ class Settings {
 	void refreshPresets();
 	void createDefaultPreset();
 };
+
+static Settings *settings;
+
 } // namespace SuperEpicFuntime
 #endif // SETTINGS_HPP

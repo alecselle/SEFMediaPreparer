@@ -6,6 +6,10 @@
 #include <string>
 
 namespace SuperEpicFuntime {
+
+/** ================================================================================================
+ * (Class) File
+ */
 class File {
   private:
 	std::string _path;
@@ -21,7 +25,6 @@ class File {
 	bool _loaded = false;
 
   public:
-	File();
 	File(std::string);
 	std::string path();
 	std::string pathSub();
@@ -35,5 +38,6 @@ class File {
 	bool loadFileInfo(rapidjson::StringStream ss);
 	bool isLoaded();
 };
+
 } // namespace SuperEpicFuntime
 #endif // FILE_HPP

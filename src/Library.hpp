@@ -2,8 +2,8 @@
 #define LIBRARY_HPP
 #pragma once
 
-#include <src/File.hpp>
-#include <src/Settings.hpp>
+#include <File.hpp>
+#include <Settings.hpp>
 
 #include <boost/container/vector.hpp>
 #include <boost/filesystem.hpp>
@@ -11,6 +11,10 @@
 #include <string>
 
 namespace SuperEpicFuntime {
+
+/** ================================================================================================
+ * (Class) Library
+ */
 class Library {
   private:
 	bool _hasSettings = false;
@@ -24,13 +28,10 @@ class Library {
 														 ".mp4", ".mpeg", ".mpg",  ".mov", ".qt",  ".flv"};
 	int _duration = -1;
 
-	SuperEpicFuntime::Settings *_settings = new Settings();
-
   public:
-	Library(SuperEpicFuntime::Settings *settingsObject);
+	Library();
 	bool Init(std::string, bool scanRecursive = false);
 	bool setDirectory(std::string directoryPath, bool scanRecursive = true, bool scanNow = false);
-	void setSettings(SuperEpicFuntime::Settings *settingsObject);
 	void setRecursive(bool scanRecursive = true, bool scanNow = false);
 
 	bool isValid(bool hasSettings = true, bool isInitialized = true, bool isChecked = true);
@@ -69,5 +70,8 @@ class Library {
 	bool skipEncode(SuperEpicFuntime::File fileObject);
 	bool skipEncode(std::string filePath);
 };
+
+static Library *library;
+
 } // namespace SuperEpicFuntime
 #endif // LIBRARY_HPP
