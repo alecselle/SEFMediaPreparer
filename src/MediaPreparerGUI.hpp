@@ -88,7 +88,7 @@ class MediaPreparerGUI : public QWidget {
 	void runWorker_encode();
 	void runWorker_cleanup();
 
-	void eventListener(Event event);
+	void eventListener(int pos = 0);
 
 	void updateProgress_primary(int progress = 0, QString msg = NULL);
 	void updateProgress_secondary(int progress = 0, QString msg = NULL);

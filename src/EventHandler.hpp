@@ -57,7 +57,7 @@ class EventHandler : public QObject {
 	void newEvent(EventType type, std::string message, int data = NULL);
 
   signals:
-	void addedEvent(Event event);
+	void addedEvent(int pos);
 	void addEvent(EventType type, std::string message, int data = NULL);
 };
 

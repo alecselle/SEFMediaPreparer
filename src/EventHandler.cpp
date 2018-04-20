@@ -44,7 +44,7 @@ void EventHandler::clearEvents() {
 void EventHandler::newEvent(EventType type, string message, int data) {
 	cout << type << " - " << message << " : " << data << endl;
 	eventContainer.insert(eventContainer.begin(), Event(type, message, data));
-	emit addedEvent(getEvent());
+	emit addedEvent(0);
 }
 
 int EventHandler::size() {

@@ -16,7 +16,7 @@ MediaPreparerGUI::MediaPreparerGUI(QWidget *parent) : QWidget(parent), ui(new Ui
 	ui->setupUi(this);
 	eventHandler = new EventHandler();
 	settings = new Settings();
-	library = new Library(settings);
+	library = new Library();
 	init();
 }
 
@@ -73,7 +73,7 @@ void MediaPreparerGUI::initSignals() {
 	connect(ui->setting_container, SIGNAL(currentIndexChanged(int)), this, SLOT(loadSettings_gui()));
 	connect(ui->setting_preset, SIGNAL(currentTextChanged(QString)), this, SLOT(loadSettings_preset(QString)));
 
-	connect(eventHandler, SIGNAL(addedEvent(Event)), this, SLOT(eventListener(Event)));
+	connect(eventHandler, SIGNAL(addedEvent(int)), this, SLOT(eventListener(int)));
 }
 
 /** ================================================================================================
@@ -193,8 +193,7 @@ void MediaPreparerGUI::runWorker_cleanup() {
  * (Section) Scan Worker
  */
 void MediaPreparerGUI::scanFile(File &f) {
-	emit eventHandler->addEvent(PROGRESS_UPDATED, "Scanning File: " + f.name(), 1);
-	emit eventHandler->addEvent(WORKER_ITEM_CHANGED, "SCAN", library->findFile(f));
+	eventHandler->newEvent(WORKER_ITEM_CHANGED, "SCAN", library->findFile(f));
 	QProcess process;
 	QList<QString> params = {"-v",  "quiet", "-show_entries", "format=duration:stream=codec_type:stream=codec_name",
 							 "-of", "json",  f.path().c_str()};
@@ -215,22 +214,24 @@ void MediaPreparerGUI::scanFile(File &f) {
 }
 
 void MediaPreparerGUI::scanLibrary() {
-	emit eventHandler->addEvent(WORKER_STARTED, "Scanning Library", SCAN);
+	eventHandler->newEvent(WORKER_STARTED, "Scanning Library", SCAN);
 	library->scan();
-	for (int i = 0; i < (int)library->size(); i++) {
+	cout << library->size() << endl;
+	for (int i = 0; i < library->size(); i++) {
 		File &f = library->getFile(i);
+		eventHandler->newEvent(PROGRESS_UPDATED, "Scanning File: " + f.name(), i);
 		scanFile(f);
 	}
 	library->scanEncode();
-	emit eventHandler->addEvent(WORKER_FINISHED, "Finished Scanning Library", SCAN);
+	eventHandler->newEvent(WORKER_FINISHED, "Finished Scanning Library", SCAN);
 }
 
 /** ================================================================================================
  * (Section) Encode Worker
  */
 void MediaPreparerGUI::encodeFile(File &f) {
-	emit eventHandler->addEvent(PROGRESS_UPDATED, "Encoding File: " + f.name(), 1);
-	emit eventHandler->addEvent(WORKER_ITEM_CHANGED, "ENCODE", library->findFileEncode(f));
+	eventHandler->newEvent(PROGRESS_UPDATED, "Encoding File: " + f.name(), 1);
+	eventHandler->newEvent(WORKER_ITEM_CHANGED, "ENCODE", library->findFileEncode(f));
 	QProcess process;
 	QList<QString> params = {"-y",		 "-v",
 							 "quiet",	"-stats",
@@ -272,22 +273,19 @@ void MediaPreparerGUI::encodeFile(File &f) {
 }
 
 void MediaPreparerGUI::encodeLibrary() {
-	emit eventHandler->addEvent(WORKER_STARTED, "Encoding Library", ENCODE);
+	eventHandler->newEvent(WORKER_STARTED, "Encoding Library", ENCODE);
 	for (int i = 0; i < (int)library->sizeEncode(); i++) {
 		File &f = library->getFileEncode(i);
 		encodeFile(f);
 	}
-	emit eventHandler->addEvent(WORKER_FINISHED, "Finished Encoding Library", ENCODE);
+	eventHandler->newEvent(WORKER_FINISHED, "Finished Encoding Library", ENCODE);
 }
 
 /** ================================================================================================
  * (Section) Event Listener
  */
-void MediaPreparerGUI::eventListener(Event e) {
-	cout << e.getType() << endl;
-	cout << e.getData() << endl;
-	cout << e.getMessage() << endl;
-
+void MediaPreparerGUI::eventListener(int pos) {
+	Event e = eventHandler->getEvent();
 	EventType t = e.getType();
 	QTime ts = e.getTimeStamp();
 	string m = e.getMessage();

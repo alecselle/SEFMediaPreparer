@@ -61,7 +61,7 @@ class MediaPreparer : public QWidget {
 
   public:
 	SuperEpicFuntime::Settings *settings = new SuperEpicFuntime::Settings();
-	SuperEpicFuntime::Library *library = new SuperEpicFuntime::Library(settings);
+	SuperEpicFuntime::Library *library = new SuperEpicFuntime::Library();
 
 	explicit MediaPreparer(QWidget *parent = 0);
 
