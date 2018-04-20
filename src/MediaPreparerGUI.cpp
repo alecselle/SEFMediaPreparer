@@ -162,7 +162,9 @@ void MediaPreparerGUI::updateGUI_timers() {
  * (Section) Workers
  */
 void MediaPreparerGUI::runWorker_scan() {
-	worker = QtConcurrent::run(this, &MediaPreparerGUI::scanLibrary);
+	if (!worker.isRunning()) {
+		worker = QtConcurrent::run(this, &MediaPreparerGUI::scanLibrary);
+	}
 }
 
 void MediaPreparerGUI::runWorker_encode() {
