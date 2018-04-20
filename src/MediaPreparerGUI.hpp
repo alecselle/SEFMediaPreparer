@@ -10,16 +10,17 @@
 #include <Worker.hpp>
 #include <product_info.hpp>
 
+#include <QAction>
+#include <QApplication>
+#include <QFuture>
+#include <QLineEdit>
+#include <QMenu>
+#include <QObject>
+#include <QProcess>
+#include <QSystemTrayIcon>
+#include <QTime>
+#include <QWidget>
 #include <QtConcurrent/QtConcurrent>
-#include <QtCore/QFuture>
-#include <QtCore/QObject>
-#include <QtCore/QProcess>
-#include <QtCore/QTime>
-#include <QtWidgets/QAction>
-#include <QtWidgets/QLineEdit>
-#include <QtWidgets/QMenu>
-#include <QtWidgets/QSystemTrayIcon>
-#include <QtWidgets/QWidget>
 #include <string>
 
 namespace SuperEpicFuntime {
