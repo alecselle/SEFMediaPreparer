@@ -74,10 +74,12 @@ class MediaPreparerGUI : public QWidget {
 	void loadSettings_gui();
 	void loadSettings_config();
 	void loadSettings_preset(QString preset);
+	void loadSettings_preset();
 	void loadSettings_presets();
 
 	void saveSettings_config();
 	void saveSettings_preset(QString preset);
+	void saveSettings_preset();
 
 	void updateGUI_settings();
 	void updateGUI_timers();
@@ -94,6 +96,7 @@ class MediaPreparerGUI : public QWidget {
 
 	bool cancel();
 
+	void lockUI(bool b = true);
 	void log(QString msg);
 	void blockSignals(bool b);
 

@@ -36,7 +36,7 @@ void MediaPreparerGUI::init() {
 
 void MediaPreparerGUI::initGUI() {
 	loadSettings_config();
-	loadSettings_preset(settings->presetPath.c_str());
+	loadSettings_preset();
 }
 
 void MediaPreparerGUI::initSignals() {
@@ -130,6 +130,10 @@ void MediaPreparerGUI::loadSettings_preset(QString preset) {
 	blockSignals(false);
 }
 
+void MediaPreparerGUI::loadSettings_preset() {
+	loadSettings_preset(settings->presetPath.c_str());
+}
+
 void MediaPreparerGUI::loadSettings_presets() {
 	ui->setting_preset->clear();
 	settings->refreshPresets();
@@ -144,12 +148,19 @@ void MediaPreparerGUI::loadSettings_presets() {
 void MediaPreparerGUI::saveSettings_config() {
 	loadSettings_gui();
 	settings->saveConfig();
+	loadSettings_config();
 }
 
 void MediaPreparerGUI::saveSettings_preset(QString preset) {
 	loadSettings_gui();
 	settings->savePresetAs(preset.toStdString());
 	loadSettings_preset(preset);
+}
+
+void MediaPreparerGUI::saveSettings_preset() {
+	loadSettings_gui();
+	settings->savePreset();
+	loadSettings_preset(settings->presetPath.c_str());
 }
 
 /** ================================================================================================
@@ -167,8 +178,6 @@ void MediaPreparerGUI::updateGUI_timers() {
 void MediaPreparerGUI::runWorker_scan() {
 	if (!worker.isRunning()) {
 		worker = QtConcurrent::run(this, &MediaPreparerGUI::scanLibrary);
-	} else {
-		cancel();
 	}
 }
 
@@ -187,15 +196,14 @@ void MediaPreparerGUI::runWorker_cleanup() {
  * (Section) Scan Worker
  */
 void MediaPreparerGUI::scanLibrary() {
-	eventHandler->newEvent(WORKER_STARTED, SCAN);
+	eventHandler->newEvent(WORKER_STARTED, "Scanning Library", SCAN);
+	loadSettings_gui();
 	library->scan();
-	eventHandler->newEvent(PROGRESS_UPDATED, "Scanning Library", 0);
 	eventHandler->newEvent(PROGRESS_MAXIMUM, library->size() - 1);
 	for (int i = 0; !cancelWorker && i < library->size(); i++) {
 		File &f = library->getFile(i);
 		// eventHandler->newEvent(WORKER_ITEM_CHANGED, "SCAN", i);
-		eventHandler->newEvent(PROGRESS_UPDATED, "Scanning File: " + f.name(), i);
-		eventHandler->newEvent(WORKER_ITEM_CHANGED, i);
+		eventHandler->newEvent(WORKER_ITEM_CHANGED, "Scanning File: " + f.name(), i);
 		QList<QString> params = {"-v",  "quiet", "-show_entries", "format=duration:stream=codec_type:stream=codec_name",
 								 "-of", "json",  f.path().c_str()};
 		QProcess process;
@@ -209,11 +217,9 @@ void MediaPreparerGUI::scanLibrary() {
 	}
 	library->scanEncode();
 	if (cancelWorker) {
-		eventHandler->newEvent(WORKER_FINISHED, SCAN, true);
-		eventHandler->newEvent(PROGRESS_UPDATED, "Cancelled Scanning Library", 0);
+		eventHandler->newEvent(WORKER_FINISHED, "Cancelled Scanning Library", SCAN, true);
 	} else {
-		eventHandler->newEvent(WORKER_FINISHED, SCAN, false);
-		eventHandler->newEvent(PROGRESS_UPDATED, "Finished Scanning Library", library->size());
+		eventHandler->newEvent(WORKER_FINISHED, "Finished Scanning Library", SCAN, false);
 	}
 }
 
@@ -221,14 +227,13 @@ void MediaPreparerGUI::scanLibrary() {
  * (Section) Encode Worker
  */
 void MediaPreparerGUI::encodeLibrary() {
-	eventHandler->newEvent(WORKER_STARTED, ENCODE);
+	eventHandler->newEvent(WORKER_STARTED, "Encoding Library", ENCODE);
+	loadSettings_gui();
 	library->scanEncode();
-	eventHandler->newEvent(PROGRESS_UPDATED, "Encoding Library", 0);
 	eventHandler->newEvent(PROGRESS_MAXIMUM, library->sizeEncode() - 1);
 	for (int i = 0; !cancelWorker && i < (int)library->sizeEncode(); i++) {
 		File &f = library->getFileEncode(i);
-		eventHandler->newEvent(PROGRESS_UPDATED, "Encoding File: " + f.name(), i);
-		eventHandler->newEvent(WORKER_ITEM_CHANGED, i);
+		eventHandler->newEvent(WORKER_ITEM_CHANGED, "Encoding File: " + f.name(), i);
 		QList<QString> params = {"-y",		 "-v",
 								 "quiet",	"-stats",
 								 "-hwaccel", "dxva2",
@@ -265,11 +270,9 @@ void MediaPreparerGUI::encodeLibrary() {
 		process.waitForFinished(-1);
 	}
 	if (cancelWorker) {
-		eventHandler->newEvent(WORKER_FINISHED, ENCODE, true);
-		eventHandler->newEvent(PROGRESS_UPDATED, "Cancelled Encoding Library", 0);
+		eventHandler->newEvent(WORKER_FINISHED, "Cancelled Encoding Library", ENCODE, true);
 	} else {
-		eventHandler->newEvent(WORKER_FINISHED, ENCODE, false);
-		eventHandler->newEvent(PROGRESS_UPDATED, "Finished Encoding Library", library->sizeEncode());
+		eventHandler->newEvent(WORKER_FINISHED, "Finished Encoding Library", ENCODE, false);
 	}
 }
 
@@ -304,26 +307,28 @@ void MediaPreparerGUI::eventListener(Event *e) {
 	case WORKER_STARTED:
 		workerType = (WorkerType)d;
 		cancelWorker = false;
-		ui->button_encode->setText("Cancel");
-		ui->button_encode->setEnabled(true);
-		if (d == SCAN) {
-
-		} else if (d == ENCODE) {
-		}
+		ui->progress_primary->setValue(0);
+		lockUI(true);
 		break;
 	/** ============================================================================================
 	 * (Event) WORKER_FINISHED
 	 */
 	case WORKER_FINISHED:
+		if (!m.empty()) {
+			ui->progress_primary->setFormat(m.c_str());
+		}
+		lockUI(false);
 		switch ((WorkerType)d) {
 		case SCAN:
 			ui->label_fileCount->setText(
 				("<html><head/><body><p>" + std::to_string(library->size()) + " file(s) found</p></body></html>")
 					.c_str());
 			if (er == 0) {
+				ui->progress_primary->setValue(library->size());
 				ui->button_encode->setText(("Encode [" + to_string(library->sizeEncode()) + "]").c_str());
 				ui->button_encode->setEnabled((library->sizeEncode() > 0));
 			} else {
+				ui->progress_primary->setValue(0);
 				ui->button_encode->setText("Encode [0]");
 				ui->button_encode->setEnabled(false);
 			}
@@ -331,6 +336,11 @@ void MediaPreparerGUI::eventListener(Event *e) {
 		case ENCODE:
 			ui->button_encode->setText(("Encode [" + to_string(library->sizeEncode()) + "]").c_str());
 			ui->button_encode->setEnabled((library->sizeEncode() > 0));
+			if (er == 0) {
+				ui->progress_primary->setValue(library->sizeEncode());
+			} else {
+				ui->progress_primary->setValue(0);
+			}
 			break;
 		default:
 
@@ -341,6 +351,10 @@ void MediaPreparerGUI::eventListener(Event *e) {
 	 * (Event) WORKER_ITEM_CHANGED
 	 */
 	case WORKER_ITEM_CHANGED:
+		ui->progress_primary->setValue(d);
+		if (!m.empty()) {
+			ui->progress_primary->setFormat(m.c_str());
+		}
 		if (workerType == SCAN) {
 			workerItem = library->getFile(d);
 		} else if (workerType == ENCODE) {
@@ -427,6 +441,28 @@ bool MediaPreparerGUI::cancel() {
 		}
 	}
 	return cancelWorker;
+}
+
+void MediaPreparerGUI::lockUI(bool b) {
+	ui->setting_directory->setEnabled(!b);
+	ui->button_browse_directory->setEnabled(!b);
+	ui->button_scan_directory->setEnabled(!b);
+	ui->setting_dirOutput->setEnabled(!b);
+	ui->button_browse_dirOutput->setEnabled(!b);
+	ui->setting_vCodec->setEnabled(!b);
+	ui->setting_vQuality->setEnabled(!b);
+	ui->setting_aCodec->setEnabled(!b);
+	ui->setting_aQuality->setEnabled(!b);
+	ui->setting_container->setEnabled(!b);
+	ui->setting_subtitles->setEnabled(!b);
+	ui->setting_subdirectories->setEnabled(!b);
+	ui->setting_threads->setEnabled(!b);
+	ui->setting_extraParams->setEnabled(!b);
+	ui->setting_preset->setEnabled(!b);
+	if (b) {
+		ui->button_encode->setText("Cancel");
+		ui->button_encode->setEnabled(true);
+	}
 }
 
 void MediaPreparerGUI::log(QString msg) {

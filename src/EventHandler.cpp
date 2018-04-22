@@ -49,8 +49,8 @@ int Event::getError() {
  */
 EventHandler::EventHandler() {
 	connect(this, SIGNAL(createEvent(EventType, std::string, int, int)), this,
-			SLOT(SIGNAL(newEvent(EventType, std::string, int, int))));
-	connect(this, SIGNAL(createEvent(EventType, int, int)), this, SLOT(SIGNAL(newEvent(EventType, int, int))));
+			SLOT(newEvent(EventType, std::string, int, int)));
+	connect(this, SIGNAL(createEvent(EventType, int, int)), this, SLOT(newEvent(EventType, int, int)));
 }
 
 void EventHandler::newEvent(EventType type, string message, int data, int error) {
