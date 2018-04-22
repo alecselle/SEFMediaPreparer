@@ -37,6 +37,12 @@ void MediaPreparerGUI::init() {
 void MediaPreparerGUI::initGUI() {
 	loadSettings_config();
 	loadSettings_preset();
+
+	ui->list_Library->setColumnWidth(0, 155);
+	ui->list_Library->setColumnWidth(1, 70);
+	ui->list_Library->setColumnWidth(2, 70);
+	ui->list_Library->setColumnWidth(3, 70);
+	ui->list_Library->setColumnWidth(4, 70);
 }
 
 void MediaPreparerGUI::initSignals() {
@@ -199,7 +205,7 @@ void MediaPreparerGUI::scanLibrary() {
 	eventHandler->newEvent(WORKER_STARTED, "Scanning Library", SCAN);
 	loadSettings_gui();
 	library->scan();
-	eventHandler->newEvent(PROGRESS_MAXIMUM, library->size() - 1);
+	eventHandler->newEvent(PROGRESS_MAXIMUM, library->size());
 	for (int i = 0; !cancelWorker && i < library->size(); i++) {
 		File &f = library->getFile(i);
 		// eventHandler->newEvent(WORKER_ITEM_CHANGED, "SCAN", i);
@@ -230,7 +236,7 @@ void MediaPreparerGUI::encodeLibrary() {
 	eventHandler->newEvent(WORKER_STARTED, "Encoding Library", ENCODE);
 	loadSettings_gui();
 	library->scanEncode();
-	eventHandler->newEvent(PROGRESS_MAXIMUM, library->sizeEncode() - 1);
+	eventHandler->newEvent(PROGRESS_MAXIMUM, library->sizeEncode());
 	for (int i = 0; !cancelWorker && i < (int)library->sizeEncode(); i++) {
 		File &f = library->getFileEncode(i);
 		eventHandler->newEvent(WORKER_ITEM_CHANGED, "Encoding File: " + f.name(), i);
@@ -320,9 +326,7 @@ void MediaPreparerGUI::eventListener(Event *e) {
 		lockUI(false);
 		switch ((WorkerType)d) {
 		case SCAN:
-			ui->label_fileCount->setText(
-				("<html><head/><body><p>" + std::to_string(library->size()) + " file(s) found</p></body></html>")
-					.c_str());
+
 			if (er == 0) {
 				ui->progress_primary->setValue(library->size());
 				ui->button_encode->setText(("Encode [" + to_string(library->sizeEncode()) + "]").c_str());
@@ -357,6 +361,19 @@ void MediaPreparerGUI::eventListener(Event *e) {
 		}
 		if (workerType == SCAN) {
 			workerItem = library->getFile(d);
+			if (d > 0) {
+				File &f = library->getFile(d - 1);
+				ui->list_Library->setRowCount(d + 1);
+				ui->list_Library->setItem(d, 0, new QTableWidgetItem(QString(f.name().c_str())));
+				ui->list_Library->setItem(d, 1, new QTableWidgetItem(QString(f.vcodec().c_str())));
+				ui->list_Library->setItem(d, 2, new QTableWidgetItem(QString(f.acodec().c_str())));
+				ui->list_Library->setItem(d, 3, new QTableWidgetItem(QString(f.extension().c_str())));
+				ui->list_Library->setItem(d, 4, new QTableWidgetItem(QString(f.subtitlesStr().c_str())));
+			}
+
+			ui->label_fileCount->setText(
+				("<html><head/><body><p>" + std::to_string(d + 1) + " file(s) found</p></body></html>").c_str());
+
 		} else if (workerType == ENCODE) {
 			workerItem = library->getFileEncode(d);
 		}

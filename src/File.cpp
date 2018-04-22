@@ -96,6 +96,7 @@ bool File::loadFileInfo(StringStream out) {
 			for (auto &stream : d["streams"].GetArray()) {
 				string codec_type = stream["codec_type"].GetString();
 				string codec_name = stream["codec_name"].GetString();
+				// cout << codec_type << " : " << codec_name << endl;
 
 				if (codec_type.compare("video") == 0 && codec_name.compare("png") != 0 && _vCodec.empty()) {
 					_vCodec = codec_name;
