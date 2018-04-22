@@ -13,13 +13,15 @@ Event::Event() {
 	timeStamp = QTime();
 	message = "ERROR";
 	data = NULL;
+	error = 1;
 }
 
-Event::Event(EventType t, string m, int d) {
+Event::Event(EventType t, string m, int d, int e) {
 	type = t;
 	timeStamp = QTime();
 	message = m;
 	data = d;
+	error = e;
 }
 
 EventType Event::getType() {
@@ -38,25 +40,29 @@ int Event::getData() {
 	return data;
 }
 
+int Event::getError() {
+	return error;
+}
+
 /** ================================================================================================
  * (Class) EventHandler
  */
 EventHandler::EventHandler() {
-	connect(this, SIGNAL(createEvent(EventType, std::string, int)), this,
-			SLOT(SIGNAL(newEvent(EventType, std::string, int))));
-	connect(this, SIGNAL(createEvent(EventType, int)), this, SLOT(SIGNAL(newEvent(EventType, int))));
+	connect(this, SIGNAL(createEvent(EventType, std::string, int, int)), this,
+			SLOT(SIGNAL(newEvent(EventType, std::string, int, int))));
+	connect(this, SIGNAL(createEvent(EventType, int, int)), this, SLOT(SIGNAL(newEvent(EventType, int, int))));
 }
 
-void EventHandler::newEvent(EventType type, string message, int data) {
-	Event *e = new Event(type, message, data);
+void EventHandler::newEvent(EventType type, string message, int data, int error) {
+	Event *e = new Event(type, message, data, error);
 	events.insert(events.begin(), e);
-	cout << "Event#: " << events.size() << " | Type: " << e->getType() << " | Data: " << e->getData()
-		 << " | Message: " << e->getMessage() << endl;
+	cout << "Event#: " << events.size() << " | Type: " << e->getType() << " | Error: " << e->getError()
+		 << " | Data: " << e->getData() << " | Message: " << e->getMessage() << endl;
 	emit createdEvent(e);
 }
 
-void EventHandler::newEvent(EventType type, int data) {
-	newEvent(type, "", data);
+void EventHandler::newEvent(EventType type, int data, int error) {
+	newEvent(type, "", data, error);
 }
 
 Event *EventHandler::getEvent(int pos) {

@@ -17,10 +17,11 @@ enum EventType {
 	WORKER_STARTED = 3,
 	WORKER_FINISHED = 4,
 	WORKER_ITEM_CHANGED = 5,
+	WORKER_CANCELED = 6,
 	DIALOG_ERROR = 99,
 	CUSTOM = 100
 };
-enum WorkerType { SCAN = 1, ENCODE = 2 };
+enum WorkerType { NONE = 0, SCAN = 1, ENCODE = 2 };
 
 /** ================================================================================================
  * (Class) Event
@@ -32,14 +33,16 @@ class Event : public QObject {
 	QTime timeStamp;
 	std::string message;
 	int data;
+	int error;
 
   public:
 	Event();
-	Event(EventType type, std::string message, int data = NULL);
+	Event(EventType type, std::string message, int data = NULL, int error = 0);
 	EventType getType();
 	QTime getTimeStamp();
 	std::string getMessage();
 	int getData();
+	int getError();
 };
 
 /** ================================================================================================
@@ -60,13 +63,13 @@ class EventHandler : public QObject {
 	int size();
 
   public slots:
-	void newEvent(EventType type, std::string message, int data = NULL);
-	void newEvent(EventType type, int data = NULL);
+	void newEvent(EventType type, std::string message, int data = NULL, int error = 0);
+	void newEvent(EventType type, int data = NULL, int error = 0);
 
   signals:
 	void createdEvent(Event *);
-	void createEvent(EventType type, std::string message, int data = NULL);
-	void createEvent(EventType type, int data = NULL);
+	void createEvent(EventType type, std::string message, int data = NULL, int error = 0);
+	void createEvent(EventType type, int data = NULL, int error = 0);
 };
 
 static EventHandler *eventHandler;

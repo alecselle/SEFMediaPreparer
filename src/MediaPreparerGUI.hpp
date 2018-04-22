@@ -50,7 +50,7 @@ class MediaPreparerGUI : public QWidget {
 
 	QFuture<void> worker;
 	WorkerType workerType;
-	File *workerFile;
+	File workerItem;
 	bool cancelWorker = false;
 
 	const std::string productName = PRODUCT_NAME;
