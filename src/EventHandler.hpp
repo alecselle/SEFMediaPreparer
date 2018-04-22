@@ -55,7 +55,6 @@ class EventHandler : public QObject {
 	EventHandler();
 
 	Event *getEvent(int pos = 0);
-	Event *getEventPrevious();
 
 	int size();
 

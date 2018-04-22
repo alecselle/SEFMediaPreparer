@@ -47,6 +47,8 @@ EventHandler::EventHandler() {
 void EventHandler::newEvent(EventType type, string message, int data) {
 	Event *e = new Event(type, message, data);
 	events.insert(events.begin(), e);
+	cout << "Event#: " << events.size() << " | Type: " << e->getType() << " | Message: " << e->getMessage()
+		 << " | Data: " << e->getData() << endl;
 	emit createdEvent(e);
 }
 
@@ -58,10 +60,6 @@ Event *EventHandler::getEvent(int pos) {
 	if (pos >= 0 && pos < size()) {
 		return events[pos];
 	}
-}
-
-Event *EventHandler::getEventPrevious() {
-	return previous;
 }
 
 int EventHandler::size() {

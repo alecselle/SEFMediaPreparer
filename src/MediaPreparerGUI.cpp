@@ -29,7 +29,7 @@ MediaPreparerGUI::~MediaPreparerGUI() {
  * (Section) Initilization
  */
 void MediaPreparerGUI::init() {
-	this->setWindowTitle((productName + productVersion).c_str());
+	this->setWindowTitle(productName.c_str());
 	initGUI();
 	initSignals();
 }
@@ -253,7 +253,6 @@ void MediaPreparerGUI::encodeLibrary() {
 		QProcess process;
 		process.start("ffmpeg", params);
 		process.waitForFinished(-1);
-		StringStream out(process.readAllStandardOutput());
 	}
 	eventHandler->newEvent(PROGRESS_UPDATED, "Finished Scanning Library", library->sizeEncode());
 	eventHandler->newEvent(WORKER_FINISHED, ENCODE);
@@ -268,8 +267,6 @@ void MediaPreparerGUI::eventListener(Event *e) {
 	string m = e->getMessage();
 	int d = e->getData();
 	File f;
-
-	cout << "[" << t << "] " << m << " : " << d << endl;
 	switch (t) {
 	case PROGRESS_UPDATED:
 		ui->progress_primary->setValue(d);
