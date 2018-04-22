@@ -254,6 +254,7 @@ void MediaPreparerGUI::encodeLibrary() {
 		process.start("ffmpeg", params);
 		process.waitForFinished(-1);
 		StringStream out(process.readAllStandardOutput());
+		
 	}
 	eventHandler->newEvent(PROGRESS_UPDATED, "Finished Scanning Library", library->sizeEncode());
 	eventHandler->newEvent(WORKER_FINISHED, ENCODE);
