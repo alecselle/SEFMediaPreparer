@@ -209,7 +209,7 @@ void MediaPreparerGUI::scanLibrary() {
 	for (int i = 0; !cancelWorker && i < library->size(); i++) {
 		File &f = library->getFile(i);
 		// eventHandler->newEvent(WORKER_ITEM_CHANGED, "SCAN", i);
-		eventHandler->newEvent(WORKER_ITEM_CHANGED, "Scanning File: " + f.name(), i);
+		eventHandler->newEvent(WORKER_ITEM_STARTED, "Scanning File: " + f.name(), i);
 		QList<QString> params = {"-v",  "quiet", "-show_entries", "format=duration:stream=codec_type:stream=codec_name",
 								 "-of", "json",  f.path().c_str()};
 		QProcess process;
@@ -220,12 +220,13 @@ void MediaPreparerGUI::scanLibrary() {
 			StringStream out(process.readAllStandardOutput());
 			r = f.loadFileInfo(out);
 		}
+		eventHandler->newEvent(WORKER_ITEM_FINISHED, "Finished Scanning File: " + f.name(), i);
 	}
 	library->scanEncode();
 	if (cancelWorker) {
-		eventHandler->newEvent(WORKER_FINISHED, "Cancelled Scanning Library", SCAN, true);
+		eventHandler->newEvent(WORKER_FINISHED, "Cancelled Scanning Library", SCAN, 2);
 	} else {
-		eventHandler->newEvent(WORKER_FINISHED, "Finished Scanning Library", SCAN, false);
+		eventHandler->newEvent(WORKER_FINISHED, "Finished Scanning Library", SCAN);
 	}
 }
 
@@ -239,7 +240,7 @@ void MediaPreparerGUI::encodeLibrary() {
 	eventHandler->newEvent(PROGRESS_MAXIMUM, library->sizeEncode());
 	for (int i = 0; !cancelWorker && i < (int)library->sizeEncode(); i++) {
 		File &f = library->getFileEncode(i);
-		eventHandler->newEvent(WORKER_ITEM_CHANGED, "Encoding File: " + f.name(), i);
+		eventHandler->newEvent(WORKER_ITEM_STARTED, "Encoding File: " + f.name(), i);
 		QList<QString> params = {"-y",		 "-v",
 								 "quiet",	"-stats",
 								 "-hwaccel", "dxva2",
@@ -274,11 +275,12 @@ void MediaPreparerGUI::encodeLibrary() {
 		QProcess process;
 		process.start("ffmpeg", params);
 		process.waitForFinished(-1);
+		eventHandler->newEvent(WORKER_ITEM_FINISHED, "Finished Encoding File: " + f.name(), i);
 	}
 	if (cancelWorker) {
-		eventHandler->newEvent(WORKER_FINISHED, "Cancelled Encoding Library", ENCODE, true);
+		eventHandler->newEvent(WORKER_FINISHED, "Cancelled Encoding Library", ENCODE, 2);
 	} else {
-		eventHandler->newEvent(WORKER_FINISHED, "Finished Encoding Library", ENCODE, false);
+		eventHandler->newEvent(WORKER_FINISHED, "Finished Encoding Library", ENCODE);
 	}
 }
 
@@ -295,37 +297,40 @@ void MediaPreparerGUI::eventListener(Event *e) {
 	/** ============================================================================================
 	 * (Event) PROGRESS_UPDATED
 	 */
-	case PROGRESS_UPDATED:
+	case PROGRESS_UPDATED: {
 		ui->progress_primary->setValue(d);
 		if (!m.empty()) {
 			ui->progress_primary->setFormat(m.c_str());
 		}
 		break;
+	}
 	/** ============================================================================================
 	 * (Event) PROGRESS_MAXIMUM
 	 */
-	case PROGRESS_MAXIMUM:
+	case PROGRESS_MAXIMUM: {
 		ui->progress_primary->setMaximum(d);
 		break;
+	}
 	/** ============================================================================================
 	 * (Event) WORKER_STARTED
 	 */
-	case WORKER_STARTED:
+	case WORKER_STARTED: {
 		workerType = (WorkerType)d;
 		cancelWorker = false;
 		ui->progress_primary->setValue(0);
 		lockUI(true);
 		break;
+	}
 	/** ============================================================================================
 	 * (Event) WORKER_FINISHED
 	 */
-	case WORKER_FINISHED:
+	case WORKER_FINISHED: {
 		if (!m.empty()) {
 			ui->progress_primary->setFormat(m.c_str());
 		}
 		lockUI(false);
 		switch ((WorkerType)d) {
-		case SCAN:
+		case SCAN: {
 
 			if (er == 0) {
 				ui->progress_primary->setValue(library->size());
@@ -337,7 +342,8 @@ void MediaPreparerGUI::eventListener(Event *e) {
 				ui->button_encode->setEnabled(false);
 			}
 			break;
-		case ENCODE:
+		}
+		case ENCODE: {
 			ui->button_encode->setText(("Encode [" + to_string(library->sizeEncode()) + "]").c_str());
 			ui->button_encode->setEnabled((library->sizeEncode() > 0));
 			if (er == 0) {
@@ -346,40 +352,48 @@ void MediaPreparerGUI::eventListener(Event *e) {
 				ui->progress_primary->setValue(0);
 			}
 			break;
-		default:
-
-			break;
+		}
+		default: { break; }
 		}
 		break;
+	}
 	/** ================================================================================================
-	 * (Event) WORKER_ITEM_CHANGED
+	 * (Event) WORKER_ITEM_STARTED
 	 */
-	case WORKER_ITEM_CHANGED:
+	case WORKER_ITEM_STARTED: {
 		ui->progress_primary->setValue(d);
 		if (!m.empty()) {
 			ui->progress_primary->setFormat(m.c_str());
 		}
-		if (workerType == SCAN) {
+		switch (workerType) {
+		case SCAN: {
 			workerItem = library->getFile(d);
-			if (d > 0) {
-				File &f = library->getFile(d - 1);
-				ui->list_Library->setRowCount(d + 1);
-				ui->list_Library->setItem(d, 0, new QTableWidgetItem(QString(f.name().c_str())));
-				ui->list_Library->setItem(d, 1, new QTableWidgetItem(QString(f.vcodec().c_str())));
-				ui->list_Library->setItem(d, 2, new QTableWidgetItem(QString(f.acodec().c_str())));
-				ui->list_Library->setItem(d, 3, new QTableWidgetItem(QString(f.extension().c_str())));
-				ui->list_Library->setItem(d, 4, new QTableWidgetItem(QString(f.subtitlesStr().c_str())));
-			}
 
 			ui->label_fileCount->setText(
 				("<html><head/><body><p>" + std::to_string(d + 1) + " file(s) found</p></body></html>").c_str());
-
-		} else if (workerType == ENCODE) {
-			workerItem = library->getFileEncode(d);
+			break;
 		}
-	default:
-
+		case ENCODE: {
+			workerItem = library->getFileEncode(d);
+			break;
+		}
+		}
 		break;
+	}
+	/** ================================================================================================
+	 * (Event) WORKER_ITEM_FINISHED
+	 */
+	case WORKER_ITEM_FINISHED: {
+		File &f = library->getFile(d);
+		ui->list_Library->setRowCount(d);
+		ui->list_Library->setItem(d, 0, new QTableWidgetItem(QString(f.name().c_str())));
+		ui->list_Library->setItem(d, 1, new QTableWidgetItem(QString(f.vcodec().c_str())));
+		ui->list_Library->setItem(d, 2, new QTableWidgetItem(QString(f.acodec().c_str())));
+		ui->list_Library->setItem(d, 3, new QTableWidgetItem(QString(f.extension().c_str())));
+		ui->list_Library->setItem(d, 4, new QTableWidgetItem(QString(f.subtitlesStr().c_str())));
+		break;
+	}
+	default: { break; }
 	}
 }
 
@@ -395,13 +409,15 @@ void MediaPreparerGUI::dialogBrowse(int type) {
 	if (dialog.result() == QDialog::Accepted) {
 		QStringList dir = dialog.selectedFiles();
 		switch (type) {
-		case 0:
+		case 0: {
 			ui->setting_directory->setText(dir[0]);
 			runWorker_scan();
 			break;
-		case 1:
+		}
+		case 1: {
 			ui->setting_dirOutput->setText(dir[0]);
 			break;
+		}
 		}
 	}
 }
