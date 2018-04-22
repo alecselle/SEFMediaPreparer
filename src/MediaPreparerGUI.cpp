@@ -208,8 +208,13 @@ void MediaPreparerGUI::scanLibrary() {
 		}
 	}
 	library->scanEncode();
-	eventHandler->newEvent(WORKER_FINISHED, SCAN, (int)cancelWorker);
-	eventHandler->newEvent(PROGRESS_UPDATED, "Finished Scanning Library", library->size());
+	if (cancelWorker) {
+		eventHandler->newEvent(WORKER_FINISHED, SCAN, true);
+		eventHandler->newEvent(PROGRESS_UPDATED, "Cancelled Scanning Library", 0);
+	} else {
+		eventHandler->newEvent(WORKER_FINISHED, SCAN, false);
+		eventHandler->newEvent(PROGRESS_UPDATED, "Finished Scanning Library", library->size());
+	}
 }
 
 /** ================================================================================================
@@ -259,8 +264,13 @@ void MediaPreparerGUI::encodeLibrary() {
 		process.start("ffmpeg", params);
 		process.waitForFinished(-1);
 	}
-	eventHandler->newEvent(WORKER_FINISHED, ENCODE, (int)cancelWorker);
-	eventHandler->newEvent(PROGRESS_UPDATED, "Finished Encoding Library", library->sizeEncode());
+	if (cancelWorker) {
+		eventHandler->newEvent(WORKER_FINISHED, ENCODE, true);
+		eventHandler->newEvent(PROGRESS_UPDATED, "Cancelled Encoding Library", 0);
+	} else {
+		eventHandler->newEvent(WORKER_FINISHED, ENCODE, false);
+		eventHandler->newEvent(PROGRESS_UPDATED, "Finished Encoding Library", library->sizeEncode());
+	}
 }
 
 /** ================================================================================================
@@ -292,29 +302,28 @@ void MediaPreparerGUI::eventListener(Event *e) {
 	 * (Event) WORKER_STARTED
 	 */
 	case WORKER_STARTED:
+		workerType = (WorkerType)d;
+		workerCancel = false;
+		ui->button_encode->setText("Cancel");
+		ui->button_encode->setEnabled(true);
 		if (d == SCAN) {
 
 		} else if (d == ENCODE) {
 		}
-		workerType = (WorkerType)d;
-		ui->button_encode->setText("Cancel");
-		ui->button_encode->setEnabled(true);
 		break;
 	/** ============================================================================================
 	 * (Event) WORKER_FINISHED
 	 */
 	case WORKER_FINISHED:
-		if (d == SCAN && er == 0) {
+		if ((d == SCAN && er == 0) || (d == ENCODE)) {
 			ui->label_fileCount->setText(
 				("<html><head/><body><p>" + std::to_string(library->size()) + " file(s) found</p></body></html>")
 					.c_str());
 			ui->button_encode->setText(("Encode [" + to_string(library->sizeEncode()) + "]").c_str());
 			ui->button_encode->setEnabled((library->sizeEncode() > 0));
 		} else if (d == SCAN && er == 1) {
-
-		} else if (d == ENCODE && er == 0) {
-
-		} else if (d == ENCODE && er == 1) {
+			ui->button_encode->setText("Encode [0]");
+			ui->button_encode->setEnabled(false);
 		}
 		break;
 	/** ================================================================================================
