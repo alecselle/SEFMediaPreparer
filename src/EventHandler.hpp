@@ -17,9 +17,10 @@ enum EventType {
 	WORKER_STARTED = 3,
 	WORKER_FINISHED = 4,
 	WORKER_ITEM_CHANGED = 5,
-	DIALOG_ERROR = 99
+	DIALOG_ERROR = 99,
+	CUSTOM = 100
 };
-enum WorkerType { SCAN = 1, ENCODE = 2, CLOSE = 0 };
+enum WorkerType { SCAN = 1, ENCODE = 2 };
 
 /** ================================================================================================
  * (Class) Event
@@ -64,6 +65,8 @@ class EventHandler : public QObject {
 
   signals:
 	void createdEvent(Event *);
+	void createEvent(EventType type, std::string message, int data = NULL);
+	void createEvent(EventType type, int data = NULL);
 };
 
 static EventHandler *eventHandler;

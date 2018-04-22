@@ -49,6 +49,8 @@ class MediaPreparerGUI : public QWidget {
 	QWidget *containerEncodeList;
 
 	QFuture<void> worker;
+	WorkerType workerType;
+	File *workerFile;
 	bool cancelWorker = false;
 
 	const std::string productName = PRODUCT_NAME;
@@ -88,7 +90,9 @@ class MediaPreparerGUI : public QWidget {
 
 	void dialogBrowse(int type = 0);
 	void dialogSave();
-	void dialogCancel();
+	bool dialogCancel();
+
+	bool cancel();
 
 	void log(QString msg);
 	void blockSignals(bool b);

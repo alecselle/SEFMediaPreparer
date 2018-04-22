@@ -21,8 +21,8 @@ MediaPreparerGUI::MediaPreparerGUI(QWidget *parent) : QWidget(parent), ui(new Ui
 }
 
 MediaPreparerGUI::~MediaPreparerGUI() {
-	cancelWorker = true;
 	saveSettings_config();
+	delete ui;
 }
 
 /** ================================================================================================
@@ -266,7 +266,6 @@ void MediaPreparerGUI::eventListener(Event *e) {
 	QTime ts = e->getTimeStamp();
 	string m = e->getMessage();
 	int d = e->getData();
-	File f;
 	switch (t) {
 	case PROGRESS_UPDATED:
 		ui->progress_primary->setValue(d);
@@ -287,12 +286,11 @@ void MediaPreparerGUI::eventListener(Event *e) {
 		case ENCODE:
 
 			break;
-		case CLOSE:
+		default:
 
 			break;
 		}
 		break;
-
 	case WORKER_FINISHED:
 		switch ((WorkerType)d) {
 		case SCAN:
@@ -305,18 +303,14 @@ void MediaPreparerGUI::eventListener(Event *e) {
 		case ENCODE:
 
 			break;
-		case CLOSE:
+		default:
 
 			break;
 		}
 		break;
 
 	case WORKER_ITEM_CHANGED:
-		if (m.compare("SCAN") == 0) {
-			f = library->getFile(d);
-		} else if (m.compare("ENCODE") == 0) {
-			f = library->getFileEncode(d);
-		}
+
 		break;
 
 	default:
@@ -357,12 +351,51 @@ void MediaPreparerGUI::dialogSave() {
 	}
 }
 
-void MediaPreparerGUI::dialogCancel() {
+bool MediaPreparerGUI::dialogCancel() {
+	QMessageBox confirm;
+	confirm.setText("Are you sure?");
+	confirm.setInformativeText("Any unfinished progress will be lost.");
+	confirm.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+	confirm.setDefaultButton(QMessageBox::No);
+	int opt = confirm.exec();
+	if (opt == QMessageBox::No) {
+		return false;
+	}
+	return true;
 }
 
 /** ================================================================================================
  * (Section) Utilities
  */
+bool MediaPreparerGUI::cancel() {
+	if (!dialogCancel()) {
+		return false;
+	}
+	if (worker.isRunning()) {
+		QProcess kill;
+		cancelWorker = true;
+		switch (workerType) {
+		case SCAN:
+			kill.start(QString("taskkill /F /T /IM ffprobe.exe"));
+			kill.waitForFinished();
+			worker.waitForFinished();
+			break;
+		case ENCODE:
+			kill.start(QString("taskkill /F /T /IM ffmpeg.exe"));
+			kill.waitForFinished();
+			worker.waitForFinished();
+			if (bf::exists(settings->tempDir + "\\" + workerFile->name() + "." + settings->container)) {
+				bf::remove(settings->tempDir + "\\" + workerFile->name() + "." + settings->container);
+			}
+			break;
+		default:
+
+			break;
+		}
+	}
+	return cancelWorker;
+}
+
 void MediaPreparerGUI::log(QString msg) {
 }
 
@@ -372,6 +405,11 @@ void MediaPreparerGUI::blockSignals(bool b) {
 }
 
 void MediaPreparerGUI::closeEvent(QCloseEvent *e) {
+	if (!worker.isRunning() || cancel()) {
+		e->accept();
+	} else {
+		e->ignore();
+	}
 }
 
 } // namespace SuperEpicFuntime
