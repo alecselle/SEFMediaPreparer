@@ -303,7 +303,7 @@ void MediaPreparerGUI::eventListener(Event *e) {
 	 */
 	case WORKER_STARTED:
 		workerType = (WorkerType)d;
-		workerCancel = false;
+		cancelWorker = false;
 		ui->button_encode->setText("Cancel");
 		ui->button_encode->setEnabled(true);
 		if (d == SCAN) {
@@ -315,15 +315,26 @@ void MediaPreparerGUI::eventListener(Event *e) {
 	 * (Event) WORKER_FINISHED
 	 */
 	case WORKER_FINISHED:
-		if ((d == SCAN && er == 0) || (d == ENCODE)) {
+		switch ((WorkerType)d) {
+		case SCAN:
 			ui->label_fileCount->setText(
 				("<html><head/><body><p>" + std::to_string(library->size()) + " file(s) found</p></body></html>")
 					.c_str());
+			if (er == 0) {
+				ui->button_encode->setText(("Encode [" + to_string(library->sizeEncode()) + "]").c_str());
+				ui->button_encode->setEnabled((library->sizeEncode() > 0));
+			} else {
+				ui->button_encode->setText("Encode [0]");
+				ui->button_encode->setEnabled(false);
+			}
+			break;
+		case ENCODE:
 			ui->button_encode->setText(("Encode [" + to_string(library->sizeEncode()) + "]").c_str());
 			ui->button_encode->setEnabled((library->sizeEncode() > 0));
-		} else if (d == SCAN && er == 1) {
-			ui->button_encode->setText("Encode [0]");
-			ui->button_encode->setEnabled(false);
+			break;
+		default:
+
+			break;
 		}
 		break;
 	/** ================================================================================================
