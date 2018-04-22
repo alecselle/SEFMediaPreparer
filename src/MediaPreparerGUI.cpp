@@ -363,18 +363,19 @@ void MediaPreparerGUI::eventListener(Event *e) {
 		 * (Event) WORKER_ITEM_STARTED
 		 */
 		case WORKER_ITEM_STARTED: {
-			ui->progress_primary->setValue(eventData);
 			if (!eventMessage.empty()) {
 				ui->progress_primary->setFormat(eventMessage.c_str());
 			}
 			switch (workerType) {
 				case SCAN: {
-					workerItem = library->getFile(eventData);
+					File &eventFile = library->getFile(eventData);
+					workerItem = eventFile;
 					ui->label_fileCount->setText(("<html><head/><body><p>" + std::to_string(eventData + 1) + " file(s) found</p></body></html>").c_str());
 					break;
 				}
 				case ENCODE: {
-					workerItem = library->getFileEncode(eventData);
+					File &eventFile = library->getFileEncode(eventData);
+					workerItem = eventFile;
 					break;
 				}
 				default: { break; }
@@ -385,19 +386,29 @@ void MediaPreparerGUI::eventListener(Event *e) {
 		 * (Event) WORKER_ITEM_FINISHED
 		 */
 		case WORKER_ITEM_FINISHED: {
-			File &eventFile = library->getFile(eventData);
-			ui->list_Library->setRowCount(eventData);
-			ui->list_Library->setItem(eventData, 0, new QTableWidgetItem(QString(eventFile.name().c_str())));
-			ui->list_Library->setItem(eventData, 1, new QTableWidgetItem(QString(eventFile.vcodec().c_str())));
-			ui->list_Library->setItem(eventData, 2, new QTableWidgetItem(QString(eventFile.acodec().c_str())));
-			ui->list_Library->setItem(eventData, 3, new QTableWidgetItem(QString(eventFile.extension().c_str())));
-			ui->list_Library->setItem(eventData, 4, new QTableWidgetItem(QString(eventFile.subtitlesStr().c_str())));
+			ui->progress_primary->setValue(eventData);
+			switch (workerType) {
+				case SCAN: {
+					File &eventFile = library->getFile(eventData);
+					ui->list_Library->setRowCount(eventData + 1);
+					ui->list_Library->setItem(eventData, 0, new QTableWidgetItem(QString(eventFile.name().c_str())));
+					ui->list_Library->setItem(eventData, 1, new QTableWidgetItem(QString(eventFile.vcodec().c_str())));
+					ui->list_Library->setItem(eventData, 2, new QTableWidgetItem(QString(eventFile.acodec().c_str())));
+					ui->list_Library->setItem(eventData, 3, new QTableWidgetItem(QString(eventFile.extension().c_str())));
+					ui->list_Library->setItem(eventData, 4, new QTableWidgetItem(QString(eventFile.subtitlesStr().c_str())));
+					break;
+				}
+				case ENCODE: {
+					File &eventFile = library->getFileEncode(eventData);
+					break;
+				}
+				default: { break; }
+			}
 			break;
 		}
 		default: { break; }
 	}
 }
-
 /** ================================================================================================
  * (Section) Dialogs
  */
