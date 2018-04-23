@@ -188,15 +188,10 @@ void MediaPreparerGUI::updateGUI_timers() {
 												  .arg(((workerTimeStamp.elapsed() % 3600000) % 60000) / 1000, 2, 10, QChar('0')));
 		}
 		if (workerItemTimeStamp.isValid()) {
-			ui->progress_secondary->setFormat(
-				QString("%1:%2:%3  -  ETA: %4:%5:%6")
-					.arg(workerItemTimeStamp.elapsed() / 3600000, 2, 10, QChar('0'))
-					.arg((workerItemTimeStamp.elapsed() % 3600000) / 60000, 2, 10, QChar('0'))
-					.arg(((workerItemTimeStamp.elapsed() % 3600000) % 60000) / 1000, 2, 10, QChar('0'))
-					.arg(workerItemTimeStamp.msecsTo(workerItemTimeStamp.addMSecs(workerItem.duration() - workerItemTimeStamp.elapsed())) / 3600000, 2, 10, QChar('0'))
-					.arg((workerItemTimeStamp.msecsTo(workerItemTimeStamp.addMSecs(workerItem.duration() - workerItemTimeStamp.elapsed())) % 3600000) / 60000, 2, 10, QChar('0'))
-					.arg(((workerItemTimeStamp.msecsTo(workerItemTimeStamp.addMSecs(workerItem.duration() - workerItemTimeStamp.elapsed())) % 3600000) % 60000) / 1000, 2, 10,
-						 QChar('0')));
+			ui->progress_secondary->setFormat(QString("%1:%2:%3")
+												  .arg(workerItemTimeStamp.elapsed() / 3600000, 2, 10, QChar('0'))
+												  .arg((workerItemTimeStamp.elapsed() % 3600000) / 60000, 2, 10, QChar('0'))
+												  .arg(((workerItemTimeStamp.elapsed() % 3600000) % 60000) / 1000, 2, 10, QChar('0')));
 			ui->progress_secondary->setValue(workerItemTimeStamp.elapsed());
 			ui->progress_secondary->repaint();
 		}
