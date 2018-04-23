@@ -1,7 +1,7 @@
 QT += core gui widgets
 TEMPLATE = app
 
-CONFIG += c++17 c++14 embed_manifest_exe
+CONFIG += c++17 embed_manifest_exe
 QMAKE_CXXFLAGS += -std=c++17 -static-libstdc++ -static-libgcc
 
 !defined(VER_MAJ):VER_MAJ = 3
