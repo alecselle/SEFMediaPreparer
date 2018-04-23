@@ -21,8 +21,6 @@ enum EventType {
 	DIALOG_ERROR = 99,
 	CUSTOM = 100
 };
-enum WorkerType { NONE = 0, SCAN = 1, ENCODE = 2 };
-
 /** ================================================================================================
  * (Class) Event
  */

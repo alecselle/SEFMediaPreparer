@@ -9,7 +9,7 @@
 namespace SuperEpicFuntime {
 
 static const int RETRY_COUNT = 5;
+static bool cancelWorker = false;
 
 } // namespace SuperEpicFuntime
-
 #endif // GLOBAL_HPP

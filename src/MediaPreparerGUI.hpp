@@ -3,8 +3,10 @@
 #pragma once
 
 #include <EventHandler.hpp>
-#include <File.hpp>
 #include <Global.hpp>
+#include <Worker.hpp>
+
+#include <File.hpp>
 #include <Library.hpp>
 #include <QtConcurrent/QtConcurrent>
 #include <QtCore/QFuture>
@@ -44,16 +46,9 @@ class MediaPreparerGUI : public QWidget {
   private:
 	Ui::MediaPreparer *ui;
 	QSignalMapper *signalMapper = new QSignalMapper(this);
-	QTimer *updateTimer = new QTimer(this);
+
 	QWidget *containerEncode;
 	QWidget *containerEncodeList;
-
-	QFuture<void> worker;
-	QTime workerTimeStamp;
-	WorkerType workerType;
-	File workerItem;
-	QTime workerItemTimeStamp;
-	bool cancelWorker = false;
 
 	const std::string productName = PRODUCT_NAME;
 	const std::string productVersion = PRODUCT_VERSION;
@@ -69,6 +64,15 @@ class MediaPreparerGUI : public QWidget {
 	void closeEvent(QCloseEvent *e);
 
   public:
+	QTimer *updateTimer = new QTimer(this);
+	Worker *w;
+	QFuture<void> worker;
+	QTime workerTimeStamp;
+	WorkerType workerType;
+	File workerItem;
+	QTime workerItemTimeStamp;
+	// bool cancelWorker = false;
+
 	explicit MediaPreparerGUI(QWidget *parent = 0);
 	~MediaPreparerGUI();
 

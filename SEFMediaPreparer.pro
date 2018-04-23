@@ -19,7 +19,8 @@ SOURCES += \
     $$PWD/src/Library.cpp \
     $$PWD/src/MediaPreparerGUI.cpp \
     $$PWD/src/EventHandler.cpp \
-    $$PWD/src/Global.cpp
+    $$PWD/src/Global.cpp \
+    src/Worker.cpp
 
 HEADERS += \
     $$PWD/src/Settings.hpp \
@@ -28,7 +29,8 @@ HEADERS += \
     $$PWD/src/product_info.hpp \
     $$PWD/src/MediaPreparerGUI.hpp \
     $$PWD/src/EventHandler.hpp \
-    $$PWD/src/Global.hpp
+    $$PWD/src/Global.hpp \
+    src/Worker.hpp
 
 FORMS += \
     $$PWD/src/MediaPreparer.ui

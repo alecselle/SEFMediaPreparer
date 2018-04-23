@@ -82,7 +82,6 @@ void MediaPreparerGUI::initSignals() {
 	connect(ui->setting_preset, SIGNAL(currentTextChanged(QString)), this, SLOT(loadSettings_preset(QString)));
 
 	connect(updateTimer, SIGNAL(timeout()), this, SLOT(updateGUI_timers()));
-	updateTimer->start(100);
 
 	connect(eventHandler, SIGNAL(createdEvent(Event *)), this, SLOT(eventListener(Event *)), Qt::UniqueConnection);
 }
@@ -209,13 +208,17 @@ void MediaPreparerGUI::updateGUI_timers() {
  */
 void MediaPreparerGUI::runWorker_scan() {
 	if (!worker.isRunning()) {
-		worker = QtConcurrent::run(this, &MediaPreparerGUI::scanLibrary);
+		//		worker = QtConcurrent::run(this, &MediaPreparerGUI::scanLibrary);
+		w = new Worker(SCAN);
+		worker = QtConcurrent::run(this->w, &Worker::run);
 	}
 }
 
 void MediaPreparerGUI::runWorker_encode() {
 	if (!worker.isRunning()) {
-		worker = QtConcurrent::run(this, &MediaPreparerGUI::encodeLibrary);
+		// worker = QtConcurrent::run(this, &MediaPreparerGUI::encodeLibrary);
+		w = new Worker(ENCODE);
+		worker = QtConcurrent::run(this->w, &Worker::run);
 	} else {
 		cancel();
 	}
@@ -336,6 +339,7 @@ void MediaPreparerGUI::eventListener(Event *e) {
 		 * (Event) WORKER_STARTED
 		 */
 		case WORKER_STARTED: {
+			updateTimer->start(100);
 			workerType = (WorkerType)eventData;
 			workerTimeStamp.start();
 			cancelWorker = false;
@@ -375,6 +379,7 @@ void MediaPreparerGUI::eventListener(Event *e) {
 		 * (Event) WORKER_FINISHED
 		 */
 		case WORKER_FINISHED: {
+			updateTimer->stop();
 			if (!eventMessage.empty()) {
 				ui->progress_primary->setFormat(eventMessage.c_str());
 			}
