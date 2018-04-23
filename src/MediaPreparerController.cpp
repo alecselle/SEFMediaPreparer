@@ -14,7 +14,6 @@ Ui::MediaPreparer *MediaPreparerController::getUI() {
 }
 
 void MediaPreparerController::show() {
-	QApplication a(argc, argv);
 	p->show();
 }
 

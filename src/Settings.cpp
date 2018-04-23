@@ -4,7 +4,7 @@ namespace bf = boost::filesystem;
 namespace bc = boost::container;
 namespace ba = boost::algorithm;
 using namespace rapidjson;
-using namespace std;
+using std::string;
 
 namespace SuperEpicFuntime {
 
