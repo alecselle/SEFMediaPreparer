@@ -5,10 +5,21 @@
 #include <Global.hpp>
 #include <QtCore/QObject>
 #include <boost/container/vector.hpp>
-#include <iostream>
+
+#include <iostream> // For debugging (cout)
 
 namespace SuperEpicFuntime {
-enum EventType { ERROR = 0, PROGRESS_UPDATED = 1, PROGRESS_MAXIMUM = 2, WORKER_STARTED = 3, WORKER_FINISHED = 4, WORKER_ITEM_STARTED = 6, WORKER_ITEM_FINISHED = 7, DIALOG_ERROR = 99, CUSTOM = 100 };
+enum EventType {
+	ERROR = 0,
+	PROGRESS_UPDATED = 1,
+	PROGRESS_MAXIMUM = 2,
+	WORKER_STARTED = 3,
+	WORKER_FINISHED = 4,
+	WORKER_ITEM_STARTED = 6,
+	WORKER_ITEM_FINISHED = 7,
+	DIALOG_ERROR = 99,
+	CUSTOM = 100
+};
 typedef void(Func)(bool);
 
 /** ================================================================================================

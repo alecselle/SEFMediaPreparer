@@ -1,9 +1,8 @@
 #include <File.hpp>
 
 namespace bf = boost::filesystem;
-namespace ba = boost::algorithm;
 using namespace rapidjson;
-using namespace std;
+using std::string;
 
 namespace SuperEpicFuntime {
 

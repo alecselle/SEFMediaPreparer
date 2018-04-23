@@ -1,23 +1,25 @@
 #ifndef MEDIAPREPARERCONTROLLER_HPP
 #define MEDIAPREPARERCONTROLLER_HPP
 
-#include <MediaPreparerGUI.hpp>
+#include <QtWidgets/QWidget>
 
-#include <QApplication>
+#include <iostream> // For debugging (cout)
 
 namespace SuperEpicFuntime {
 
+/** ================================================================================================
+ * (Class) MediaPreparerController
+ */
 class MediaPreparerController {
   private:
-	MediaPreparerGUI *p = new MediaPreparerGUI();
-	Ui::MediaPreparer *ui = p->ui;
+	QWidget *p;
 
   public:
-	MediaPreparerController();
-	MediaPreparerGUI *getParent();
-	Ui::MediaPreparer *getUI();
+	MediaPreparerController(QWidget *parent);
+	QWidget *getParent();
 
 	void show();
 };
+
 } // namespace SuperEpicFuntime
 #endif // MEDIAPREPARERCONTROLLER_HPP

@@ -1,16 +1,20 @@
 #include <MediaPreparerController.hpp>
 
+using std::string;
+
+using namespace std; // For debugging (cout)
+
 namespace SuperEpicFuntime {
 
-MediaPreparerController::MediaPreparerController() {
+/** ================================================================================================
+ * (Class) MediaPreparerController
+ */
+MediaPreparerController::MediaPreparerController(QWidget *parent) {
+	p = parent;
 }
 
-MediaPreparerGUI *MediaPreparerController::getParent() {
+QWidget *MediaPreparerController::getParent() {
 	return p;
-}
-
-Ui::MediaPreparer *MediaPreparerController::getUI() {
-	return ui;
 }
 
 void MediaPreparerController::show() {
