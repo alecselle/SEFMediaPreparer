@@ -73,16 +73,12 @@ int File::subtitles() {
 
 string File::subtitlesStr() {
 	if (_loaded) {
-		switch (_subtitles) {
-		case 0:
+		if (_subtitles == 0) {
 			return "Not Found";
-			break;
-		case 1:
+		} else if (_subtitles == 1) {
 			return "Found";
-			break;
-		case 2:
+		} else if (_subtitles == 2) {
 			return "Embedded";
-			break;
 		}
 	}
 	return "error";
@@ -96,7 +92,6 @@ bool File::loadFileInfo(StringStream out) {
 			for (auto &stream : d["streams"].GetArray()) {
 				string codec_type = stream["codec_type"].GetString();
 				string codec_name = stream["codec_name"].GetString();
-				// cout << codec_type << " : " << codec_name << endl;
 
 				if (codec_type.compare("video") == 0 && codec_name.compare("png") != 0 && _vCodec.empty()) {
 					_vCodec = codec_name;
@@ -117,7 +112,7 @@ bool File::loadFileInfo(StringStream out) {
 	if (!_vCodec.empty() && !_aCodec.empty()) {
 		if (_subtitles == -1 && bf::exists(_pathSub)) {
 			_subtitles = 1;
-		} else {
+		} else if (_subtitles == -1) {
 			_subtitles = 0;
 		}
 		_loaded = true;

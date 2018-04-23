@@ -49,8 +49,10 @@ class MediaPreparerGUI : public QWidget {
 	QWidget *containerEncodeList;
 
 	QFuture<void> worker;
+	QTime workerTimeStamp;
 	WorkerType workerType;
 	File workerItem;
+	QTime workerItemTimeStamp;
 	bool cancelWorker = false;
 
 	const std::string productName = PRODUCT_NAME;

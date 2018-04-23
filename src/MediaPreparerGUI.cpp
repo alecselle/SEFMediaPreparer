@@ -43,6 +43,8 @@ void MediaPreparerGUI::initGUI() {
 	ui->list_Library->setColumnWidth(2, 70);
 	ui->list_Library->setColumnWidth(3, 70);
 	ui->list_Library->setColumnWidth(4, 70);
+
+	updateGUI_timers();
 }
 
 void MediaPreparerGUI::initSignals() {
@@ -78,6 +80,9 @@ void MediaPreparerGUI::initSignals() {
 	connect(ui->setting_aCodec, SIGNAL(currentIndexChanged(int)), this, SLOT(loadSettings_gui()));
 	connect(ui->setting_container, SIGNAL(currentIndexChanged(int)), this, SLOT(loadSettings_gui()));
 	connect(ui->setting_preset, SIGNAL(currentTextChanged(QString)), this, SLOT(loadSettings_preset(QString)));
+
+	connect(updateTimer, SIGNAL(timeout()), this, SLOT(updateGUI_timers()));
+	updateTimer->start(100);
 
 	connect(eventHandler, SIGNAL(createdEvent(Event *)), this, SLOT(eventListener(Event *)), Qt::UniqueConnection);
 }
@@ -176,6 +181,22 @@ void MediaPreparerGUI::updateGUI_settings() {
 }
 
 void MediaPreparerGUI::updateGUI_timers() {
+	if (worker.isRunning() && workerType == SCAN) {
+		if (workerTimeStamp.isValid()) {
+			ui->value_encode_runtime->setText(QString("%1:%2:%3")
+												  .arg(workerTimeStamp.elapsed() / 3600000, 2, 10, QChar('0'))
+												  .arg((workerTimeStamp.elapsed() % 3600000) / 60000, 2, 10, QChar('0'))
+												  .arg(((workerTimeStamp.elapsed() % 3600000) % 60000) / 1000, 2, 10, QChar('0')));
+		}
+		if (worker.isRunning() && workerType == ENCODE) {
+			ui->progress_secondary->setFormat(QString("%1:%2:%3")
+												  .arg(workerItemTimeStamp.elapsed() / 3600000, 2, 10, QChar('0'))
+												  .arg((workerItemTimeStamp.elapsed() % 3600000) / 60000, 2, 10, QChar('0'))
+												  .arg(((workerItemTimeStamp.elapsed() % 3600000) % 60000) / 1000, 2, 10, QChar('0')));
+			ui->progress_secondary->setValue(workerItemTimeStamp.elapsed());
+			ui->progress_secondary->repaint();
+		}
+	}
 }
 
 /** ================================================================================================
@@ -202,9 +223,9 @@ void MediaPreparerGUI::runWorker_cleanup() {
  * (Section) Scan Worker
  */
 void MediaPreparerGUI::scanLibrary() {
-	eventHandler->newEvent(WORKER_STARTED, "Scanning Library", SCAN);
 	loadSettings_gui();
 	library->scan();
+	eventHandler->newEvent(WORKER_STARTED, "Scanning Library", SCAN);
 	eventHandler->newEvent(PROGRESS_MAXIMUM, library->size());
 	for (int i = 0; !cancelWorker && i < library->size(); i++) {
 		File &f = library->getFile(i);
@@ -222,6 +243,7 @@ void MediaPreparerGUI::scanLibrary() {
 		eventHandler->newEvent(WORKER_ITEM_FINISHED, i);
 	}
 	library->scanEncode();
+	cout << library->sizeEncode() << endl;
 	if (cancelWorker) {
 		eventHandler->newEvent(WORKER_FINISHED, "Cancelled Scanning Library", SCAN, 2);
 	} else {
@@ -233,9 +255,9 @@ void MediaPreparerGUI::scanLibrary() {
  * (Section) Encode Worker
  */
 void MediaPreparerGUI::encodeLibrary() {
-	eventHandler->newEvent(WORKER_STARTED, "Encoding Library", ENCODE);
 	loadSettings_gui();
 	library->scanEncode();
+	eventHandler->newEvent(WORKER_STARTED, "Encoding Library", ENCODE);
 	eventHandler->newEvent(PROGRESS_MAXIMUM, library->sizeEncode());
 	for (int i = 0; !cancelWorker && i < (int)library->sizeEncode(); i++) {
 		File &f = library->getFileEncode(i);
@@ -310,9 +332,38 @@ void MediaPreparerGUI::eventListener(Event *e) {
 		 */
 		case WORKER_STARTED: {
 			workerType = (WorkerType)eventData;
+			workerTimeStamp = QTime();
 			cancelWorker = false;
 			ui->progress_primary->setValue(0);
 			lockUI(true);
+			switch ((WorkerType)eventData) {
+				case SCAN: {
+					ui->list_Library->clearContents();
+					break;
+				}
+				case ENCODE: {
+					ui->list_encode_Library->clearContents();
+
+					ui->value_encode_vCodec->setText(settings->vCodec.c_str());
+					ui->value_encode_vQuality->setText(settings->vQuality.c_str());
+					ui->value_encode_aCodec->setText(settings->aCodec.c_str());
+					ui->value_encode_aQuality->setText(settings->aQuality.c_str());
+					ui->value_encode_container->setText(settings->container.c_str());
+					ui->value_encode_subtitles->setText(settings->subtitles.c_str());
+
+					for (int i = 0; i < library->sizeEncode(); i++) {
+						File &f = library->getFileEncode(i);
+						ui->list_encode_Library->setRowCount(i + 1);
+						ui->list_encode_Library->setItem(i, 0, new QTableWidgetItem(QString(f.name().c_str())));
+						ui->list_encode_Library->setItem(i, 1, new QTableWidgetItem(QString(f.vcodec().c_str())));
+						ui->list_encode_Library->setItem(i, 2, new QTableWidgetItem(QString(f.acodec().c_str())));
+						ui->list_encode_Library->setItem(i, 3, new QTableWidgetItem(QString(f.extension().c_str())));
+						ui->list_encode_Library->setItem(i, 4, new QTableWidgetItem(QString(f.subtitlesStr().c_str())));
+					}
+					break;
+				}
+				default: { break; }
+			}
 			break;
 		}
 		/** ============================================================================================
@@ -325,45 +376,24 @@ void MediaPreparerGUI::eventListener(Event *e) {
 			lockUI(false);
 			switch ((WorkerType)eventData) {
 				case SCAN: {
-					switch (eventError) {
-						case 0: {
-							ui->progress_primary->setValue(library->size());
-							ui->button_encode->setText(("Encode [" + to_string(library->sizeEncode()) + "]").c_str());
-							ui->button_encode->setEnabled((library->sizeEncode() > 0));
-
-							for (int i = 0; i < library->sizeEncode(); i++) {
-								File &f = library->getFileEncode(i);
-								cout << f.name() << " : " << f.vcodec() << " : " << f.acodec() << endl;
-								ui->list_encode_Library->setRowCount(i + 1);
-								ui->list_Library->setItem(i, 0, new QTableWidgetItem(QString(f.name().c_str())));
-								ui->list_Library->setItem(i, 1, new QTableWidgetItem(QString(f.vcodec().c_str())));
-								ui->list_Library->setItem(i, 2, new QTableWidgetItem(QString(f.acodec().c_str())));
-								ui->list_Library->setItem(i, 3, new QTableWidgetItem(QString(f.extension().c_str())));
-								ui->list_Library->setItem(i, 4, new QTableWidgetItem(QString(f.subtitlesStr().c_str())));
-							}
-							break;
-						}
-						default: {
-							ui->progress_primary->setValue(0);
-							ui->button_encode->setText("Encode [0]");
-							ui->button_encode->setEnabled(false);
-							break;
-						}
+					if (eventError == 0) {
+						ui->progress_primary->setValue(library->size());
+						ui->button_encode->setText(("Encode [" + to_string(library->sizeEncode()) + "]").c_str());
+						ui->button_encode->setEnabled((library->sizeEncode() > 0));
+					} else {
+						ui->progress_primary->setValue(0);
+						ui->button_encode->setText("Encode [0]");
+						ui->button_encode->setEnabled(false);
 					}
 					break;
 				}
 				case ENCODE: {
 					ui->button_encode->setText(("Encode [" + to_string(library->sizeEncode()) + "]").c_str());
 					ui->button_encode->setEnabled((library->sizeEncode() > 0));
-					switch (eventError) {
-						case 0: {
-							ui->progress_primary->setValue(library->sizeEncode());
-							break;
-						}
-						default: {
-							ui->progress_primary->setValue(0);
-							break;
-						}
+					if (eventError == 0) {
+						ui->progress_primary->setValue(library->sizeEncode());
+					} else {
+						ui->progress_primary->setValue(0);
 					}
 					break;
 				}
@@ -379,6 +409,7 @@ void MediaPreparerGUI::eventListener(Event *e) {
 				ui->progress_primary->setFormat(eventMessage.c_str());
 			}
 			switch (workerType) {
+				workerItemTimeStamp = QTime();
 				case SCAN: {
 					File &eventFile = library->getFile(eventData);
 					workerItem = eventFile;
@@ -388,6 +419,17 @@ void MediaPreparerGUI::eventListener(Event *e) {
 				case ENCODE: {
 					File &eventFile = library->getFileEncode(eventData);
 					workerItem = eventFile;
+					ui->list_encode_Library->selectRow(eventData);
+
+					ui->value_encode_file->setText(eventFile.name().c_str());
+					ui->value_encode_file_vCodec->setText(eventFile.vcodec().c_str());
+					ui->value_encode_file_aCodec->setText(eventFile.acodec().c_str());
+					ui->value_encode_file_container->setText(eventFile.extension().c_str());
+					ui->value_encode_file_subtitles->setText(eventFile.subtitlesStr().c_str());
+					ui->value_encode_file_duration->setText(to_string(eventFile.duration()).c_str());
+
+					ui->value_encode_count->setText((to_string(eventData + 1) + " / " + to_string(library->sizeEncode())).c_str());
+
 					break;
 				}
 				default: { break; }
