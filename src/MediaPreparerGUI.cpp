@@ -210,7 +210,7 @@ void MediaPreparerGUI::runWorker_scan() {
 	if (!worker.isRunning()) {
 		//		worker = QtConcurrent::run(this, &MediaPreparerGUI::scanLibrary);
 		w = new Worker(SCAN);
-		worker = QtConcurrent::run(this->w, &Worker::run);
+		worker = QtConcurrent::run(w, &Worker::run);
 	}
 }
 
@@ -218,7 +218,7 @@ void MediaPreparerGUI::runWorker_encode() {
 	if (!worker.isRunning()) {
 		// worker = QtConcurrent::run(this, &MediaPreparerGUI::encodeLibrary);
 		w = new Worker(ENCODE);
-		worker = QtConcurrent::run(this->w, &Worker::run);
+		worker = QtConcurrent::run(w, &Worker::run);
 	} else {
 		cancel();
 	}

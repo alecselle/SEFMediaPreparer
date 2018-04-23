@@ -4,6 +4,8 @@
 
 #include <EventHandler.hpp>
 #include <Global.hpp>
+#include <QtConcurrent/QtConcurrent>
+#include <QtCore/QFuture>
 #include <QtCore/QProcess>
 #include <iostream>
 #include <rapidjson/document.h>
@@ -18,6 +20,7 @@ class Worker : public QObject {
 	WorkerType type;
 	void scan();
 	void encode();
+	QFuture<void> thread;
 
   public:
 	Worker(WorkerType type);
