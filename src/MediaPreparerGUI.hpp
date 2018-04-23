@@ -33,7 +33,7 @@ class MediaPreparer;
  */
 class MediaPreparerGUI : public QWidget {
 	Q_OBJECT
-  private:
+  public:
 	Ui::MediaPreparer *ui;
 	QSignalMapper *signalMapper = new QSignalMapper(this);
 
@@ -53,7 +53,6 @@ class MediaPreparerGUI : public QWidget {
 
 	void closeEvent(QCloseEvent *e);
 
-  public:
 	QTimer *updateTimer = new QTimer(this);
 	QFuture<void> worker;
 	QTime workerTimeStamp;

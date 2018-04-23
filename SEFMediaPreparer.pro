@@ -5,7 +5,7 @@ CONFIG += c++17 embed_manifest_exe
 QMAKE_CXXFLAGS += -std=c++17 -static-libstdc++ -static-libgcc
 
 !defined(VER_MAJ):VER_MAJ = 3
-!defined(VER_MIN):VER_MIN = 3
+!defined(VER_MIN):VER_MIN = 4
 !defined(VER_PAT):VER_PAT = 0
 VERSION = $${VER_MAJ}.$${VER_MIN}.$${VER_PAT}
 
@@ -19,7 +19,8 @@ SOURCES += \
     $$PWD/src/Library.cpp \
     $$PWD/src/MediaPreparerGUI.cpp \
     $$PWD/src/EventHandler.cpp \
-    $$PWD/src/Global.cpp
+    $$PWD/src/Global.cpp \
+    MediaPreparerController.cpp
 
 HEADERS += \
     $$PWD/src/Settings.hpp \
@@ -28,7 +29,8 @@ HEADERS += \
     $$PWD/src/product_info.hpp \
     $$PWD/src/MediaPreparerGUI.hpp \
     $$PWD/src/EventHandler.hpp \
-    $$PWD/src/Global.hpp
+    $$PWD/src/Global.hpp \
+    MediaPreparerController.hpp
 
 FORMS += \
     $$PWD/src/MediaPreparer.ui

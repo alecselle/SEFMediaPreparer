@@ -8,17 +8,8 @@
 #include <iostream>
 
 namespace SuperEpicFuntime {
-enum EventType {
-	ERROR = 0,
-	PROGRESS_UPDATED = 1,
-	PROGRESS_MAXIMUM = 2,
-	WORKER_STARTED = 3,
-	WORKER_FINISHED = 4,
-	WORKER_ITEM_STARTED = 6,
-	WORKER_ITEM_FINISHED = 7,
-	DIALOG_ERROR = 99,
-	CUSTOM = 100
-};
+enum EventType { ERROR = 0, PROGRESS_UPDATED = 1, PROGRESS_MAXIMUM = 2, WORKER_STARTED = 3, WORKER_FINISHED = 4, WORKER_ITEM_STARTED = 6, WORKER_ITEM_FINISHED = 7, DIALOG_ERROR = 99, CUSTOM = 100 };
+typedef void(Func)(bool);
 
 /** ================================================================================================
  * (Class) Event
@@ -47,11 +38,14 @@ class EventHandler : public QObject {
 	Q_OBJECT
   private:
 	boost::container::vector<Event *> events;
+	// boost::container::vector<boost::container::vector<Func *>> bindings;
 	Event *current = new Event();
 	Event *previous = new Event();
 
   public:
 	EventHandler();
+
+	// void bind(EventType, Func *);
 
 	Event *getEvent(int pos = 0);
 
