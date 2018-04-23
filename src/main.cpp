@@ -1,12 +1,11 @@
-#include <MediaPreparerController.hpp>
-#include <MediaPreparerGUI.hpp>
+#include <Controller.hpp>
+#include <MediaPreparer.hpp>
 #include <QtWidgets/QApplication>
 
 int main(int argc, char *argv[]) {
 	QApplication app(argc, argv);
 
-	QWidget *widget = new SuperEpicFuntime::MediaPreparerGUI();
-	SuperEpicFuntime::MediaPreparerController c(widget);
+	SuperEpicFuntime::Controller c(new SuperEpicFuntime::MediaPreparer());
 
 	c.show();
 

@@ -2,150 +2,121 @@
 #define MEDIAPREPARER_HPP
 #pragma once
 
-#include <src/File.hpp>
-#include <src/Library.hpp>
-#include <src/Settings.hpp>
-#include <src/product_info.hpp>
+#include <Global.hpp>
+
+#include <EventHandler.hpp>
+#include <File.hpp>
+#include <Library.hpp>
+#include <Settings.hpp>
 
 #include <QtConcurrent/QtConcurrent>
-#include <QtCore/QFuture>
-#include <QtCore/QObject>
-#include <QtCore/QProcess>
-#include <QtCore/QTime>
-#include <QtWidgets/QAction>
-#include <QtWidgets/QLineEdit>
-#include <QtWidgets/QMenu>
-#include <QtWidgets/QSystemTrayIcon>
-#include <QtWidgets/QWidget>
-#include <string>
+#include <QtCore/QtCore>
+#include <QtGui/QtGui>
+#include <QtWidgets/QtWidgets>
+
+#include <boost/algorithm/string.hpp>
+#include <boost/container/vector.hpp>
+#include <boost/filesystem.hpp>
+#include <rapidjson/document.h>
+#include <rapidjson/stream.h>
+
+#include <iostream> // For debugging (cout)
 
 namespace SuperEpicFuntime {
+
 namespace Ui {
 class MediaPreparer;
 }
+
+/** ================================================================================================
+ * (Class) MediaPreparer
+ */
 class MediaPreparer : public QWidget {
 	Q_OBJECT
-  private:
+  public:
 	Ui::MediaPreparer *ui;
 	QSignalMapper *signalMapper = new QSignalMapper(this);
-	QSystemTrayIcon *trayIcon;
-	QMenu *trayIconMenu;
-	QAction *minimizeAction;
-	QAction *maximizeAction;
-	QAction *restoreAction;
-	QAction *quitAction;
-	QTimer *updateTimer = new QTimer(this);
+
 	QWidget *containerEncode;
 	QWidget *containerEncodeList;
-
-	QFuture<void> workerScan;
-	QFuture<void> workerEncode;
-	QFuture<void> workercleanUp;
-	QTime workerTimeStamp;
-	QTime fileTimeStamp;
-	int scanIndex;
-	int encodeIndex;
-	bool cancelScan = false;
-	bool cancelEncode = false;
 
 	const std::string productName = PRODUCT_NAME;
 	const std::string productVersion = PRODUCT_VERSION;
 
-	void closeEvent(QCloseEvent *);
+	void init();
+	void initGUI();
+	void initSignals();
 
-	void scanLibrary(std::string directoryPath);
+	void scanLibrary();
 
 	void encodeLibrary();
 
-	std::string getPath();
+	void closeEvent(QCloseEvent *e);
 
-  public:
-	SuperEpicFuntime::Settings *settings = new SuperEpicFuntime::Settings();
-	SuperEpicFuntime::Library *library = new SuperEpicFuntime::Library(settings);
+	QTimer *updateTimer = new QTimer(this);
+	QFuture<void> worker;
+	QTime workerTimeStamp;
+	WorkerType workerType;
+	File workerItem;
+	QTime workerItemTimeStamp;
+	bool cancelWorker = false;
 
 	explicit MediaPreparer(QWidget *parent = 0);
-
 	~MediaPreparer();
 
-  private slots:
-	void runWorkerScan();
-	QStringList workerScanParams(SuperEpicFuntime::File &file);
-	void workerScanStart();
-	void workerScanAddItem(int itemPosition);
-	void workerScanUpdateProgress(QString message, int progress);
-	void workerScanUpdateProgress(QString message);
-	void workerScanUpdateProgress(int progress);
-	void workerScanEnd();
+  public slots:
+	void loadSettings_gui();
+	void loadSettings_config();
+	void loadSettings_preset(QString preset);
+	void loadSettings_preset();
+	void loadSettings_presets();
 
-	void runWorkerEncode();
-	QStringList workerEncodeParams(SuperEpicFuntime::File &file);
-	void workerEncodeStart();
-	void workerEncodeChangeItem(int itemPosition);
-	void workerEncodeUpdateProgress(QString message, int progress);
-	void workerEncodeUpdateProgress(QString message);
-	void workerEncodeUpdateProgress(int progress);
-	void workerEncodeEnd();
+	void saveSettings_config();
+	void saveSettings_preset(QString preset);
+	void saveSettings_preset();
 
-	void log(std::string message, int logLevel = 0);
-	void log(QString message, int logLevel = 0);
+	void updateGUI_settings();
+	void updateGUI_timers();
 
-	void Init();
-	void InitGUI();
+	void runWorker_scan();
+	void runWorker_encode();
+	void runWorker_cleanup();
 
-	void updateGUI();
+	void eventListener(Event *);
 
-	// void updateEncodeList();
-	// void toggleEncodeFile(int position, int null = NULL);
+	void dialogBrowse(int type = 0);
+	void dialogSave();
+	bool dialogCancel();
 
-	void encodeTab(bool display);
-	void lockUIEncode(bool lock);
-	void lockUILoad(bool lock);
-
-	void createTrayActions();
-	void createTrayIcon();
-	void showTrayMessage(QString message);
-	void trayIconActivated(QSystemTrayIcon::ActivationReason);
-
-	void saveConfig();
-	void loadConfig();
-	bool checkConfig();
-
-	bool diffPreset();
-	void savePreset(std::string presetName);
-	void savePreset();
-	void loadPresets();
-	void loadPreset(std::string presetName);
-	void loadPreset(QString presetName);
-
-	void setEncodeOptions();
-
-	void browseDialog(int type = 0);
-
-	void saveDialog();
-
-	bool cancelDialog();
 	bool cancel();
 
-	void blockAllSignals(bool block);
-
-	void on_button_encode_clicked();
+	void lockUI(bool b = true);
+	void log(QString msg);
+	void blockSignals(bool b);
 
   signals:
-	void started_workerScan();
-	void finished_workerScan();
+	void signal_loadSettings_gui();
+	void signal_loadSettings_config();
+	void signal_loadSettings_preset(QString preset);
+	void signal_loadSettings_presets();
 
-	void started_workerEncode();
-	void finished_workerEncode();
+	void signal_saveSettings_config();
+	void signal_saveSettings_preset(QString preset);
 
-	void item_added_scan(int itemPosition);
-	void progress_updated_scan(QString message, int progress);
-	void progress_updated_scan(QString message);
-	void progress_updated_scan(int progress);
+	void signal_updateGUI_settings();
+	void signal_updateGUI_timers();
 
-	void item_changed_encode(int itemPosition);
-	void progress_updated_encode(QString message, int progress);
-	void progress_updated_encode(QString message);
-	void progress_updated_encode(int progress);
+	void signal_runWorker_scan();
+	void signal_runWorker_encode();
+	void signal_runWorker_cleanup();
+
+	void signal_dialogBrowse(int type = 0);
+	void signal_dialogSave();
+	void signal_dialogCancel();
+
+	void signal_log(QString msg);
+	void signal_blockSignals(bool b);
 };
+
 } // namespace SuperEpicFuntime
 #endif // MEDIAPREPARER_HPP

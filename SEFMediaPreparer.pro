@@ -17,22 +17,20 @@ SOURCES += \
     $$PWD/src/Settings.cpp \
     $$PWD/src/File.cpp \
     $$PWD/src/Library.cpp \
-    $$PWD/src/MediaPreparerGUI.cpp \
+    $$PWD/src/MediaPreparer.cpp \
     $$PWD/src/EventHandler.cpp \
     $$PWD/src/Global.cpp \
-    $$PWD/src/MediaPreparerController.cpp \
-    src/View.cpp
+    $$PWD/src/Controller.cpp
 
 HEADERS += \
     $$PWD/src/Settings.hpp \
     $$PWD/src/File.hpp \
     $$PWD/src/Library.hpp \
     $$PWD/src/product_info.hpp \
-    $$PWD/src/MediaPreparerGUI.hpp \
+    $$PWD/src/MediaPreparer.hpp \
     $$PWD/src/EventHandler.hpp \
     $$PWD/src/Global.hpp \
-    $$PWD/src/MediaPreparerController.hpp \
-    src/View.hpp
+    $$PWD/src/Controller.hpp
 
 FORMS += \
     $$PWD/src/MediaPreparer.ui
@@ -45,8 +43,8 @@ DISTFILES += \
     $$PWD/README.md \
     $$PWD/.gitignore \
     $$PWD/version.txt \
-    $$PWD/src/MediaPreparer.hpp \
-    $$PWD/src/MediaPreparer.cpp
+    $$PWD/src/MediaPreparer.d.hpp \
+    $$PWD/src/MediaPreparer.d.cpp
 
 LIBS += \
     -L$$(LIBS) -lboost_filesystem-mt \

@@ -1,4 +1,4 @@
-#include <MediaPreparerController.hpp>
+#include <Controller.hpp>
 
 using std::string;
 
@@ -9,15 +9,15 @@ namespace SuperEpicFuntime {
 /** ================================================================================================
  * (Class) MediaPreparerController
  */
-MediaPreparerController::MediaPreparerController(QWidget *w) {
+Controller::Controller(QWidget *w) {
 	widget = w;
 }
 
-QWidget *MediaPreparerController::getWidget() {
+QWidget *Controller::getWidget() {
 	return widget;
 }
 
-void MediaPreparerController::show() {
+void Controller::show() {
 	widget->show();
 }
 

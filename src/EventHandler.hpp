@@ -20,7 +20,7 @@ enum EventType {
 	DIALOG_ERROR = 99,
 	CUSTOM = 100
 };
-typedef void(Func)(bool);
+typedef void (*Func)();
 
 /** ================================================================================================
  * (Class) Event
@@ -49,14 +49,14 @@ class EventHandler : public QObject {
 	Q_OBJECT
   private:
 	boost::container::vector<Event *> events;
-	// boost::container::vector<boost::container::vector<Func *>> bindings;
+	boost::container::vector<boost::container::vector<Func>> bindings;
 	Event *current = new Event();
 	Event *previous = new Event();
 
   public:
 	EventHandler();
 
-	// void bind(EventType, Func *);
+	void bind(EventType type, Func functionPtr);
 
 	Event *getEvent(int pos = 0);
 
