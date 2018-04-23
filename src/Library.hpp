@@ -21,8 +21,7 @@ class Library {
 	Settings *_settings;
 	boost::container::vector<File> _Library = {};
 	boost::container::vector<File> _LibraryEncode = {};
-	boost::container::vector<std::string> _extensions = {".wmv", ".avi",  ".divx", ".mkv", ".mka", ".mks", ".webm",
-														 ".mp4", ".mpeg", ".mpg",  ".mov", ".qt",  ".flv"};
+	boost::container::vector<std::string> _extensions = {".wmv", ".avi", ".divx", ".mkv", ".mka", ".mks", ".webm", ".mp4", ".mpeg", ".mpg", ".mov", ".qt", ".flv"};
 	int _duration = -1;
 
   public:

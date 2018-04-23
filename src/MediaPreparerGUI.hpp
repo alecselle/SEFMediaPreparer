@@ -3,10 +3,8 @@
 #pragma once
 
 #include <EventHandler.hpp>
-#include <Global.hpp>
-#include <Worker.hpp>
-
 #include <File.hpp>
+#include <Global.hpp>
 #include <Library.hpp>
 #include <QtConcurrent/QtConcurrent>
 #include <QtCore/QFuture>
@@ -14,14 +12,14 @@
 #include <QtCore/QProcess>
 #include <QtCore/QThread>
 #include <QtCore/QTime>
-#include <QtCore>
-#include <QtGui>
+#include <QtCore/QtCore>
+#include <QtGui/QtGui>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QSystemTrayIcon>
 #include <QtWidgets/QWidget>
-#include <QtWidgets>
+#include <QtWidgets/QtWidgets>
 #include <Settings.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/container/vector.hpp>
@@ -65,13 +63,12 @@ class MediaPreparerGUI : public QWidget {
 
   public:
 	QTimer *updateTimer = new QTimer(this);
-	Worker *w;
 	QFuture<void> worker;
 	QTime workerTimeStamp;
 	WorkerType workerType;
 	File workerItem;
 	QTime workerItemTimeStamp;
-	// bool cancelWorker = false;
+	bool cancelWorker = false;
 
 	explicit MediaPreparerGUI(QWidget *parent = 0);
 	~MediaPreparerGUI();

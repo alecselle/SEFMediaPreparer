@@ -208,17 +208,13 @@ void MediaPreparerGUI::updateGUI_timers() {
  */
 void MediaPreparerGUI::runWorker_scan() {
 	if (!worker.isRunning()) {
-		//		worker = QtConcurrent::run(this, &MediaPreparerGUI::scanLibrary);
-		w = new Worker(SCAN);
-		worker = QtConcurrent::run(w, &Worker::run);
+		worker = QtConcurrent::run(this, &MediaPreparerGUI::scanLibrary);
 	}
 }
 
 void MediaPreparerGUI::runWorker_encode() {
 	if (!worker.isRunning()) {
-		// worker = QtConcurrent::run(this, &MediaPreparerGUI::encodeLibrary);
-		w = new Worker(ENCODE);
-		worker = QtConcurrent::run(w, &Worker::run);
+		worker = QtConcurrent::run(this, &MediaPreparerGUI::encodeLibrary);
 	} else {
 		cancel();
 	}
@@ -232,6 +228,8 @@ void MediaPreparerGUI::runWorker_cleanup() {
  */
 void MediaPreparerGUI::scanLibrary() {
 	loadSettings_gui();
+	//	Worker *w = new Worker(SCAN);
+	//	w->run();
 	library->scan();
 	eventHandler->newEvent(WORKER_STARTED, "Scanning Library", SCAN);
 	eventHandler->newEvent(PROGRESS_MAXIMUM, library->size());
@@ -264,6 +262,8 @@ void MediaPreparerGUI::scanLibrary() {
  */
 void MediaPreparerGUI::encodeLibrary() {
 	loadSettings_gui();
+	//	Worker *w = new Worker(ENCODE);
+	//	w->run();
 	library->scanEncode();
 	eventHandler->newEvent(WORKER_STARTED, "Encoding Library", ENCODE);
 	eventHandler->newEvent(PROGRESS_MAXIMUM, library->sizeEncode());
@@ -313,7 +313,6 @@ void MediaPreparerGUI::encodeLibrary() {
  */
 void MediaPreparerGUI::eventListener(Event *e) {
 	EventType eventType = e->getType();
-	QTime eventTimeStamp = e->getTimeStamp();
 	string eventMessage = e->getMessage();
 	int eventData = e->getData();
 	int eventError = e->getError();

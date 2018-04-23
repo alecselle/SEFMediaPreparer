@@ -3,11 +3,9 @@
 #pragma once
 
 #include <Global.hpp>
-#include <QtCore/QTime>
-#include <QtWidgets/QWidget>
+#include <QtCore/QObject>
 #include <boost/container/vector.hpp>
 #include <iostream>
-#include <string>
 
 namespace SuperEpicFuntime {
 enum EventType {
@@ -21,14 +19,13 @@ enum EventType {
 	DIALOG_ERROR = 99,
 	CUSTOM = 100
 };
+
 /** ================================================================================================
  * (Class) Event
  */
-class Event : public QObject {
-	Q_OBJECT
+class Event {
   private:
 	EventType type;
-	QTime timeStamp;
 	std::string message;
 	int data;
 	int error;
@@ -36,8 +33,8 @@ class Event : public QObject {
   public:
 	Event();
 	Event(EventType type, std::string message, int data = NULL, int error = 0);
+
 	EventType getType();
-	QTime getTimeStamp();
 	std::string getMessage();
 	int getData();
 	int getError();

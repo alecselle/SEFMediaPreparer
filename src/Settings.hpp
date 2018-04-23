@@ -40,8 +40,7 @@ class Settings {
 
 	const boost::container::vector<boost::container::vector<std::string>> DEFAULT_VCODECS = {
 		{"libx265", "hevc", "x265", "h265"}, {"libx264", "x264", "h264"}, {"libvpx", "libvpx-vp9", "vp9", "vpx"}};
-	const boost::container::vector<boost::container::vector<std::string>> DEFAULT_ACODECS = {
-		{"aac"}, {"ac3"}, {"libopus", "opus"}, {"libmp3lame", "mp3", "libmp3"}};
+	const boost::container::vector<boost::container::vector<std::string>> DEFAULT_ACODECS = {{"aac"}, {"ac3"}, {"libopus", "opus"}, {"libmp3lame", "mp3", "libmp3"}};
 	const boost::container::vector<std::string> DEFAULT_CONTAINERS = {"mkv", "mp4", "mpeg", "avi", "mov", "webm"};
 
 	const std::string DEFAULT_VCODEC = "libx265";

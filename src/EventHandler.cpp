@@ -1,6 +1,5 @@
-#include "EventHandler.hpp"
+#include "src/EventHandler.hpp"
 
-namespace bc = boost::container;
 using namespace std;
 
 namespace SuperEpicFuntime {
@@ -10,36 +9,25 @@ namespace SuperEpicFuntime {
  */
 Event::Event() {
 	type = ERROR;
-	timeStamp = QTime();
 	message = "ERROR";
 	data = NULL;
 	error = 1;
 }
-
-Event::Event(EventType t, string m, int d, int e) {
+Event::Event(EventType t, std::string m, int d, int e) {
 	type = t;
-	timeStamp = QTime();
 	message = m;
 	data = d;
 	error = e;
 }
-
 EventType Event::getType() {
 	return type;
 }
-
-QTime Event::getTimeStamp() {
-	return timeStamp;
-}
-
-string Event::getMessage() {
+std::string Event::getMessage() {
 	return message;
 }
-
 int Event::getData() {
 	return data;
 }
-
 int Event::getError() {
 	return error;
 }
@@ -48,19 +36,16 @@ int Event::getError() {
  * (Class) EventHandler
  */
 EventHandler::EventHandler() {
-	connect(this, SIGNAL(createEvent(EventType, std::string, int, int)), this,
-			SLOT(newEvent(EventType, std::string, int, int)));
+	connect(this, SIGNAL(createEvent(EventType, std::string, int, int)), this, SLOT(newEvent(EventType, std::string, int, int)));
 	connect(this, SIGNAL(createEvent(EventType, int, int)), this, SLOT(newEvent(EventType, int, int)));
 }
 
-void EventHandler::newEvent(EventType type, string message, int data, int error) {
+void EventHandler::newEvent(EventType type, std::string message, int data, int error) {
 	Event *e = new Event(type, message, data, error);
 	events.insert(events.begin(), e);
-	cout << "Event#: " << events.size() << " | Type: " << e->getType() << " | Error: " << e->getError()
-		 << " | Data: " << e->getData() << " | Message: " << e->getMessage() << endl;
+	cout << "Event#: " << events.size() << " | Type: " << e->getType() << " | Error: " << e->getError() << " | Data: " << e->getData() << " | Message: " << e->getMessage() << endl;
 	emit createdEvent(e);
 }
-
 void EventHandler::newEvent(EventType type, int data, int error) {
 	newEvent(type, "", data, error);
 }
