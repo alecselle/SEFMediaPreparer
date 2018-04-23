@@ -181,14 +181,15 @@ void MediaPreparerGUI::updateGUI_settings() {
 }
 
 void MediaPreparerGUI::updateGUI_timers() {
-	if (worker.isRunning() && workerType == SCAN) {
+	if (worker.isRunning() && workerType == ENCODE) {
 		if (workerTimeStamp.isValid()) {
 			ui->value_encode_runtime->setText(QString("%1:%2:%3")
 												  .arg(workerTimeStamp.elapsed() / 3600000, 2, 10, QChar('0'))
 												  .arg((workerTimeStamp.elapsed() % 3600000) / 60000, 2, 10, QChar('0'))
 												  .arg(((workerTimeStamp.elapsed() % 3600000) % 60000) / 1000, 2, 10, QChar('0')));
 		}
-		if (worker.isRunning() && workerType == ENCODE) {
+		if (workerItemTimeStamp.isValid()) {
+			cout << workerItemTimeStamp.elapsed() << endl;
 			ui->progress_secondary->setFormat(QString("%1:%2:%3")
 												  .arg(workerItemTimeStamp.elapsed() / 3600000, 2, 10, QChar('0'))
 												  .arg((workerItemTimeStamp.elapsed() % 3600000) / 60000, 2, 10, QChar('0'))
@@ -332,7 +333,7 @@ void MediaPreparerGUI::eventListener(Event *e) {
 		 */
 		case WORKER_STARTED: {
 			workerType = (WorkerType)eventData;
-			workerTimeStamp = QTime();
+			workerTimeStamp.start();
 			cancelWorker = false;
 			ui->progress_primary->setValue(0);
 			lockUI(true);
@@ -409,25 +410,24 @@ void MediaPreparerGUI::eventListener(Event *e) {
 				ui->progress_primary->setFormat(eventMessage.c_str());
 			}
 			switch (workerType) {
-				workerItemTimeStamp = QTime();
+				workerItemTimeStamp.start();
 				case SCAN: {
-					File &eventFile = library->getFile(eventData);
-					workerItem = eventFile;
+					workerItem = library->getFile(eventData);
 					ui->label_fileCount->setText(("<html><head/><body><p>" + std::to_string(eventData + 1) + " file(s) found</p></body></html>").c_str());
 					break;
 				}
 				case ENCODE: {
-					File &eventFile = library->getFileEncode(eventData);
-					workerItem = eventFile;
+					workerItem = library->getFileEncode(eventData);
 					ui->list_encode_Library->selectRow(eventData);
 
-					ui->value_encode_file->setText(eventFile.name().c_str());
-					ui->value_encode_file_vCodec->setText(eventFile.vcodec().c_str());
-					ui->value_encode_file_aCodec->setText(eventFile.acodec().c_str());
-					ui->value_encode_file_container->setText(eventFile.extension().c_str());
-					ui->value_encode_file_subtitles->setText(eventFile.subtitlesStr().c_str());
-					ui->value_encode_file_duration->setText(to_string(eventFile.duration()).c_str());
+					ui->value_encode_file->setText(workerItem.name().c_str());
+					ui->value_encode_file_vCodec->setText(workerItem.vcodec().c_str());
+					ui->value_encode_file_aCodec->setText(workerItem.acodec().c_str());
+					ui->value_encode_file_container->setText(workerItem.extension().c_str());
+					ui->value_encode_file_subtitles->setText(workerItem.subtitlesStr().c_str());
+					ui->value_encode_file_duration->setText(to_string(workerItem.duration()).c_str());
 
+					ui->progress_secondary->setMaximum(workerItem.duration());
 					ui->value_encode_count->setText((to_string(eventData + 1) + " / " + to_string(library->sizeEncode())).c_str());
 
 					break;
