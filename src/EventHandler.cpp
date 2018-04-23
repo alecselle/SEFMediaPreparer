@@ -1,4 +1,4 @@
-#include "src/EventHandler.hpp"
+#include <EventHandler.hpp>
 
 using namespace std;
 

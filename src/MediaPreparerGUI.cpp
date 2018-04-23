@@ -1,5 +1,5 @@
-#include "src/MediaPreparerGUI.hpp"
-#include "ui_MediaPreparer.h"
+#include <MediaPreparerGUI.hpp>
+#include <ui_MediaPreparer.h>
 
 namespace bf = boost::filesystem;
 namespace bc = boost::container;

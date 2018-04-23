@@ -1,4 +1,4 @@
-#include "src/Library.hpp"
+#include <Library.hpp>
 
 namespace bf = boost::filesystem;
 namespace bc = boost::container;

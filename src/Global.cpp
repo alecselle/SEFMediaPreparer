@@ -1,3 +1,3 @@
-#include "Global.hpp"
+#include <Global.hpp>
 
 namespace SuperEpicFuntime {}
