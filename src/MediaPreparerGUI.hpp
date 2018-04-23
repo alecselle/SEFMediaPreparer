@@ -2,33 +2,25 @@
 #define MEDIAPREPARERGUI_HPP
 #pragma once
 
+#include <Global.hpp>
+
 #include <EventHandler.hpp>
 #include <File.hpp>
-#include <Global.hpp>
 #include <Library.hpp>
+#include <Settings.hpp>
+
 #include <QtConcurrent/QtConcurrent>
-#include <QtCore/QFuture>
-#include <QtCore/QObject>
-#include <QtCore/QProcess>
-#include <QtCore/QThread>
-#include <QtCore/QTime>
 #include <QtCore/QtCore>
 #include <QtGui/QtGui>
-#include <QtWidgets/QAction>
-#include <QtWidgets/QLineEdit>
-#include <QtWidgets/QMenu>
-#include <QtWidgets/QSystemTrayIcon>
-#include <QtWidgets/QWidget>
 #include <QtWidgets/QtWidgets>
-#include <Settings.hpp>
+
 #include <boost/algorithm/string.hpp>
 #include <boost/container/vector.hpp>
 #include <boost/filesystem.hpp>
-#include <iostream>
-#include <product_info.hpp>
 #include <rapidjson/document.h>
 #include <rapidjson/stream.h>
-#include <string>
+
+#include <iostream>
 
 namespace SuperEpicFuntime {
 

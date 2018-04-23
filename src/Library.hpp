@@ -2,14 +2,13 @@
 #define LIBRARY_HPP
 #pragma once
 
+#include <Global.hpp>
+
 #include <File.hpp>
 #include <Settings.hpp>
+
 #include <boost/container/vector.hpp>
 #include <boost/filesystem.hpp>
-#include <iostream>
-#include <src/File.hpp>
-#include <src/Settings.hpp>
-#include <string>
 
 namespace SuperEpicFuntime {
 

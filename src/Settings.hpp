@@ -2,17 +2,13 @@
 #define SETTINGS_HPP
 #pragma once
 
-#include "rapidjson/filereadstream.h"
 #include <boost/algorithm/string.hpp>
 #include <boost/container/vector.hpp>
 #include <boost/filesystem.hpp>
-#include <cstdio>
-#include <iostream>
-#include <product_info.hpp>
 #include <rapidjson/document.h>
+#include <rapidjson/filereadstream.h>
 #include <rapidjson/filewritestream.h>
 #include <rapidjson/prettywriter.h>
-#include <string>
 
 namespace SuperEpicFuntime {
 
