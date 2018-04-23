@@ -193,7 +193,7 @@ void MediaPreparerGUI::updateGUI_timers() {
 												  .arg(workerItemTimeStamp.elapsed() / 3600000, 2, 10, QChar('0'))
 												  .arg((workerItemTimeStamp.elapsed() % 3600000) / 60000, 2, 10, QChar('0'))
 												  .arg(((workerItemTimeStamp.elapsed() % 3600000) % 60000) / 1000, 2, 10, QChar('0'))
-												  .arg(workerItemTimeStamp.elapsed() / 3600000, 2, 10, QChar('0'))
+												  .arg(workerItemTimeStamp.msecsTo(QT) / 3600000, 2, 10, QChar('0'))
 												  .arg((workerItemTimeStamp.elapsed() % 3600000) / 60000, 2, 10, QChar('0'))
 												  .arg(((workerItemTimeStamp.elapsed() % 3600000) % 60000) / 1000, 2, 10, QChar('0')));
 			ui->progress_secondary->setValue(workerItemTimeStamp.elapsed());
