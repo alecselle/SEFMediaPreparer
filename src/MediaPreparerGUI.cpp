@@ -219,7 +219,7 @@ void MediaPreparerGUI::scanLibrary() {
 			StringStream out(process.readAllStandardOutput());
 			r = f.loadFileInfo(out);
 		}
-		eventHandler->newEvent(WORKER_ITEM_FINISHED, "Finished Scanning File: " + f.name(), i);
+		eventHandler->newEvent(WORKER_ITEM_FINISHED, i);
 	}
 	library->scanEncode();
 	if (cancelWorker) {
@@ -269,7 +269,7 @@ void MediaPreparerGUI::encodeLibrary() {
 		QProcess process;
 		process.start("ffmpeg", params);
 		process.waitForFinished(-1);
-		eventHandler->newEvent(WORKER_ITEM_FINISHED, "Finished Encoding File: " + f.name(), i);
+		eventHandler->newEvent(WORKER_ITEM_FINISHED, i);
 	}
 	if (cancelWorker) {
 		eventHandler->newEvent(WORKER_FINISHED, "Cancelled Encoding Library", ENCODE, 2);
@@ -330,6 +330,17 @@ void MediaPreparerGUI::eventListener(Event *e) {
 							ui->progress_primary->setValue(library->size());
 							ui->button_encode->setText(("Encode [" + to_string(library->sizeEncode()) + "]").c_str());
 							ui->button_encode->setEnabled((library->sizeEncode() > 0));
+
+							for (int i = 0; i < library->sizeEncode(); i++) {
+								File &f = library->getFileEncode(i);
+								cout << f.name() << " : " << f.vcodec() << " : " << f.acodec() << endl;
+								ui->list_encode_Library->setRowCount(i + 1);
+								ui->list_Library->setItem(i, 0, new QTableWidgetItem(QString(f.name().c_str())));
+								ui->list_Library->setItem(i, 1, new QTableWidgetItem(QString(f.vcodec().c_str())));
+								ui->list_Library->setItem(i, 2, new QTableWidgetItem(QString(f.acodec().c_str())));
+								ui->list_Library->setItem(i, 3, new QTableWidgetItem(QString(f.extension().c_str())));
+								ui->list_Library->setItem(i, 4, new QTableWidgetItem(QString(f.subtitlesStr().c_str())));
+							}
 							break;
 						}
 						default: {
@@ -339,6 +350,7 @@ void MediaPreparerGUI::eventListener(Event *e) {
 							break;
 						}
 					}
+					break;
 				}
 				case ENCODE: {
 					ui->button_encode->setText(("Encode [" + to_string(library->sizeEncode()) + "]").c_str());
