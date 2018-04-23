@@ -6,9 +6,9 @@ int main(int argc, char *argv[]) {
 	QApplication app(argc, argv);
 
 	QWidget *widget = new SuperEpicFuntime::MediaPreparerGUI();
-	SuperEpicFuntime::MediaPreparerController controller(widget);
+	SuperEpicFuntime::MediaPreparerController c(widget);
 
-	controller.show();
+	c.show();
 
 	return app.exec();
 }

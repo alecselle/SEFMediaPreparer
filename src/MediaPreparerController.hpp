@@ -12,11 +12,11 @@ namespace SuperEpicFuntime {
  */
 class MediaPreparerController {
   private:
-	QWidget *p;
+	QWidget *widget;
 
   public:
-	MediaPreparerController(QWidget *parent);
-	QWidget *getParent();
+	MediaPreparerController(QWidget *widget);
+	QWidget *getWidget();
 
 	void show();
 };

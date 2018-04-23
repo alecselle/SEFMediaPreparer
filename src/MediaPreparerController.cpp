@@ -9,16 +9,16 @@ namespace SuperEpicFuntime {
 /** ================================================================================================
  * (Class) MediaPreparerController
  */
-MediaPreparerController::MediaPreparerController(QWidget *parent) {
-	p = parent;
+MediaPreparerController::MediaPreparerController(QWidget *w) {
+	widget = w;
 }
 
-QWidget *MediaPreparerController::getParent() {
-	return p;
+QWidget *MediaPreparerController::getWidget() {
+	return widget;
 }
 
 void MediaPreparerController::show() {
-	p->show();
+	widget->show();
 }
 
 } // namespace SuperEpicFuntime
