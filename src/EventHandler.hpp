@@ -49,7 +49,7 @@ class EventHandler : public QObject {
 	Q_OBJECT
   private:
 	boost::container::vector<Event *> events;
-	boost::container::vector<boost::container::vector<Func>> bindings;
+	boost::container::vector<boost::container::vector<Func>> bindings = {{}};
 	Event *current = new Event();
 	Event *previous = new Event();
 

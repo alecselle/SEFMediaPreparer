@@ -1,7 +1,6 @@
 #ifndef CONTROLLER_HPP
 #define CONTROLLER_HPP
 
-#include <EventHandler.hpp>
 #include <MediaPreparer.hpp>
 #include <QtWidgets/QWidget>
 
@@ -18,6 +17,8 @@ class Controller {
 
   public:
 	Controller(QWidget *widget);
+	Controller();
+
 	QWidget *getWidget();
 
 	void show();

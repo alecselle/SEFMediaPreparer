@@ -13,6 +13,10 @@ Controller::Controller(QWidget *w) {
 	widget = w;
 }
 
+Controller::Controller() {
+	widget = new MediaPreparer();
+}
+
 QWidget *Controller::getWidget() {
 	return widget;
 }
