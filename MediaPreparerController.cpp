@@ -2,9 +2,7 @@
 
 namespace SuperEpicFuntime {
 
-MediaPreparerController::MediaPreparerController(int argc, char *argv[]) {
-	this->argc = argc;
-	this->argv = argv;
+MediaPreparerController::MediaPreparerController() {
 }
 
 MediaPreparerGUI *MediaPreparerController::getParent() {

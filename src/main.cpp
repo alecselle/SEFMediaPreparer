@@ -6,11 +6,11 @@ using namespace SuperEpicFuntime;
 // class SuperEpicFuntime::Event;
 
 int main(int argc, char *argv[]) {
-	// QApplication a(argc, argv);
+	QApplication a(argc, argv);
 
 	// SuperEpicFuntime::MediaPreparer w;
 	// SuperEpicFuntime::MediaPreparerGUI w;
-	MediaPreparerController c(argc, argv);
+	MediaPreparerController c;
 
 	c.show();
 

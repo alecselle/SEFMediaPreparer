@@ -9,13 +9,11 @@ namespace SuperEpicFuntime {
 
 class MediaPreparerController {
   private:
-	int argc;
-	char *argv[];
 	MediaPreparerGUI *p = new MediaPreparerGUI();
 	Ui::MediaPreparer *ui = p->ui;
 
   public:
-	MediaPreparerController(int argc, char *argv[]);
+	MediaPreparerController();
 	MediaPreparerGUI *getParent();
 	Ui::MediaPreparer *getUI();
 
