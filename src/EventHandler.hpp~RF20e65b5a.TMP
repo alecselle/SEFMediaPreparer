@@ -22,7 +22,7 @@ enum EventType {
 	DIALOG_ERROR = 99,
 	CUSTOM = 100
 };
-class MediaPreparer;
+
 /** ================================================================================================
  * (Class) Event
  */
@@ -43,20 +43,15 @@ class Event {
 	int getError();
 };
 
-template <class S, class T> class EventFunction {
-	typedef S (T::*Function)();
-
+template <typename T, class C> class EventFunction {
   private:
 	EventType type;
-	Function function;
-	T *parent;
+	std::mem_fun_t<T, C> function;
 
   public:
-	EventFunction(EventType eventType, Function func, T *parentObject) {
+	EventFunction(EventType eventType, std::mem_fun_t<T, C> func) {
 		type = eventType;
 		function = func;
-		parent = parentObject;
-		std::cout << "created" << std::endl;
 	}
 	EventType getType() {
 		return type;
@@ -64,8 +59,8 @@ template <class S, class T> class EventFunction {
 	std::function<T> getFunc() {
 		return function;
 	}
-	S operator()() {
-		(parent->*function)();
+	T operator()() const {
+		(*function)();
 	}
 };
 
@@ -76,22 +71,16 @@ class EventHandler : public QObject {
 	Q_OBJECT
   private:
 	boost::container::vector<Event *> events;
-	boost::container::vector<EventFunction<void, EventHandler>> bindings;
+	boost::container::vector<EventFunction<void(), QWidget>> bindings;
+
+	template <typename T, class C> void bind(EventType type, std::mem_fun_t<T, C> function);
 
   public:
 	EventHandler();
 
-	void bind(EventType type, void (EventHandler::*f)()) {
-		bindings.push_back(EventFunction<void, EventHandler>(type, f, this));
-	}
-
 	Event *getEvent(int pos = 0);
 
 	int size();
-
-	void test() {
-		std::cout << "test" << std::endl;
-	}
 
   public slots:
 	void newEvent(EventType type, std::string message, int data = NULL, int error = 0);

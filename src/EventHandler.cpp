@@ -48,18 +48,15 @@ void EventHandler::newEvent(EventType type, std::string message, int data, int e
 	events.insert(events.begin(), e);
 	cout << "Event#: " << events.size() << " | Type: " << e->getType() << " | Error: " << e->getError() << " | Data: " << e->getData() << " | Message: " << e->getMessage() << endl;
 	emit createdEvent(e);
-
-	for (int i = 0; i < bindings[type].size(); i++) {
-		Func f = bindings[type][i];
-		f();
+	bindings.push_back(EventFunction(type, &EventHandler::test, this));
+	for (int i = 0; i < bindings.size(); i++) {
+		if (bindings[i].getType() == type) {
+			bindings[i]();
+		}
 	}
 }
 void EventHandler::newEvent(EventType type, int data, int error) {
 	newEvent(type, "", data, error);
-}
-
-void EventHandler::bind(EventType type, Func functionPtr) {
-	bindings[type].push_back(functionPtr);
 }
 
 Event *EventHandler::getEvent(int pos) {

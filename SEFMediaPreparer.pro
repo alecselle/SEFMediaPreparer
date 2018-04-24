@@ -42,9 +42,7 @@ DISTFILES += \
     $$PWD/seflogo.ico \
     $$PWD/README.md \
     $$PWD/.gitignore \
-    $$PWD/version.txt \
-    $$PWD/src/MediaPreparer.d.hpp \
-    $$PWD/src/MediaPreparer.d.cpp
+    $$PWD/version.txt
 
 LIBS += \
     -L$$(LIBS) -lboost_filesystem-mt \

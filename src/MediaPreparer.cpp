@@ -86,6 +86,10 @@ void MediaPreparer::initSignals() {
 	connect(updateTimer, SIGNAL(timeout()), this, SLOT(updateGUI_timers()));
 
 	connect(eventHandler, SIGNAL(createdEvent(Event *)), this, SLOT(eventListener(Event *)), Qt::UniqueConnection);
+
+	// eventHandler->bind(WORKER_STARTED, &MediaPreparer::encodeLibrary);
+
+	// eventHandler->bind(WORKER_STARTED, this, &MediaPreparer::encodeLibrary);
 }
 
 /** ================================================================================================
