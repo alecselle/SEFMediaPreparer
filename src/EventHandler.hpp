@@ -70,10 +70,7 @@ class EventHandler : public QObject {
 	void newEvent(EventType type, std::string message, int data = -1, int error = 0);
 	void newEvent(EventType type, int data = -1, int error = 0);
 
-	Event *getEvent(int pos = -1);
-	int getEventPos(Event *event);
-	Event *lastEvent();
-	int lastEventPos();
+	Event *getEvent(int pos = NULL);
 	int size();
 
   signals:

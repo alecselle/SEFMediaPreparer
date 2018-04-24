@@ -38,30 +38,32 @@ int Event::getError() {
 /** ================================================================================================
  * (Class) EventHandler
  */
-void EventHandler::newEvent(EventType type, std::string message, int data, int error) {
-	Event *e = new Event(type, message, data, error);
+void EventHandler::newEvent(EventType t, std::string m, int d, int er) {
+	Event *e = new Event(t, m, d, er);
 	events.push_back(e);
 
-	cout << "Event#: " << events.size() << " | ";
-	cout << "Type: " << e->getType() << " | ";
+	cout << "Event: " << (size() - 1) << " | ";
+	cout << "Type : " << e->getType() << " | ";
 	cout << "Error: " << e->getError() << " | ";
-	cout << "Data: " << e->getData() << " | ";
-	cout << "Message: " << e->getMessage() << std::endl;
+	cout << "Data : " << e->getData() << " | ";
+	cout << "Mesg : " << e->getMessage() << std::endl;
 
 	emit eventAdded(e);
 	emit eventAdded(size() - 1);
 }
 
-void EventHandler::newEvent(EventType type, int data, int error) {
-	newEvent(type, "", data, error);
+void EventHandler::newEvent(EventType t, int d, int er) {
+	newEvent(t, "", d, er);
 }
 
 Event *EventHandler::getEvent(int pos) {
-	if (pos == -1) {
-		return events[size() - 1];
-	}
-	if (pos >= 0 && pos < size()) {
-		return events[pos];
+	if (size() > 0) {
+		if (pos == NULL) {
+			return events[size() - 1];
+		}
+		if (pos >= 0 && pos < size()) {
+			return events[pos];
+		}
 	}
 	return new Event();
 }
