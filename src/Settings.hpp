@@ -77,7 +77,7 @@ class Settings {
 	void createDefaultPreset();
 };
 
-static Settings *settings;
+// static Settings *settings;
 
 } // namespace SuperEpicFuntime
 #endif // SETTINGS_HPP

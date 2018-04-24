@@ -43,67 +43,83 @@ class Event {
 	int getError();
 };
 
-template <class S, class T> class EventFunction {
-	typedef S (T::*Function)();
-
-  private:
-	EventType type;
-	Function function;
-	T *parent;
-
-  public:
-	EventFunction(EventType eventType, Function func, T *parentObject) {
-		type = eventType;
-		function = func;
-		parent = parentObject;
-		std::cout << "created" << std::endl;
-	}
-	EventType getType() {
-		return type;
-	}
-	std::function<T> getFunc() {
-		return function;
-	}
-	S operator()() {
-		(parent->*function)();
-	}
-};
-
 /** ================================================================================================
  * (Class) EventHandler
  */
-class EventHandler : public QObject {
-	Q_OBJECT
+template <class S, class T> class EventHandler {
   private:
+	typedef S (T::*Function)();
+
+	class EventBinding {
+	  private:
+		EventType type;
+		Function function;
+		T *parent;
+
+	  public:
+		EventBinding(EventType eventType, Function func, T *parentObject) {
+			type = eventType;
+			function = func;
+			parent = parentObject;
+			std::cout << "created" << std::endl;
+		}
+		EventType getType() {
+			return type;
+		}
+		std::function<T> getFunc() {
+			return function;
+		}
+		S operator()() {
+			(parent->*function)();
+		}
+	};
+
 	boost::container::vector<Event *> events;
-	boost::container::vector<EventFunction<void, MediaPreparer>> bindings;
+	boost::container::vector<EventBinding> bindings;
+	T *parent;
 
   public:
-	EventHandler();
-
-	void bind(EventType type, void (MediaPreparer::*f)(), MediaPreparer *parent) {
-		bindings.push_back(EventFunction<void, MediaPreparer>(type, f, parent));
+	EventHandler(T *parentObject) {
+		parent = parentObject;
 	}
 
-	Event *getEvent(int pos = 0);
+	void newEvent(EventType type, std::string message, int data = NULL, int error = 0) {
+		Event *e = new Event(type, message, data, error);
+		events.insert(events.begin(), e);
+		std::cout << "Event#: " << events.size() << " | Type: " << e->getType() << " | Error: " << e->getError() << " | Data: " << e->getData() << " | Message: " << e->getMessage()
+				  << std::endl;
+		// bindings.push_back(EventFunction(type, &EventHandler::test, this));
+		for (int i = 0; i < bindings.size(); i++) {
+			if (bindings[i].getType() == type) {
+				bindings[i]();
+			}
+		}
+	}
 
-	int size();
+	void newEvent(EventType type, int data = NULL, int error = 0) {
+		newEvent(type, "", data, error);
+	}
+
+	void bind(EventType type, S (T::*f)()) {
+		bindings.push_back(EventBinding(type, f, parent));
+	}
+
+	Event *getEvent(int pos = 0) {
+		if (pos >= 0 && pos < size()) {
+			return events[pos];
+		}
+	}
+
+	int size() {
+		return events.size();
+	}
 
 	void test() {
 		std::cout << "test" << std::endl;
 	}
-
-  public slots:
-	void newEvent(EventType type, std::string message, int data = NULL, int error = 0);
-	void newEvent(EventType type, int data = NULL, int error = 0);
-
-  signals:
-	void createdEvent(Event *);
-	void createEvent(EventType type, std::string message, int data = NULL, int error = 0);
-	void createEvent(EventType type, int data = NULL, int error = 0);
 };
 
-static EventHandler *eventHandler;
+// static EventHandler *eventHandler;
 
 } // namespace SuperEpicFuntime
 #endif // EVENTHANDLER_HPP

@@ -60,7 +60,7 @@ class Library {
 	bool skipEncode(std::string filePath);
 };
 
-static Library *library;
+// static Library *library;
 
 } // namespace SuperEpicFuntime
 #endif // LIBRARY_HPP

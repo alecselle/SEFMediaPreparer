@@ -16,9 +16,9 @@ namespace SuperEpicFuntime {
  */
 MediaPreparer::MediaPreparer(QWidget *parent) : QWidget(parent), ui(new Ui::MediaPreparer) {
 	ui->setupUi(this);
-	eventHandler = new EventHandler();
-	settings = new Settings();
-	library = new Library(settings);
+	// eventHandler = new EventHandler();
+	// settings = new Settings();
+	// library = new Library(settings);
 	init();
 }
 
@@ -85,9 +85,9 @@ void MediaPreparer::initSignals() {
 
 	connect(updateTimer, SIGNAL(timeout()), this, SLOT(updateGUI_timers()));
 
-	connect(eventHandler, SIGNAL(createdEvent(Event *)), this, SLOT(eventListener(Event *)), Qt::UniqueConnection);
+	//	connect(eventHandler, SIGNAL(createdEvent(Event *)), this, SLOT(eventListener(Event *)), Qt::UniqueConnection);
 
-	eventHandler->bind(WORKER_STARTED, &MediaPreparer::encodeLibrary, this);
+	//	eventHandler->bind(WORKER_FINISHED, &MediaPreparer::encodeLibrary, this);
 
 	// eventHandler->bind(WORKER_STARTED, this, &MediaPreparer::encodeLibrary);
 }
