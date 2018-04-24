@@ -12,30 +12,30 @@
 
 namespace SuperEpicFuntime {
 enum EventType {
-	WORKER_SCAN_STARTED = 00000101,
-	WORKER_SCAN_FINISHED = 00000102,
-	WORKER_SCAN_ERRORED = 00000103,
-	WORKER_SCAN_ITEM_STARTED = 00000111,
-	WORKER_SCAN_ITEM_FINISHED = 00000112,
+	WORKER_SCAN_STARTED		  = 0xAA01,
+	WORKER_SCAN_FINISHED	  = 0xAA02,
+	WORKER_SCAN_ERRORED		  = 0xAA03,
+	WORKER_SCAN_ITEM_STARTED  = 0xAA11,
+	WORKER_SCAN_ITEM_FINISHED = 0xAA12,
 
-	WORKER_ENCODE_STARTED = 00000201,
-	WORKER_ENCODE_FINISHED = 00000202,
-	WORKER_ENCODE_ERRORED = 00000203,
-	WORKER_ENCODE_ITEM_STARTED = 00000211,
-	WORKER_ENCODE_ITEM_FINISHED = 00000212,
+	WORKER_ENCODE_STARTED		= 0xAB01,
+	WORKER_ENCODE_FINISHED		= 0xAB02,
+	WORKER_ENCODE_ERRORED		= 0xAB03,
+	WORKER_ENCODE_ITEM_STARTED  = 0xAB11,
+	WORKER_ENCODE_ITEM_FINISHED = 0xAB12,
 
-	PROGRESS_PRIMARY_UPDATED = 00001101,
-	PROGRESS_PRIMARY_MAXIMUM_CHANGED = 00001102,
+	PROGRESS_PRIMARY_UPDATED = 0xBA01,
+	PROGRESS_PRIMARY_MAXIMUM = 0xBA02,
 
-	PROGRESS_SECONDARY_UPDATED = 00001201,
-	PROGRESS_SECONDARY_MAXIMUM_CHANGED = 00001202,
+	PROGRESS_SECONDARY_UPDATED = 0xBB01,
+	PROGRESS_SECONDARY_MAXIMUM = 0xBB02,
 
-	DIALOG_BROWSE = 00000770,
-	DIALOG_SAVE = 00000771,
-	DIALOG_ERROR = 00000777,
+	DIALOG_BROWSE = 0xFDA0,
+	DIALOG_SAVE   = 0xFDB0,
+	DIALOG_ERROR  = 0xFD00,
 
-	CUSTOM = 9999,
-	ERROR = -1
+	CUSTOM = 0xFFFF,
+	ERROR  = 0x0000
 };
 class MediaPreparer;
 /** ================================================================================================
@@ -61,96 +61,22 @@ class Event {
 /** ================================================================================================
  * (Class) EventHandler
  */
-/*template <class S, class T> */ class EventHandler : public QObject {
+class EventHandler : public QObject {
 	Q_OBJECT
   private:
-	//	typedef S (T::*Function)();
-	//	class EventBinding {
-	//	  private:
-	//		EventType type;
-	//		int data;
-	//		int error;
-	//		Function function;
-	//		T *parent;
-	//	  public:
-	//		EventBinding(EventType eventType, Function func, T *parentObject) {
-	//			type = eventType;
-	//			function = func;
-	//			parent = parentObject;
-	//			data = NULL;
-	//			error = 0;
-	//		}
-	//		EventBinding(EventType eventType, int eventData, Function func, T *parentObject) {
-	//			type = eventType;
-	//			function = func;
-	//			parent = parentObject;
-	//			data = NULL;
-	//			error = 0;
-	//		}
-	//		EventBinding(EventType eventType, int eventData, int eventError, Function func, T *parentObject) {
-	//			type = eventType;
-	//			function = func;
-	//			parent = parentObject;
-	//			data = NULL;
-	//			error = eventError;
-	//		}
-	//		EventType getType() {
-	//			return type;
-	//		}
-	//		int getData() {
-	//			return data;
-	//		}
-	//		int getError() {
-	//			return error;
-	//		}
-	//		std::function<T> getFunc() {
-	//			return function;
-	//		}
-	//		S operator()() {
-	//			(parent->*function)();
-	//		}
-	//	};
-	//	boost::container::vector<EventBinding> bindings;
-	//	T *parent;
-
 	boost::container::vector<Event *> events;
 
   public:
-	//	EventHandler(T *parentObject) {
-	//		parent = parentObject;
-	//	}
-	//	void bind(EventType type, S (T::*f)()) {
-	//		bindings.push_back(EventBinding(type, f, parent));
-	//	}
-
-	//	void bind(EventType type, int data, S (T::*f)()) {
-	//		bindings.push_back(EventBinding(type, data, f, parent));
-	//	}
-
-	//	void bind(EventType type, int data, int error, S (T::*f)()) {
-	//		bindings.push_back(EventBinding(type, data, error, f, parent));
-	//	}
-
-	//	void callBindings(EventType type, int data, int error) {
-	//		for (int i = 0; i < bindings.size(); i++) {
-	//			auto binding = bindings[i];
-	//			if (binding.getType() == type && (binding.getData() == data || binding.getData() == NULL) && (binding.getError() == error)) {
-	//				bindings[i]();
-	//			}
-	//		}
-	//	}
-
-	Event *getEvent(int pos = 0);
-	int size();
-  public slots:
 	void newEvent(EventType type, std::string message, int data = -1, int error = 0);
 	void newEvent(EventType type, int data = -1, int error = 0);
+
+	Event *getEvent(int pos = -1);
+	int size();
 
   signals:
 	void eventAdded(Event *);
 };
 
-// static EventHandler<void, MediaPreparer> *eventHandler;
 static EventHandler *eventHandler;
 
 } // namespace SuperEpicFuntime

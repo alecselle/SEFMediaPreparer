@@ -14,12 +14,12 @@ File::File() {
 
 File::File(std::string file) {
 	if (bf::exists(bf::canonical(file.c_str()))) {
-		bf::path path = bf::canonical(file.c_str());
+		bf::path path	= bf::canonical(file.c_str());
 		bf::path pathSub = file;
 		pathSub.replace_extension(".srt");
-		_path = path.string();
-		_pathSub = pathSub.string();
-		_name = path.filename().replace_extension().string();
+		_path	  = path.string();
+		_pathSub   = pathSub.string();
+		_name	  = path.filename().replace_extension().string();
 		_extension = path.extension().string();
 	}
 }
@@ -102,7 +102,7 @@ bool File::loadFileInfo(StringStream out) {
 			}
 		}
 		if (d.HasMember("format") && d["format"].HasMember("duration")) {
-			string t = d["format"]["duration"].GetString();
+			string t  = d["format"]["duration"].GetString();
 			_duration = stoi(t) * 1000.0;
 		} else {
 			_duration = 0;

@@ -11,16 +11,16 @@ namespace SuperEpicFuntime {
  * (Class) Event
  */
 Event::Event() {
-	type = ERROR;
+	type	= ERROR;
 	message = "ERROR";
-	data = -1;
-	error = 1;
+	data	= -1;
+	error   = 1;
 }
 Event::Event(EventType t, std::string m, int d, int e) {
-	type = t;
+	type	= t;
 	message = m;
-	data = d;
-	error = e;
+	data	= d;
+	error   = e;
 }
 EventType Event::getType() {
 	return type;
@@ -40,10 +40,15 @@ int Event::getError() {
  */
 void EventHandler::newEvent(EventType type, std::string message, int data, int error) {
 	Event *e = new Event(type, message, data, error);
-	events.insert(events.begin(), e);
+	events.push_back(e);
+
+	cout << "Event#: " << events.size() << " | ";
+	cout << "Type: " << e->getType() << " | ";
+	cout << "Error: " << e->getError() << " | ";
+	cout << "Data: " << e->getData() << " | ";
+	cout << "Message: " << e->getMessage() << std::endl;
+
 	emit eventAdded(e);
-	std::cout << "Event#: " << events.size() << " | Type: " << e->getType() << " | Error: " << e->getError() << " | Data: " << e->getData() << " | Message: " << e->getMessage()
-			  << std::endl;
 }
 
 void EventHandler::newEvent(EventType type, int data, int error) {

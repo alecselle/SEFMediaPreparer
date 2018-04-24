@@ -24,7 +24,7 @@ class File {
 	int _duration = -1;
 
 	int _subtitles = -1;
-	bool _loaded = false;
+	bool _loaded   = false;
 
   public:
 	File();

@@ -16,10 +16,9 @@ namespace SuperEpicFuntime {
  */
 MediaPreparer::MediaPreparer(QWidget *parent) : QWidget(parent), ui(new Ui::MediaPreparer) {
 	ui->setupUi(this);
-	//	eventHandler = new EventHandler<void, MediaPreparer>(this);
 	eventHandler = new EventHandler();
-	settings = new Settings();
-	library = new Library(settings);
+	settings	 = new Settings();
+	library		 = new Library(settings);
 	init();
 }
 
@@ -78,15 +77,15 @@ void MediaPreparer::initSignals() {
  * (Section) Load Settings
  */
 void MediaPreparer::loadSettings_gui() {
-	settings->vCodec = ba::trim_copy(ui->setting_vCodec->currentText().toStdString());
-	settings->aCodec = ba::trim_copy(ui->setting_aCodec->currentText().toStdString());
-	settings->vQuality = ba::trim_copy(std::to_string(ui->setting_vQuality->value()));
-	settings->aQuality = ba::trim_copy(std::to_string(ui->setting_aQuality->value()));
-	settings->container = ba::trim_copy(ui->setting_container->currentText().toStdString());
-	settings->subtitles = ba::trim_copy(ui->setting_subtitles->currentText().toStdString());
-	settings->libraryDir = ba::trim_copy(ui->setting_directory->text().toStdString());
-	settings->outputDir = ba::trim_copy(ui->setting_dirOutput->text().toStdString());
-	settings->threads = ba::trim_copy(ui->setting_threads->text().toStdString());
+	settings->vCodec	  = ba::trim_copy(ui->setting_vCodec->currentText().toStdString());
+	settings->aCodec	  = ba::trim_copy(ui->setting_aCodec->currentText().toStdString());
+	settings->vQuality	= ba::trim_copy(std::to_string(ui->setting_vQuality->value()));
+	settings->aQuality	= ba::trim_copy(std::to_string(ui->setting_aQuality->value()));
+	settings->container   = ba::trim_copy(ui->setting_container->currentText().toStdString());
+	settings->subtitles   = ba::trim_copy(ui->setting_subtitles->currentText().toStdString());
+	settings->libraryDir  = ba::trim_copy(ui->setting_directory->text().toStdString());
+	settings->outputDir   = ba::trim_copy(ui->setting_dirOutput->text().toStdString());
+	settings->threads	 = ba::trim_copy(ui->setting_threads->text().toStdString());
 	settings->extraParams = ba::trim_copy(ui->setting_extraParams->text().toStdString());
 }
 
@@ -214,9 +213,9 @@ void MediaPreparer::runWorker_cleanup() {
  */
 void MediaPreparer::scanLibrary() {
 	eventHandler->newEvent(WORKER_SCAN_STARTED, "Scanning Library");
-	eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM_CHANGED, 0);
+	eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM, 0);
 	library->scan();
-	eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM_CHANGED, library->size());
+	eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM, library->size());
 	for (int i = 0; !cancelWorker && i < library->size(); i++) {
 		File &f = library->getFile(i);
 		eventHandler->newEvent(WORKER_SCAN_ITEM_STARTED, "Scanning File: " + f.name(), i);
@@ -244,9 +243,9 @@ void MediaPreparer::scanLibrary() {
  */
 void MediaPreparer::encodeLibrary() {
 	eventHandler->newEvent(WORKER_ENCODE_STARTED, "Encoding Library");
-	eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM_CHANGED, 0);
+	eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM, 0);
 	library->scanEncode();
-	eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM_CHANGED, library->sizeEncode());
+	eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM, library->sizeEncode());
 	for (int i = 0; !cancelWorker && i < (int)library->sizeEncode(); i++) {
 		File &f = library->getFileEncode(i);
 		eventHandler->newEvent(WORKER_ENCODE_ITEM_STARTED, "Encoding File: " + f.name(), i);
@@ -279,7 +278,9 @@ void MediaPreparer::encodeLibrary() {
 		QProcess process;
 		process.start("ffmpeg", params);
 		process.waitForFinished(-1);
-		bf::rename(settings->tempDir + "\\" + f.name() + "." + settings->container, settings->outputDir + "\\" + f.name() + "." + settings->container);
+		if (!cancelWorker) {
+			bf::rename(settings->tempDir + "\\" + f.name() + "." + settings->container, settings->outputDir + "\\" + f.name() + "." + settings->container);
+		}
 		eventHandler->newEvent(WORKER_ENCODE_ITEM_FINISHED, i);
 	}
 	if (cancelWorker) {
@@ -296,8 +297,8 @@ void MediaPreparer::eventListener(Event *e) {
 	blockSignals(true);
 	EventType eventType = e->getType();
 	string eventMessage = e->getMessage();
-	int eventData = e->getData();
-	int eventError = e->getError();
+	int eventData		= e->getData();
+	int eventError		= e->getError();
 	switch (eventType) {
 		/** ============================================================================================
 		 * (Event) WORKER_SCAN_STARTED
@@ -470,7 +471,7 @@ void MediaPreparer::eventListener(Event *e) {
 		/** ============================================================================================
 		 * (Event) PROGRESS_PRIMARY_MAXIMUM_CHANGED
 		 */
-		case PROGRESS_PRIMARY_MAXIMUM_CHANGED: {
+		case PROGRESS_PRIMARY_MAXIMUM: {
 			ui->progress_primary->setMaximum(eventData);
 			break;
 		}

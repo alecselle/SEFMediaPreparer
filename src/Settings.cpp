@@ -50,7 +50,7 @@ string Settings::parsePresetPath(string path) {
 
 string Settings::parsePresetName(string name) {
 	bf::path p = parsePresetPath(name);
-	string t = p.filename().replace_extension().string();
+	string t   = p.filename().replace_extension().string();
 	return t;
 }
 
@@ -172,14 +172,14 @@ void Settings::saveConfig() {
 }
 
 void Settings::createDefaultConfig() {
-	presetName = parsePresetName(DEFAULT_PRESET);
-	presetPath = DEFAULT_PRESET;
-	libraryDir = DEFAULT_LIBRARY_DIR;
-	tempDir = DEFAULT_TEMP_DIR;
-	outputDir = DEFAULT_OUTPUT_DIR;
-	preserveLog = DEFAULT_PRESERVE_LOG;
-	vCodecList = DEFAULT_VCODECS;
-	aCodecList = DEFAULT_ACODECS;
+	presetName	= parsePresetName(DEFAULT_PRESET);
+	presetPath	= DEFAULT_PRESET;
+	libraryDir	= DEFAULT_LIBRARY_DIR;
+	tempDir		  = DEFAULT_TEMP_DIR;
+	outputDir	 = DEFAULT_OUTPUT_DIR;
+	preserveLog   = DEFAULT_PRESERVE_LOG;
+	vCodecList	= DEFAULT_VCODECS;
+	aCodecList	= DEFAULT_ACODECS;
 	containerList = DEFAULT_CONTAINERS;
 	saveConfig();
 }
@@ -300,13 +300,13 @@ void Settings::refreshPresets() {
 }
 
 void Settings::createDefaultPreset() {
-	vCodec = DEFAULT_VCODEC;
-	vQuality = DEFAULT_VQUALITY;
-	aCodec = DEFAULT_ACODEC;
-	aQuality = DEFAULT_AQUALITY;
-	container = DEFAULT_CONTAINER;
-	subtitles = DEFAULT_SUBTITLES;
-	threads = DEFAULT_THREADS;
+	vCodec		= DEFAULT_VCODEC;
+	vQuality	= DEFAULT_VQUALITY;
+	aCodec		= DEFAULT_ACODEC;
+	aQuality	= DEFAULT_AQUALITY;
+	container   = DEFAULT_CONTAINER;
+	subtitles   = DEFAULT_SUBTITLES;
+	threads		= DEFAULT_THREADS;
 	extraParams = DEFAULT_EXTRA_PARAMS;
 	savePresetAs(DEFAULT_PRESET);
 }

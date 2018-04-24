@@ -40,7 +40,7 @@ class MediaPreparer : public QWidget {
 	QWidget *containerEncode;
 	QWidget *containerEncodeList;
 
-	const std::string productName = PRODUCT_NAME;
+	const std::string productName	= PRODUCT_NAME;
 	const std::string productVersion = PRODUCT_VERSION;
 
 	void init();
