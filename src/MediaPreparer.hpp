@@ -92,28 +92,6 @@ class MediaPreparer : public QWidget {
 
 	void lockUI(bool b = true);
 	void blockSignals(bool b);
-
-  signals:
-	void signal_loadSettings_gui();
-	void signal_loadSettings_config();
-	void signal_loadSettings_preset(QString preset);
-	void signal_loadSettings_presets();
-
-	void signal_saveSettings_config();
-	void signal_saveSettings_preset(QString preset);
-
-	void signal_updateGUI_settings();
-	void signal_updateGUI_timers();
-
-	void signal_runWorker_scan();
-	void signal_runWorker_encode();
-	void signal_runWorker_cleanup();
-
-	void signal_dialogBrowse(int type = 0);
-	void signal_dialogSave();
-	void signal_dialogCancel();
-
-	void signal_blockSignals(bool b);
 };
 
 // static EventHandler<void, MediaPreparer> *eventHandler;

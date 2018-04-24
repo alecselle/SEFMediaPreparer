@@ -51,20 +51,6 @@ void MediaPreparer::initGUI() {
 }
 
 void MediaPreparer::initSignals() {
-	connect(this, SIGNAL(signal_loadSettings_gui()), this, SLOT(loadSettings_gui()));
-	connect(this, SIGNAL(signal_loadSettings_config()), this, SLOT(loadSettings_config()));
-	connect(this, SIGNAL(signal_loadSettings_preset(QString)), this, SLOT(loadSettings_preset(QString)));
-	connect(this, SIGNAL(signal_saveSettings_config()), this, SLOT(saveSettings_config()));
-	connect(this, SIGNAL(signal_saveSettings_preset(QString)), this, SLOT(saveSettings_preset(QString)));
-	connect(this, SIGNAL(signal_updateGUI_settings()), this, SLOT(updateGUI_settings()));
-	connect(this, SIGNAL(signal_updateGUI_timers()), this, SLOT(updateGUI_timers()));
-	connect(this, SIGNAL(signal_runWorker_scan()), this, SLOT(runWorker_scan()), Qt::UniqueConnection);
-	connect(this, SIGNAL(signal_runWorker_encode()), this, SLOT(runWorker_encode()), Qt::UniqueConnection);
-	connect(this, SIGNAL(signal_runWorker_cleanup()), this, SLOT(runWorker_cleanup()), Qt::UniqueConnection);
-	connect(this, SIGNAL(signal_dialogSave()), this, SLOT(dialogSave()));
-	connect(this, SIGNAL(signal_dialogCancel()), this, SLOT(dialogCancel()));
-	connect(this, SIGNAL(signal_blockSignals(bool)), this, SLOT(blockSignals(bool)));
-
 	connect(ui->button_scan_directory, SIGNAL(clicked()), this, SLOT(runWorker_scan()), Qt::UniqueConnection);
 	connect(ui->setting_directory, SIGNAL(returnPressed()), this, SLOT(runWorker_scan()), Qt::UniqueConnection);
 
@@ -86,10 +72,6 @@ void MediaPreparer::initSignals() {
 	connect(updateTimer, SIGNAL(timeout()), this, SLOT(updateGUI_timers()));
 
 	connect(eventHandler, SIGNAL(eventAdded(Event *)), this, SLOT(eventListener(Event *)), Qt::UniqueConnection);
-
-	//	eventHandler->bind(WORKER_FINISHED, SCAN, 0, &MediaPreparer::encodeLibrary);
-
-	// eventHandler->bind(WORKER_STARTED, this, &MediaPreparer::encodeLibrary);
 }
 
 /** ================================================================================================
@@ -311,6 +293,7 @@ void MediaPreparer::encodeLibrary() {
  * (Section) Event Listener
  */
 void MediaPreparer::eventListener(Event *e) {
+	blockSignals(true);
 	EventType eventType = e->getType();
 	string eventMessage = e->getMessage();
 	int eventData = e->getData();
@@ -394,6 +377,7 @@ void MediaPreparer::eventListener(Event *e) {
 			ui->progress_primary->setValue(0);
 			ui->progress_secondary->setValue(0);
 			lockUI(true);
+			ui->container_settings_tabs->setCurrentIndex(3);
 			ui->list_encode_Library->clearContents();
 			ui->value_encode_vCodec->setText(settings->vCodec.c_str());
 			ui->value_encode_vQuality->setText(settings->vQuality.c_str());
@@ -493,6 +477,7 @@ void MediaPreparer::eventListener(Event *e) {
 		}
 		default: { break; }
 	}
+	blockSignals(false);
 }
 /** ================================================================================================
  * (Section) Dialogs
