@@ -6,7 +6,7 @@ QMAKE_CXXFLAGS += -std=c++17 -static-libstdc++ -static-libgcc -Wpedantic -Wno-un
 
 !defined(VER_MAJ):VER_MAJ = 3
 !defined(VER_MIN):VER_MIN = 4
-!defined(VER_PAT):VER_PAT = 0
+!defined(VER_PAT):VER_PAT = 1
 VERSION = $${VER_MAJ}.$${VER_MIN}.$${VER_PAT}
 
 DESTDIR = $$PWD/bin
@@ -14,23 +14,23 @@ TARGET = SEFMediaPreparer
 
 SOURCES += \
     $$PWD/src/main.cpp \
+    $$PWD/src/MediaPreparer.cpp \
+    $$PWD/src/Controller.cpp \
+    $$PWD/src/Global.cpp \
+    $$PWD/src/Event.cpp \
     $$PWD/src/Settings.cpp \
     $$PWD/src/File.cpp \
-    $$PWD/src/Library.cpp \
-    $$PWD/src/MediaPreparer.cpp \
-    $$PWD/src/EventHandler.cpp \
-    $$PWD/src/Global.cpp \
-    $$PWD/src/Controller.cpp
+    $$PWD/src/Library.cpp
 
 HEADERS += \
-    $$PWD/src/Settings.hpp \
-    $$PWD/src/File.hpp \
-    $$PWD/src/Library.hpp \
     $$PWD/src/product_info.hpp \
     $$PWD/src/MediaPreparer.hpp \
-    $$PWD/src/EventHandler.hpp \
+    $$PWD/src/Controller.hpp \
     $$PWD/src/Global.hpp \
-    $$PWD/src/Controller.hpp
+    $$PWD/src/Event.hpp \
+    $$PWD/src/Settings.hpp \
+    $$PWD/src/File.hpp \
+    $$PWD/src/Library.hpp
 
 FORMS += \
     $$PWD/src/MediaPreparer.ui

@@ -1,4 +1,4 @@
-#include <EventHandler.hpp>
+#include <Event.hpp>
 
 namespace bc = boost::container;
 using std::string;

@@ -482,6 +482,7 @@ void MediaPreparer::eventListener(Event *e) {
 	}
 	blockSignals(false);
 }
+
 /** ================================================================================================
  * (Section) Dialogs
  */

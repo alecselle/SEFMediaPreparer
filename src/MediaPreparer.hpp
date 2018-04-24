@@ -4,7 +4,7 @@
 
 #include <Global.hpp>
 
-#include <EventHandler.hpp>
+#include <Event.hpp>
 #include <File.hpp>
 #include <Library.hpp>
 #include <Settings.hpp>

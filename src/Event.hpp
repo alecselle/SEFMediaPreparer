@@ -1,5 +1,5 @@
-#ifndef EVENTHANDLER_HPP
-#define EVENTHANDLER_HPP
+#ifndef EVENT_HPP
+#define EVENT_HPP
 #pragma once
 
 #include <Global.hpp>
@@ -81,4 +81,4 @@ class EventHandler : public QObject {
 static EventHandler *eventHandler;
 
 } // namespace SuperEpicFuntime
-#endif // EVENTHANDLER_HPP
+#endif // EVENT_HPP

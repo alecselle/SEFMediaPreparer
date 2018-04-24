@@ -1,7 +1,7 @@
 #ifndef CONTROLLER_HPP
 #define CONTROLLER_HPP
 
-#include <EventHandler.hpp>
+#include <Event.hpp>
 #include <MediaPreparer.hpp>
 #include <QtWidgets/QWidget>
 
