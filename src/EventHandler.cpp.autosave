@@ -66,6 +66,8 @@ Event *EventHandler::getEvent(int pos) {
 	return new Event();
 }
 
+int EventHandler::getEventPos(Event *event)
+
 int EventHandler::size() {
 	return events.size();
 }

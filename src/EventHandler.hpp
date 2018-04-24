@@ -71,10 +71,14 @@ class EventHandler : public QObject {
 	void newEvent(EventType type, int data = -1, int error = 0);
 
 	Event *getEvent(int pos = -1);
+	int getEventPos(Event *event);
+	Event *lastEvent();
+	int lastEventPos();
 	int size();
 
   signals:
-	void eventAdded(Event *);
+	void eventAdded(Event *event);
+	void eventAdded(int pos);
 };
 
 static EventHandler *eventHandler;
