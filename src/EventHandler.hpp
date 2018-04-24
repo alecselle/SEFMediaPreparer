@@ -76,13 +76,13 @@ class EventHandler : public QObject {
 	Q_OBJECT
   private:
 	boost::container::vector<Event *> events;
-	boost::container::vector<EventFunction<void, EventHandler>> bindings;
+	boost::container::vector<EventFunction<void, MediaPreparer>> bindings;
 
   public:
 	EventHandler();
 
-	void bind(EventType type, void (EventHandler::*f)()) {
-		bindings.push_back(EventFunction<void, EventHandler>(type, f, this));
+	void bind(EventType type, void (MediaPreparer::*f)(), MediaPreparer *parent) {
+		bindings.push_back(EventFunction<void, MediaPreparer>(type, f, parent));
 	}
 
 	Event *getEvent(int pos = 0);

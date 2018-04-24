@@ -20,8 +20,6 @@
 #include <rapidjson/document.h>
 #include <rapidjson/stream.h>
 
-#include <boost/bind.hpp>
-
 #include <iostream> // For debugging (cout)
 
 namespace SuperEpicFuntime {

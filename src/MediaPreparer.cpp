@@ -87,7 +87,7 @@ void MediaPreparer::initSignals() {
 
 	connect(eventHandler, SIGNAL(createdEvent(Event *)), this, SLOT(eventListener(Event *)), Qt::UniqueConnection);
 
-	// eventHandler->bind(WORKER_STARTED, &MediaPreparer::encodeLibrary);
+	eventHandler->bind(WORKER_STARTED, &MediaPreparer::encodeLibrary, this);
 
 	// eventHandler->bind(WORKER_STARTED, this, &MediaPreparer::encodeLibrary);
 }
