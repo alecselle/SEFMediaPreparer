@@ -63,7 +63,6 @@ void MediaPreparer::initSignals() {
 	connect(this, SIGNAL(signal_runWorker_cleanup()), this, SLOT(runWorker_cleanup()), Qt::UniqueConnection);
 	connect(this, SIGNAL(signal_dialogSave()), this, SLOT(dialogSave()));
 	connect(this, SIGNAL(signal_dialogCancel()), this, SLOT(dialogCancel()));
-	connect(this, SIGNAL(signal_log(QString)), this, SLOT(log(QString)));
 	connect(this, SIGNAL(signal_blockSignals(bool)), this, SLOT(blockSignals(bool)));
 
 	connect(ui->button_scan_directory, SIGNAL(clicked()), this, SLOT(runWorker_scan()), Qt::UniqueConnection);
@@ -210,12 +209,14 @@ void MediaPreparer::updateGUI_timers() {
  */
 void MediaPreparer::runWorker_scan() {
 	if (!worker.isRunning()) {
+		loadSettings_gui();
 		worker = QtConcurrent::run(this, &MediaPreparer::scanLibrary);
 	}
 }
 
 void MediaPreparer::runWorker_encode() {
 	if (!worker.isRunning()) {
+		loadSettings_gui();
 		worker = QtConcurrent::run(this, &MediaPreparer::encodeLibrary);
 	} else {
 		cancel();
@@ -229,16 +230,12 @@ void MediaPreparer::runWorker_cleanup() {
  * (Section) Scan Worker
  */
 void MediaPreparer::scanLibrary() {
-	loadSettings_gui();
-	//	Worker *w = new Worker(SCAN);
-	//	w->run();
+	eventHandler->newEvent(WORKER_SCAN_STARTED, "Scanning Library");
 	library->scan();
-	eventHandler->newEvent(WORKER_STARTED, "Scanning Library", SCAN);
-	eventHandler->newEvent(PROGRESS_MAXIMUM, library->size());
+	eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM_CHANGED, library->size());
 	for (int i = 0; !cancelWorker && i < library->size(); i++) {
 		File &f = library->getFile(i);
-		// eventHandler->newEvent(WORKER_ITEM_CHANGED, "SCAN", i);
-		eventHandler->newEvent(WORKER_ITEM_STARTED, "Scanning File: " + f.name(), i);
+		eventHandler->newEvent(WORKER_SCAN_ITEM_STARTED, "Scanning File: " + f.name(), i);
 		QList<QString> params = {"-v", "quiet", "-show_entries", "format=duration:stream=codec_type:stream=codec_name", "-of", "json", f.path().c_str()};
 		QProcess process;
 		bool r = false;
@@ -248,14 +245,13 @@ void MediaPreparer::scanLibrary() {
 			StringStream out(process.readAllStandardOutput());
 			r = f.loadFileInfo(out);
 		}
-		eventHandler->newEvent(WORKER_ITEM_FINISHED, i);
+		eventHandler->newEvent(WORKER_SCAN_ITEM_FINISHED, i);
 	}
 	library->scanEncode();
-	cout << library->sizeEncode() << endl;
 	if (cancelWorker) {
-		eventHandler->newEvent(WORKER_FINISHED, "Cancelled Scanning Library", SCAN, 2);
+		eventHandler->newEvent(WORKER_SCAN_ERRORED, "Cancelled Scanning Library");
 	} else {
-		eventHandler->newEvent(WORKER_FINISHED, "Finished Scanning Library", SCAN);
+		eventHandler->newEvent(WORKER_SCAN_FINISHED, "Finished Scanning Library");
 	}
 }
 
@@ -267,11 +263,11 @@ void MediaPreparer::encodeLibrary() {
 	//	Worker *w = new Worker(ENCODE);
 	//	w->run();
 	library->scanEncode();
-	eventHandler->newEvent(WORKER_STARTED, "Encoding Library", ENCODE);
-	eventHandler->newEvent(PROGRESS_MAXIMUM, library->sizeEncode());
+	eventHandler->newEvent(WORKER_ENCODE_STARTED, "Encoding Library");
+	eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM_CHANGED, library->sizeEncode());
 	for (int i = 0; !cancelWorker && i < (int)library->sizeEncode(); i++) {
 		File &f = library->getFileEncode(i);
-		eventHandler->newEvent(WORKER_ITEM_STARTED, "Encoding File: " + f.name(), i);
+		eventHandler->newEvent(WORKER_ENCODE_ITEM_STARTED, "Encoding File: " + f.name(), i);
 		QList<QString> params = {"-y", "-v", "quiet", "-stats", "-hwaccel", "dxva2", "-threads", settings->threads.c_str(), "-i", f.path().c_str()};
 		if (f.subtitles() == 1 && settings->subtitles.compare("Embed") == 0) {
 			params += {"-i", f.pathSub().c_str()};
@@ -302,12 +298,12 @@ void MediaPreparer::encodeLibrary() {
 		process.start("ffmpeg", params);
 		process.waitForFinished(-1);
 		bf::rename(settings->tempDir + "\\" + f.name() + "." + settings->container, settings->outputDir + "\\" + f.name() + "." + settings->container);
-		eventHandler->newEvent(WORKER_ITEM_FINISHED, i);
+		eventHandler->newEvent(WORKER_ENCODE_ITEM_FINISHED, i);
 	}
 	if (cancelWorker) {
-		eventHandler->newEvent(WORKER_FINISHED, "Cancelled Encoding Library", ENCODE, 2);
+		eventHandler->newEvent(WORKER_ENCODE_ERRORED, "Cancelled Encoding Library");
 	} else {
-		eventHandler->newEvent(WORKER_FINISHED, "Finished Encoding Library", ENCODE);
+		eventHandler->newEvent(WORKER_ENCODE_FINISHED, "Finished Encoding Library");
 	}
 }
 
@@ -321,158 +317,178 @@ void MediaPreparer::eventListener(Event *e) {
 	int eventError = e->getError();
 	switch (eventType) {
 		/** ============================================================================================
-		 * (Event) PROGRESS_UPDATED
+		 * (Event) WORKER_SCAN_STARTED
 		 */
-		case PROGRESS_UPDATED: {
-			ui->progress_primary->setValue(eventData);
-			if (!eventMessage.empty()) {
-				ui->progress_primary->setFormat(eventMessage.c_str());
-			}
-			break;
-		}
-		/** ============================================================================================
-		 * (Event) PROGRESS_MAXIMUM
-		 */
-		case PROGRESS_MAXIMUM: {
-			ui->progress_primary->setMaximum(eventData);
-			break;
-		}
-		/** ============================================================================================
-		 * (Event) WORKER_STARTED
-		 */
-		case WORKER_STARTED: {
+		case WORKER_SCAN_STARTED: {
 			updateTimer->start(100);
-			workerType = (WorkerType)eventData;
+			workerType = SCAN;
 			workerTimeStamp.start();
 			cancelWorker = false;
 			ui->progress_primary->setValue(0);
 			lockUI(true);
-			switch ((WorkerType)eventData) {
-				case SCAN: {
-					ui->list_Library->clearContents();
-					break;
-				}
-				case ENCODE: {
-					ui->list_encode_Library->clearContents();
-
-					ui->value_encode_vCodec->setText(settings->vCodec.c_str());
-					ui->value_encode_vQuality->setText(settings->vQuality.c_str());
-					ui->value_encode_aCodec->setText(settings->aCodec.c_str());
-					ui->value_encode_aQuality->setText(settings->aQuality.c_str());
-					ui->value_encode_container->setText(settings->container.c_str());
-					ui->value_encode_subtitles->setText(settings->subtitles.c_str());
-
-					for (int i = 0; i < library->sizeEncode(); i++) {
-						File &f = library->getFileEncode(i);
-						ui->list_encode_Library->setRowCount(i + 1);
-						ui->list_encode_Library->setItem(i, 0, new QTableWidgetItem(QString(f.name().c_str())));
-						ui->list_encode_Library->setItem(i, 1, new QTableWidgetItem(QString(f.vcodec().c_str())));
-						ui->list_encode_Library->setItem(i, 2, new QTableWidgetItem(QString(f.acodec().c_str())));
-						ui->list_encode_Library->setItem(i, 3, new QTableWidgetItem(QString(f.extension().c_str())));
-						ui->list_encode_Library->setItem(i, 4, new QTableWidgetItem(QString(f.subtitlesStr().c_str())));
-					}
-					break;
-				}
-				default: { break; }
-			}
+			ui->list_Library->clearContents();
 			break;
 		}
 		/** ============================================================================================
-		 * (Event) WORKER_FINISHED
+		 * (Event) WORKER_SCAN_FINISHED
 		 */
-		case WORKER_FINISHED: {
+		case WORKER_SCAN_FINISHED: {
 			updateTimer->stop();
 			if (!eventMessage.empty()) {
 				ui->progress_primary->setFormat(eventMessage.c_str());
 			}
 			lockUI(false);
-			switch ((WorkerType)eventData) {
-				case SCAN: {
-					if (eventError == 0) {
-						ui->progress_primary->setValue(library->size());
-						ui->button_encode->setText(("Encode [" + to_string(library->sizeEncode()) + "]").c_str());
-						ui->button_encode->setEnabled((library->sizeEncode() > 0));
-					} else {
-						ui->progress_primary->setValue(0);
-						ui->button_encode->setText("Encode [0]");
-						ui->button_encode->setEnabled(false);
-					}
-					break;
-				}
-				case ENCODE: {
-					ui->button_encode->setText(("Encode [" + to_string(library->sizeEncode()) + "]").c_str());
-					ui->button_encode->setEnabled((library->sizeEncode() > 0));
-					if (eventError == 0) {
-						ui->progress_primary->setValue(library->sizeEncode());
-					} else {
-						ui->progress_primary->setValue(0);
-					}
-					break;
-				}
-				default: { break; }
+			ui->progress_primary->setValue(library->size());
+			ui->button_encode->setText(("Encode [" + to_string(library->sizeEncode()) + "]").c_str());
+			ui->button_encode->setEnabled((library->sizeEncode() > 0));
+			break;
+		}
+		/** ============================================================================================
+		 * (Event) WORKER_SCAN_ERRORED
+		 */
+		case WORKER_SCAN_ERRORED: {
+			updateTimer->stop();
+			if (!eventMessage.empty()) {
+				ui->progress_primary->setFormat(eventMessage.c_str());
 			}
+			lockUI(false);
+			ui->progress_primary->setValue(0);
+			ui->button_encode->setText("Encode [0]");
+			ui->button_encode->setEnabled(false);
 			break;
 		}
 		/** ================================================================================================
-		 * (Event) WORKER_ITEM_STARTED
+		 * (Event) WORKER_SCAN_ITEM_STARTED
 		 */
-		case WORKER_ITEM_STARTED: {
+		case WORKER_SCAN_ITEM_STARTED: {
 			workerItemTimeStamp.start();
 			if (!eventMessage.empty()) {
 				ui->progress_primary->setFormat(eventMessage.c_str());
 			}
-			switch (workerType) {
-				case SCAN: {
-					workerItem = library->getFile(eventData);
-					ui->label_fileCount->setText(("<html><head/><body><p>" + std::to_string(eventData + 1) + " file(s) found</p></body></html>").c_str());
-					break;
-				}
-				case ENCODE: {
-					workerItem = library->getFileEncode(eventData);
-					ui->list_encode_Library->selectRow(eventData);
-
-					ui->value_encode_file->setText(workerItem.name().c_str());
-					ui->value_encode_file_vCodec->setText(workerItem.vcodec().c_str());
-					ui->value_encode_file_aCodec->setText(workerItem.acodec().c_str());
-					ui->value_encode_file_container->setText(workerItem.extension().c_str());
-					ui->value_encode_file_subtitles->setText(workerItem.subtitlesStr().c_str());
-					ui->value_encode_file_duration->setText(to_string(workerItem.duration()).c_str());
-
-					ui->progress_secondary->setMaximum(workerItem.duration());
-					ui->value_encode_count->setText((to_string(eventData + 1) + " / " + to_string(library->sizeEncode())).c_str());
-
-					break;
-				}
-				default: { break; }
-			}
+			workerItem = library->getFile(eventData);
+			ui->label_fileCount->setText(("<html><head/><body><p>" + std::to_string(eventData + 1) + " file(s) found</p></body></html>").c_str());
 			break;
 		}
 		/** ================================================================================================
-		 * (Event) WORKER_ITEM_FINISHED
+		 * (Event) WORKER_SCAN_ITEM_FINISHED
 		 */
-		case WORKER_ITEM_FINISHED: {
+		case WORKER_SCAN_ITEM_FINISHED: {
 			ui->progress_primary->setValue(eventData);
-			switch (workerType) {
-				case SCAN: {
-					File &eventFile = library->getFile(eventData);
-					ui->list_Library->setRowCount(eventData + 1);
-					ui->list_Library->setItem(eventData, 0, new QTableWidgetItem(QString(eventFile.name().c_str())));
-					ui->list_Library->setItem(eventData, 1, new QTableWidgetItem(QString(eventFile.vcodec().c_str())));
-					ui->list_Library->setItem(eventData, 2, new QTableWidgetItem(QString(eventFile.acodec().c_str())));
-					ui->list_Library->setItem(eventData, 3, new QTableWidgetItem(QString(eventFile.extension().c_str())));
-					ui->list_Library->setItem(eventData, 4, new QTableWidgetItem(QString(eventFile.subtitlesStr().c_str())));
-					break;
-				}
-				case ENCODE: {
-					File &eventFile = library->getFileEncode(eventData);
-					ui->value_encode_lastFile->setText(QString("%1:%2:%3")
-														   .arg(workerItemTimeStamp.elapsed() / 3600000, 2, 10, QChar('0'))
-														   .arg((workerItemTimeStamp.elapsed() % 3600000) / 60000, 2, 10, QChar('0'))
-														   .arg(((workerItemTimeStamp.elapsed() % 3600000) % 60000) / 1000, 2, 10, QChar('0')));
-					break;
-				}
-				default: { break; }
+			File &eventFile = library->getFile(eventData);
+			ui->list_Library->setRowCount(eventData + 1);
+			ui->list_Library->setItem(eventData, 0, new QTableWidgetItem(QString(eventFile.name().c_str())));
+			ui->list_Library->setItem(eventData, 1, new QTableWidgetItem(QString(eventFile.vcodec().c_str())));
+			ui->list_Library->setItem(eventData, 2, new QTableWidgetItem(QString(eventFile.acodec().c_str())));
+			ui->list_Library->setItem(eventData, 3, new QTableWidgetItem(QString(eventFile.extension().c_str())));
+			ui->list_Library->setItem(eventData, 4, new QTableWidgetItem(QString(eventFile.subtitlesStr().c_str())));
+			break;
+		}
+		/** ============================================================================================
+		 * (Event) WORKER_ENCODE_STARTED
+		 */
+		case WORKER_ENCODE_STARTED: {
+			updateTimer->start(100);
+			workerType = ENCODE;
+			workerTimeStamp.start();
+			cancelWorker = false;
+			ui->progress_primary->setValue(0);
+			ui->progress_secondary->setValue(0);
+			lockUI(true);
+			ui->list_encode_Library->clearContents();
+			ui->value_encode_vCodec->setText(settings->vCodec.c_str());
+			ui->value_encode_vQuality->setText(settings->vQuality.c_str());
+			ui->value_encode_aCodec->setText(settings->aCodec.c_str());
+			ui->value_encode_aQuality->setText(settings->aQuality.c_str());
+			ui->value_encode_container->setText(settings->container.c_str());
+			ui->value_encode_subtitles->setText(settings->subtitles.c_str());
+			for (int i = 0; i < library->sizeEncode(); i++) {
+				File &f = library->getFileEncode(i);
+				ui->list_encode_Library->setRowCount(i + 1);
+				ui->list_encode_Library->setItem(i, 0, new QTableWidgetItem(QString(f.name().c_str())));
+				ui->list_encode_Library->setItem(i, 1, new QTableWidgetItem(QString(f.vcodec().c_str())));
+				ui->list_encode_Library->setItem(i, 2, new QTableWidgetItem(QString(f.acodec().c_str())));
+				ui->list_encode_Library->setItem(i, 3, new QTableWidgetItem(QString(f.extension().c_str())));
+				ui->list_encode_Library->setItem(i, 4, new QTableWidgetItem(QString(f.subtitlesStr().c_str())));
 			}
+			break;
+		}
+		/** ============================================================================================
+		 * (Event) WORKER_ENCODE_FINISHED
+		 */
+		case WORKER_ENCODE_FINISHED: {
+			updateTimer->stop();
+			if (!eventMessage.empty()) {
+				ui->progress_primary->setFormat(eventMessage.c_str());
+			}
+			lockUI(false);
+			ui->button_encode->setText(("Encode [" + to_string(library->sizeEncode()) + "]").c_str());
+			ui->button_encode->setEnabled((library->sizeEncode() > 0));
+			ui->progress_primary->setValue(library->sizeEncode());
+			break;
+		}
+		/** ============================================================================================
+		 * (Event) WORKER_ENCODE_ERRORED
+		 */
+		case WORKER_ENCODE_ERRORED: {
+			updateTimer->stop();
+			if (!eventMessage.empty()) {
+				ui->progress_primary->setFormat(eventMessage.c_str());
+			}
+			lockUI(false);
+			ui->button_encode->setText(("Encode [" + to_string(library->sizeEncode()) + "]").c_str());
+			ui->button_encode->setEnabled((library->sizeEncode() > 0));
+			ui->progress_primary->setValue(0);
+			break;
+		}
+		/** ============================================================================================
+		 * (Event) WORKER_ENCODE_ITEM_STARTED
+		 */
+		case WORKER_ENCODE_ITEM_STARTED: {
+			workerItemTimeStamp.start();
+			if (!eventMessage.empty()) {
+				ui->progress_primary->setFormat(eventMessage.c_str());
+			}
+			workerItem = library->getFileEncode(eventData);
+			ui->list_encode_Library->selectRow(eventData);
+			ui->value_encode_file->setText(workerItem.name().c_str());
+			ui->value_encode_file_vCodec->setText(workerItem.vcodec().c_str());
+			ui->value_encode_file_aCodec->setText(workerItem.acodec().c_str());
+			ui->value_encode_file_container->setText(ba::replace_all_copy(workerItem.extension(), ".", "").c_str());
+			ui->value_encode_file_subtitles->setText(workerItem.subtitlesStr().c_str());
+			ui->value_encode_file_duration->setText(QString("%1:%2:%3")
+														.arg(workerItem.duration() / 3600000, 2, 10, QChar('0'))
+														.arg((workerItem.duration() % 3600000) / 60000, 2, 10, QChar('0'))
+														.arg(((workerItem.duration() % 3600000) % 60000) / 1000, 2, 10, QChar('0')));
+			ui->progress_secondary->setMaximum(workerItem.duration());
+			ui->value_encode_count->setText((to_string(eventData + 1) + " / " + to_string(library->sizeEncode())).c_str());
+			break;
+		}
+		/** ============================================================================================
+		 * (Event) WORKER_ENCODE_ITEM_FINISHED
+		 */
+		case WORKER_ENCODE_ITEM_FINISHED: {
+			File &eventFile = library->getFileEncode(eventData);
+			ui->value_encode_lastFile->setText(QString("%1:%2:%3")
+												   .arg(workerItemTimeStamp.elapsed() / 3600000, 2, 10, QChar('0'))
+												   .arg((workerItemTimeStamp.elapsed() % 3600000) / 60000, 2, 10, QChar('0'))
+												   .arg(((workerItemTimeStamp.elapsed() % 3600000) % 60000) / 1000, 2, 10, QChar('0')));
+			break;
+		}
+		/** ============================================================================================
+		 * (Event) PROGRESS_PRIMARY_UPDATED
+		 */
+		case PROGRESS_PRIMARY_UPDATED: {
+			ui->progress_primary->setValue(eventData);
+			if (!eventMessage.empty()) {
+				ui->progress_primary->setFormat(eventMessage.c_str());
+			}
+			break;
+		}
+		/** ============================================================================================
+		 * (Event) PROGRESS_PRIMARY_MAXIMUM_CHANGED
+		 */
+		case PROGRESS_PRIMARY_MAXIMUM_CHANGED: {
+			ui->progress_primary->setMaximum(eventData);
 			break;
 		}
 		default: { break; }
@@ -576,9 +592,6 @@ void MediaPreparer::lockUI(bool b) {
 		ui->button_encode->setText("Cancel");
 		ui->button_encode->setEnabled(true);
 	}
-}
-
-void MediaPreparer::log(QString msg) {
 }
 
 void MediaPreparer::blockSignals(bool b) {

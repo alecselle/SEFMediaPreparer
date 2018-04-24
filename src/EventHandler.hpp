@@ -12,15 +12,30 @@
 
 namespace SuperEpicFuntime {
 enum EventType {
-	ERROR = 0,
-	PROGRESS_UPDATED = 1,
-	PROGRESS_MAXIMUM = 2,
-	WORKER_STARTED = 3,
-	WORKER_FINISHED = 4,
-	WORKER_ITEM_STARTED = 6,
-	WORKER_ITEM_FINISHED = 7,
-	DIALOG_ERROR = 99,
-	CUSTOM = 100
+	WORKER_SCAN_STARTED = 101,
+	WORKER_SCAN_FINISHED = 102,
+	WORKER_SCAN_ERRORED = 103,
+	WORKER_SCAN_ITEM_STARTED = 111,
+	WORKER_SCAN_ITEM_FINISHED = 112,
+
+	WORKER_ENCODE_STARTED = 201,
+	WORKER_ENCODE_FINISHED = 202,
+	WORKER_ENCODE_ERRORED = 203,
+	WORKER_ENCODE_ITEM_STARTED = 211,
+	WORKER_ENCODE_ITEM_FINISHED = 212,
+
+	PROGRESS_PRIMARY_UPDATED = 1101,
+	PROGRESS_PRIMARY_MAXIMUM_CHANGED = 1102,
+
+	PROGRESS_SECONDARY_UPDATED = 1201,
+	PROGRESS_SECONDARY_MAXIMUM_CHANGED = 1202,
+
+	DIALOG_BROWSE = 990,
+	DIALOG_SAVE = 991,
+	DIALOG_ERROR = 999,
+
+	CUSTOM = 9999,
+	ERROR = -1
 };
 class MediaPreparer;
 /** ================================================================================================
@@ -35,7 +50,7 @@ class Event {
 
   public:
 	Event();
-	Event(EventType type, std::string message, int data = NULL, int error = 0);
+	Event(EventType type, std::string message = "", int data = -1, int error = 0);
 
 	EventType getType();
 	std::string getMessage();
@@ -50,7 +65,6 @@ class Event {
 	Q_OBJECT
   private:
 	//	typedef S (T::*Function)();
-
 	//	class EventBinding {
 	//	  private:
 	//		EventType type;
@@ -58,7 +72,6 @@ class Event {
 	//		int error;
 	//		Function function;
 	//		T *parent;
-
 	//	  public:
 	//		EventBinding(EventType eventType, Function func, T *parentObject) {
 	//			type = eventType;
@@ -97,43 +110,15 @@ class Event {
 	//			(parent->*function)();
 	//		}
 	//	};
-
-	boost::container::vector<Event *> events;
 	//	boost::container::vector<EventBinding> bindings;
 	//	T *parent;
+
+	boost::container::vector<Event *> events;
 
   public:
 	//	EventHandler(T *parentObject) {
 	//		parent = parentObject;
 	//	}
-	EventHandler() {
-	}
-
-	Event *getEvent(int pos = 0) {
-		if (pos >= 0 && pos < size()) {
-			return events[pos];
-		}
-	}
-
-	int size() {
-		return events.size();
-	}
-  public slots:
-
-	void newEvent(EventType type, std::string message, int data = NULL, int error = 0) {
-		Event *e = new Event(type, message, data, error);
-		events.insert(events.begin(), e);
-		emit eventAdded(e);
-		std::cout << "Event#: " << events.size() << " | Type: " << e->getType() << " | Error: " << e->getError() << " | Data: " << e->getData() << " | Message: " << e->getMessage()
-				  << std::endl;
-
-		//		callBindings(type, data, error);
-	}
-
-	void newEvent(EventType type, int data = NULL, int error = 0) {
-		newEvent(type, "", data, error);
-	}
-
 	//	void bind(EventType type, S (T::*f)()) {
 	//		bindings.push_back(EventBinding(type, f, parent));
 	//	}
@@ -154,6 +139,12 @@ class Event {
 	//			}
 	//		}
 	//	}
+
+	Event *getEvent(int pos = 0);
+	int size();
+  public slots:
+	void newEvent(EventType type, std::string message, int data = -1, int error = 0);
+	void newEvent(EventType type, int data = -1, int error = 0);
 
   signals:
 	void eventAdded(Event *);

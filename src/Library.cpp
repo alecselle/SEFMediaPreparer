@@ -205,8 +205,8 @@ int Library::findFileEncode(std::string file) {
 }
 
 bool Library::forceEncode(File file) {
-	int i;
-	if ((i = findFile(file)) != NULL && findFileEncode(file) == NULL) {
+	int i = findFile(file);
+	if (i >= 0 && findFileEncode(file) < 0) {
 		_LibraryEncode.push_back(file);
 		return true;
 	}
@@ -218,8 +218,8 @@ bool Library::forceEncode(std::string file) {
 }
 
 bool Library::skipEncode(File file) {
-	int i;
-	if ((i = findFileEncode(file)) != NULL) {
+	int i = findFileEncode(file);
+	if (i >= 0) {
 		_LibraryEncode.erase(_LibraryEncode.begin() + i);
 		return true;
 	}

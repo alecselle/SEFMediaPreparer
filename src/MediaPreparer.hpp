@@ -91,7 +91,6 @@ class MediaPreparer : public QWidget {
 	bool cancel();
 
 	void lockUI(bool b = true);
-	void log(QString msg);
 	void blockSignals(bool b);
 
   signals:
@@ -114,7 +113,6 @@ class MediaPreparer : public QWidget {
 	void signal_dialogSave();
 	void signal_dialogCancel();
 
-	void signal_log(QString msg);
 	void signal_blockSignals(bool b);
 };
 
