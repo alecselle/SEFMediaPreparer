@@ -377,7 +377,8 @@ void MediaPreparer::eventListener(Event *e) {
 			ui->progress_primary->setValue(0);
 			ui->progress_secondary->setValue(0);
 			lockUI(true);
-			ui->container_settings_tabs->setCurrentIndex(3);
+			ui->container_settings_tabs->setCurrentWidget(ui->container_encode);
+			ui->container_encode->show();
 			ui->list_encode_Library->clearContents();
 			ui->value_encode_vCodec->setText(settings->vCodec.c_str());
 			ui->value_encode_vQuality->setText(settings->vQuality.c_str());
