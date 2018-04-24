@@ -55,8 +55,8 @@ call "%~dp0/version.bat"> nul 2>&1
 	exit /b !ERROR_LEVEL!
 	goto EOF
 :INSTALLER
-	echo.[Release] "SEFMediaPreparer-Setup-!VERSION!.exe"
-	call "!WORKSPACE!/SEFMediaPreparer-!VERSION!-Setup.exe"
+	echo.[Release] "SEFMediaPreparer-!VERSION!-Setup.exe" /SILENT
+	call "!WORKSPACE!/SEFMediaPreparer-!VERSION!-Setup.exe" /SILENT
 	if %errorlevel% NEQ 0 call :ERROR_BUILD_FAILED "INSTALLER" "Installer returned an error"
 	exit /b !ERROR_LEVEL!
 	goto EOF

@@ -214,6 +214,7 @@ void MediaPreparer::runWorker_cleanup() {
  */
 void MediaPreparer::scanLibrary() {
 	eventHandler->newEvent(WORKER_SCAN_STARTED, "Scanning Library");
+	eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM_CHANGED, 0);
 	library->scan();
 	eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM_CHANGED, library->size());
 	for (int i = 0; !cancelWorker && i < library->size(); i++) {
@@ -242,11 +243,9 @@ void MediaPreparer::scanLibrary() {
  * (Section) Encode Worker
  */
 void MediaPreparer::encodeLibrary() {
-	loadSettings_gui();
-	//	Worker *w = new Worker(ENCODE);
-	//	w->run();
-	library->scanEncode();
 	eventHandler->newEvent(WORKER_ENCODE_STARTED, "Encoding Library");
+	eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM_CHANGED, 0);
+	library->scanEncode();
 	eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM_CHANGED, library->sizeEncode());
 	for (int i = 0; !cancelWorker && i < (int)library->sizeEncode(); i++) {
 		File &f = library->getFileEncode(i);
@@ -468,13 +467,13 @@ void MediaPreparer::eventListener(Event *e) {
 			}
 			break;
 		}
-			/** ============================================================================================
-			 * (Event) PROGRESS_PRIMARY_MAXIMUM_CHANGED
-			 */
-			//		case PROGRESS_PRIMARY_MAXIMUM_CHANGED: {
-			//			ui->progress_primary->setMaximum(eventData);
-			//			break;
-			//		}
+		/** ============================================================================================
+		 * (Event) PROGRESS_PRIMARY_MAXIMUM_CHANGED
+		 */
+		case PROGRESS_PRIMARY_MAXIMUM_CHANGED: {
+			ui->progress_primary->setMaximum(eventData);
+			break;
+		}
 		default: {
 			cout << "Unhandled Event | Type: " << eventType << " | Error: " << eventError << " | Data: " << eventData << " | Message: " << eventMessage << endl;
 			break;
