@@ -48,6 +48,7 @@ class MediaPreparer : public QWidget {
 	void initSignals();
 
 	void scanLibrary();
+	void scanFile(File &file);
 
 	void encodeLibrary();
 

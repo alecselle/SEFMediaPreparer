@@ -199,6 +199,7 @@ void MediaPreparer::runWorker_scan() {
 void MediaPreparer::runWorker_encode() {
 	if (!worker.isRunning()) {
 		loadSettings_gui();
+		ui->container_settings_tabs->setCurrentIndex(3);
 		worker = QtConcurrent::run(this, &MediaPreparer::encodeLibrary);
 	} else {
 		cancel();
@@ -377,8 +378,6 @@ void MediaPreparer::eventListener(Event *e) {
 			ui->progress_primary->setValue(0);
 			ui->progress_secondary->setValue(0);
 			lockUI(true);
-			ui->container_settings_tabs->setCurrentWidget(ui->container_encode);
-			ui->container_encode->show();
 			ui->list_encode_Library->clearContents();
 			ui->value_encode_vCodec->setText(settings->vCodec.c_str());
 			ui->value_encode_vQuality->setText(settings->vQuality.c_str());
@@ -469,14 +468,17 @@ void MediaPreparer::eventListener(Event *e) {
 			}
 			break;
 		}
-		/** ============================================================================================
-		 * (Event) PROGRESS_PRIMARY_MAXIMUM_CHANGED
-		 */
-		case PROGRESS_PRIMARY_MAXIMUM_CHANGED: {
-			ui->progress_primary->setMaximum(eventData);
+			/** ============================================================================================
+			 * (Event) PROGRESS_PRIMARY_MAXIMUM_CHANGED
+			 */
+			//		case PROGRESS_PRIMARY_MAXIMUM_CHANGED: {
+			//			ui->progress_primary->setMaximum(eventData);
+			//			break;
+			//		}
+		default: {
+			cout << "Unhandled Event | Type: " << eventType << " | Error: " << eventError << " | Data: " << eventData << " | Message: " << eventMessage << endl;
 			break;
 		}
-		default: { break; }
 	}
 	blockSignals(false);
 }
