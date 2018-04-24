@@ -118,5 +118,7 @@ class MediaPreparer : public QWidget {
 	void signal_blockSignals(bool b);
 };
 
+// static EventHandler<void, MediaPreparer> *eventHandler;
+
 } // namespace SuperEpicFuntime
 #endif // MEDIAPREPARER_HPP

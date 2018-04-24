@@ -16,9 +16,10 @@ namespace SuperEpicFuntime {
  */
 MediaPreparer::MediaPreparer(QWidget *parent) : QWidget(parent), ui(new Ui::MediaPreparer) {
 	ui->setupUi(this);
-	// eventHandler = new EventHandler();
-	// settings = new Settings();
-	// library = new Library(settings);
+	//	eventHandler = new EventHandler<void, MediaPreparer>(this);
+	eventHandler = new EventHandler();
+	settings = new Settings();
+	library = new Library(settings);
 	init();
 }
 
@@ -85,9 +86,9 @@ void MediaPreparer::initSignals() {
 
 	connect(updateTimer, SIGNAL(timeout()), this, SLOT(updateGUI_timers()));
 
-	//	connect(eventHandler, SIGNAL(createdEvent(Event *)), this, SLOT(eventListener(Event *)), Qt::UniqueConnection);
+	connect(eventHandler, SIGNAL(eventAdded(Event *)), this, SLOT(eventListener(Event *)), Qt::UniqueConnection);
 
-	//	eventHandler->bind(WORKER_FINISHED, &MediaPreparer::encodeLibrary, this);
+	//	eventHandler->bind(WORKER_FINISHED, SCAN, 0, &MediaPreparer::encodeLibrary);
 
 	// eventHandler->bind(WORKER_STARTED, this, &MediaPreparer::encodeLibrary);
 }
@@ -300,6 +301,7 @@ void MediaPreparer::encodeLibrary() {
 		QProcess process;
 		process.start("ffmpeg", params);
 		process.waitForFinished(-1);
+		bf::rename(settings->tempDir + "\\" + f.name() + "." + settings->container, settings->outputDir + "\\" + f.name() + "." + settings->container);
 		eventHandler->newEvent(WORKER_ITEM_FINISHED, i);
 	}
 	if (cancelWorker) {
