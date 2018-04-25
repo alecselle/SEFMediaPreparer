@@ -71,18 +71,15 @@ class Event {
 		charToString();
 	}
 
-	Event(EventType type, boost::any d) : type(type), d(d) {
-	}
-
 	EventType getType() {
 		return type;
 	}
 
-	boost::container::vector<boost::any> &getDataVector() {
+	boost::container::vector<boost::any> getDataVector() {
 		return data;
 	}
 
-	boost::any &getData(int i = 0) {
+	boost::any getData(int i = 0) {
 		if (i < data.size()) {
 			return data[i];
 		}
