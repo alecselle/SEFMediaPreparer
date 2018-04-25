@@ -47,16 +47,26 @@ class Event {
 	boost::container::vector<boost::any> data;
 	std::string message;
 
+	void charToString() {
+		for (int i = 0; i < data.size(); i++) {
+			if (data[i].type() == typeid(const char *)) {
+				data[i] = (std::string)boost::any_cast<const char *>(data[i]);
+			}
+		}
+	}
+
   public:
 	Event(EventType type, boost::any data, std::string message = "") {
 		this->type = type;
 		this->data.insert(this->data.begin(), data);
 		this->message = message;
+		charToString();
 	}
 	Event(EventType type, std::initializer_list<boost::any> data, std::string message = "") {
 		this->type	= type;
 		this->data	= data;
 		this->message = message;
+		charToString();
 	}
 
 	EventType getType() {
@@ -108,9 +118,6 @@ class EventHandler : public QObject {
 			} else if (e->dataIsType<std::string>(i)) {
 				std::string data = boost::any_cast<std::string>(e->getData(i));
 				std::cout << "Data[" << i << "](string) : " << data << " | ";
-			} else if (e->dataIsType<const char *>(i)) {
-				const char *data = boost::any_cast<const char *>(e->getData(i));
-				std::cout << "Data[" << i << "](char*) : " << data << " | ";
 			} else {
 				std::cout << "Data[" << i << "](NULL) : Unknown/NULL | ";
 			}
