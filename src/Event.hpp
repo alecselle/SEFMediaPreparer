@@ -55,29 +55,28 @@ class Event {
 		}
 	}
 
-	template <typename T> void assignData(T t) {
-		data.push_back(t);
+	template <typename... Args> void assignData(Args... args) {
+		boost::container::vector<boost::any> temp = {args...};
+		for (auto x : temp) {
+			if (x.type() == typeid(EventType)) {
+				type = boost::any_cast<EventType>(x);
+			} else if (x.type() == typeid(const char *)) {
+				data.push_back((std::string)boost::any_cast<const char *>(x));
+			}
+		}
 	}
 
   public:
-	Event(EventType type, std::initializer_list<boost::any> data, std::string message = "") {
+	template <typename... Args> Event(EventType type, std::string message, Args... args) {
 		this->type	= type;
-		this->data	= data;
 		this->message = message;
-		charToString();
-	}
-
-	Event(EventType type, boost::any data, std::string message = "") {
-		this->type = type;
-		this->data.insert(this->data.begin(), data);
-		this->message = message;
-		charToString();
+		assignData(args...);
 	}
 
 	template <typename... Args> Event(EventType type, Args... args) {
-		this->type = type;
-		data	   = {args...};
-		charToString();
+		this->type	= type;
+		this->message = "";
+		assignData(args...);
 	}
 
 	EventType getType() {
@@ -124,11 +123,14 @@ class EventHandler : public QObject {
 		std::cout << "Type: " << e->getType() << " | ";
 		for (int i = 0; i < e->getDataVector().size(); i++) {
 			if (e->dataIsType<int>(i)) {
-				int data = boost::any_cast<int>(e->getData(i));
-				std::cout << "Data[" << i << "](int): " << data << " | ";
+				std::cout << "Data[" << i << "](int): " << e->getData<int>(i) << " | ";
+
 			} else if (e->dataIsType<std::string>(i)) {
-				std::string data = boost::any_cast<std::string>(e->getData(i));
-				std::cout << "Data[" << i << "](string): " << data << " | ";
+				std::cout << "Data[" << i << "](string): " << e->getData<std::string>(i) << " | ";
+
+			} else if (e->dataIsType<char>(i)) {
+				std::cout << "Data[" << i << "](char): " << e->getData<char>(i) << " | ";
+
 			} else {
 				std::cout << "Data[" << i << "](NULL): Unknown/NULL | ";
 			}
@@ -150,6 +152,9 @@ class EventHandler : public QObject {
 		Event *e = new Event(type, data);
 		events.push_back(e);
 		onEventAdded(e);
+	}
+
+	template <typename... Args> void newEvent(EventType type, std::string message, Args... args) {
 	}
 
 	template <typename... Args> void newEvent(EventType type, Args... args) {
