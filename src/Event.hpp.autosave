@@ -70,7 +70,6 @@ class Event {
 		return message;
 	}
 };
-template <class T> class Ev
 
 /** ================================================================================================
  * (Class) EventHandler
@@ -87,6 +86,7 @@ class EventHandler : public QObject {
 
 		std::cout << "Event: " << (size() - 1) << " | ";
 		std::cout << "Type : " << e->getType() << " | ";
+		if (std::is_integral<boost::any>::e->getData())
 		std::cout << "Mesg : " << e->getMessage() << std::endl;
 
 		emit eventAdded(e);
