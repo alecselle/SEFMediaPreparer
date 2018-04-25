@@ -69,7 +69,7 @@ class Event {
 		return NULL;
 	}
 
-	template <class T> bool isType() {
+	template <class T> bool dataIsType() {
 		return (data.type() == typeid(T));
 	}
 
@@ -93,9 +93,9 @@ class EventHandler : public QObject {
 
 		std::cout << "Event: " << (size() - 1) << " | ";
 		std::cout << "Type : " << e->getType() << " | ";
-		if (e->isType<int>()) {
+		if (e->dataIsType<int>()) {
 			std::cout << "Data(int) : " << e->getData<int>() << " | ";
-		} else if (e->isType<std::string>()) {
+		} else if (e->dataIsType<std::string>()) {
 			std::cout << "Data(string) : " << e->getData<std::string>() << " | ";
 		} else {
 			std::cout << "Data(NULL) : Unknown/NULL | ";
