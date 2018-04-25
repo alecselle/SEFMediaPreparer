@@ -112,19 +112,19 @@ class EventHandler : public QObject {
 
 	void onEventAdded(Event *e) {
 		std::cout << "Event: " << (size() - 1) << " | ";
-		std::cout << "Type : " << e->getType() << " | ";
+		std::cout << "Type: " << e->getType() << " | ";
 		for (int i = 0; i < e->getDataVector().size(); i++) {
 			if (e->dataIsType<int>(i)) {
 				int data = boost::any_cast<int>(e->getData(i));
-				std::cout << "Data[" << i << "](int) : " << data << " | ";
+				std::cout << "Data[" << i << "](int): " << data << " | ";
 			} else if (e->dataIsType<std::string>(i)) {
 				std::string data = boost::any_cast<std::string>(e->getData(i));
-				std::cout << "Data[" << i << "](string) : " << data << " | ";
+				std::cout << "Data[" << i << "](string): " << data << " | ";
 			} else {
-				std::cout << "Data[" << i << "](NULL) : Unknown/NULL | ";
+				std::cout << "Data[" << i << "](NULL): Unknown/NULL | ";
 			}
 		}
-		std::cout << "Mesg : " << e->getMessage() << std::endl;
+		std::cout << "Mesg: " << e->getMessage() << std::endl;
 
 		emit eventAdded(getEvent());
 		emit eventAdded(size() - 1);
