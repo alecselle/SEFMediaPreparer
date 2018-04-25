@@ -63,11 +63,11 @@ class Event {
 		return type;
 	}
 
-	boost::container::vector<boost::any> getDataVector() {
+	boost::container::vector<boost::any> &getDataVector() {
 		return data;
 	}
 
-	boost::any getData(int i = 0) {
+	boost::any &getData(int i = 0) {
 		if (i < data.size()) {
 			return data[i];
 		}
@@ -85,7 +85,7 @@ class Event {
 		}
 	}
 
-	std::string getMessage() {
+	std::string &getMessage() {
 		return message;
 	}
 };
@@ -102,10 +102,15 @@ class EventHandler : public QObject {
 		std::cout << "Event: " << (size() - 1) << " | ";
 		std::cout << "Type : " << e->getType() << " | ";
 		for (int i = 0; i < e->getDataVector().size(); i++) {
-			if (e->getData(i).type() == typeid(int)) {
-				std::cout << "Data[" << i << "](int) : " << e->getData<int>(i) << " | ";
-			} else if (e->getData(i).type() == typeid(std::string)) {
-				std::cout << "Data[" << i << "](string) : " << e->getData<std::string>(i) << " | ";
+			if (e->dataIsType<int>(i)) {
+				int data = boost::any_cast<int>(e->getData(i));
+				std::cout << "Data[" << i << "](int) : " << data << " | ";
+			} else if (e->dataIsType<std::string>(i)) {
+				std::string data = boost::any_cast<std::string>(e->getData(i));
+				std::cout << "Data[" << i << "](string) : " << data << " | ";
+			} else if (e->dataIsType<const char *>(i)) {
+				const char *data = boost::any_cast<const char *>(e->getData(i));
+				std::cout << "Data[" << i << "](char*) : " << data << " | ";
 			} else {
 				std::cout << "Data[" << i << "](NULL) : Unknown/NULL | ";
 			}
