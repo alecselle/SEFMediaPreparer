@@ -212,6 +212,7 @@ void MediaPreparer::runWorker_cleanup() {
  * (Section) Scan Worker
  */
 void MediaPreparer::scanLibrary() {
+	eventHandler->newEvent(CUSTOM, {1, 3, "dsa"});
 	eventHandler->newEvent(WORKER_SCAN_STARTED, NULL, "Scanning Library");
 	eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM, 0);
 	library->scan();

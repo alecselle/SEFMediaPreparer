@@ -49,14 +49,14 @@ class Event {
 
   public:
 	Event(EventType type, boost::any data, std::string message = "") {
-		this->type	= type;
-		this->data[0] = data;
+		this->type = type;
+		this->data.insert(this->data.begin(), data);
 		this->message = message;
 	}
-	Event(EventType type, std::initializer_list<boost::any> data) {
+	Event(EventType type, std::initializer_list<boost::any> data, std::string message = "") {
 		this->type	= type;
 		this->data	= data;
-		this->message = "";
+		this->message = message;
 	}
 
 	EventType getType() {
@@ -101,19 +101,19 @@ class EventHandler : public QObject {
 	void onEventAdded(Event *e) {
 		std::cout << "Event: " << (size() - 1) << " | ";
 		std::cout << "Type : " << e->getType() << " | ";
-		//		for (int i = 0; i < e->getDataVector().size(); i++) {
-		//			if (e->getData(i).type() == typeid(int)) {
-		//				std::cout << "Data[" << i << "](int) : " << e->getData<int>(i) << " | ";
-		//			} else if (e->getData(i).type() == typeid(std::string)) {
-		//				std::cout << "Data[" << i << "](string) : " << e->getData<std::string>(i) << " | ";
-		//			} else {
-		//				std::cout << "Data[" << i << "](NULL) : Unknown/NULL | ";
-		//			}
-		//		}
+		for (int i = 0; i < e->getDataVector().size(); i++) {
+			if (e->getData(i).type() == typeid(int)) {
+				std::cout << "Data[" << i << "](int) : " << e->getData<int>(i) << " | ";
+			} else if (e->getData(i).type() == typeid(std::string)) {
+				std::cout << "Data[" << i << "](string) : " << e->getData<std::string>(i) << " | ";
+			} else {
+				std::cout << "Data[" << i << "](NULL) : Unknown/NULL | ";
+			}
+		}
 		std::cout << "Mesg : " << e->getMessage() << std::endl;
 
-		emit eventAdded(e);
-		emit eventAdded(size() - 2);
+		emit eventAdded(getEvent());
+		emit eventAdded(size() - 1);
 	}
 
   public:
