@@ -56,15 +56,16 @@ class Event {
 	}
 
   public:
-	Event(EventType type, boost::any data, std::string message = "") {
-		this->type = type;
-		this->data.insert(this->data.begin(), data);
-		this->message = message;
-		charToString();
-	}
 	Event(EventType type, std::initializer_list<boost::any> data, std::string message = "") {
 		this->type	= type;
 		this->data	= data;
+		this->message = message;
+		charToString();
+	}
+
+	Event(EventType type, boost::any data, std::string message = "") {
+		this->type = type;
+		this->data.insert(this->data.begin(), data);
 		this->message = message;
 		charToString();
 	}
