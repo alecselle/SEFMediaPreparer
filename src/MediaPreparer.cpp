@@ -295,9 +295,8 @@ void MediaPreparer::encodeLibrary() {
  */
 void MediaPreparer::eventListener(Event *e) {
 	blockSignals(true);
-	EventType eventType  = e->getType();
-	string eventMessage  = e->getMessage();
-	boost::any eventData = e->getData();
+	EventType eventType = e->getType();
+	string eventMessage = e->getMessage();
 	switch (eventType) {
 		/** ============================================================================================
 		 * (Event) WORKER_SCAN_STARTED
@@ -344,28 +343,28 @@ void MediaPreparer::eventListener(Event *e) {
 		 * (Event) WORKER_SCAN_ITEM_STARTED
 		 */
 		case WORKER_SCAN_ITEM_STARTED: {
-			int data = boost::any_cast<int>(eventData);
+			int eventData = e->getData<int>();
 			workerItemTimeStamp.start();
 			if (!eventMessage.empty()) {
 				ui->progress_primary->setFormat(eventMessage.c_str());
 			}
-			workerItem = library->getFile(data);
-			ui->label_fileCount->setText(("<html><head/><body><p>" + std::to_string(data + 1) + " file(s) found</p></body></html>").c_str());
+			workerItem = library->getFile(eventData);
+			ui->label_fileCount->setText(("<html><head/><body><p>" + std::to_string(eventData + 1) + " file(s) found</p></body></html>").c_str());
 			break;
 		}
 		/** ================================================================================================
 		 * (Event) WORKER_SCAN_ITEM_FINISHED
 		 */
 		case WORKER_SCAN_ITEM_FINISHED: {
-			int data = boost::any_cast<int>(eventData);
-			ui->progress_primary->setValue(data);
-			File &eventFile = library->getFile(data);
-			ui->list_Library->setRowCount(data + 1);
-			ui->list_Library->setItem(data, 0, new QTableWidgetItem(QString(eventFile.name().c_str())));
-			ui->list_Library->setItem(data, 1, new QTableWidgetItem(QString(eventFile.vcodec().c_str())));
-			ui->list_Library->setItem(data, 2, new QTableWidgetItem(QString(eventFile.acodec().c_str())));
-			ui->list_Library->setItem(data, 3, new QTableWidgetItem(QString(eventFile.extension().c_str())));
-			ui->list_Library->setItem(data, 4, new QTableWidgetItem(QString(eventFile.subtitlesStr().c_str())));
+			int eventData = e->getData<int>();
+			ui->progress_primary->setValue(eventData);
+			File &eventFile = library->getFile(eventData);
+			ui->list_Library->setRowCount(eventData + 1);
+			ui->list_Library->setItem(eventData, 0, new QTableWidgetItem(QString(eventFile.name().c_str())));
+			ui->list_Library->setItem(eventData, 1, new QTableWidgetItem(QString(eventFile.vcodec().c_str())));
+			ui->list_Library->setItem(eventData, 2, new QTableWidgetItem(QString(eventFile.acodec().c_str())));
+			ui->list_Library->setItem(eventData, 3, new QTableWidgetItem(QString(eventFile.extension().c_str())));
+			ui->list_Library->setItem(eventData, 4, new QTableWidgetItem(QString(eventFile.subtitlesStr().c_str())));
 			break;
 		}
 		/** ============================================================================================
@@ -429,13 +428,13 @@ void MediaPreparer::eventListener(Event *e) {
 		 * (Event) WORKER_ENCODE_ITEM_STARTED
 		 */
 		case WORKER_ENCODE_ITEM_STARTED: {
-			int data = boost::any_cast<int>(eventData);
+			int eventData = e->getData<int>();
 			workerItemTimeStamp.start();
 			if (!eventMessage.empty()) {
 				ui->progress_primary->setFormat(eventMessage.c_str());
 			}
-			workerItem = library->getFileEncode(data);
-			ui->list_encode_Library->selectRow(data);
+			workerItem = library->getFileEncode(eventData);
+			ui->list_encode_Library->selectRow(eventData);
 			ui->value_encode_file->setText(workerItem.name().c_str());
 			ui->value_encode_file_vCodec->setText(workerItem.vcodec().c_str());
 			ui->value_encode_file_aCodec->setText(workerItem.acodec().c_str());
@@ -446,15 +445,15 @@ void MediaPreparer::eventListener(Event *e) {
 														.arg((workerItem.duration() % 3600000) / 60000, 2, 10, QChar('0'))
 														.arg(((workerItem.duration() % 3600000) % 60000) / 1000, 2, 10, QChar('0')));
 			ui->progress_secondary->setMaximum(workerItem.duration());
-			ui->value_encode_count->setText((to_string(data + 1) + " / " + to_string(library->sizeEncode())).c_str());
+			ui->value_encode_count->setText((to_string(eventData + 1) + " / " + to_string(library->sizeEncode())).c_str());
 			break;
 		}
 		/** ============================================================================================
 		 * (Event) WORKER_ENCODE_ITEM_FINISHED
 		 */
 		case WORKER_ENCODE_ITEM_FINISHED: {
-			int data		= boost::any_cast<int>(eventData);
-			File &eventFile = library->getFileEncode(data);
+			int eventData   = e->getData<int>();
+			File &eventFile = library->getFileEncode(eventData);
 			ui->value_encode_lastFile->setText(QString("%1:%2:%3")
 												   .arg(workerItemTimeStamp.elapsed() / 3600000, 2, 10, QChar('0'))
 												   .arg((workerItemTimeStamp.elapsed() % 3600000) / 60000, 2, 10, QChar('0'))
@@ -465,8 +464,8 @@ void MediaPreparer::eventListener(Event *e) {
 		 * (Event) PROGRESS_PRIMARY_UPDATED
 		 */
 		case PROGRESS_PRIMARY_UPDATED: {
-			int data = boost::any_cast<int>(eventData);
-			ui->progress_primary->setValue(data);
+			int eventData = e->getData<int>();
+			ui->progress_primary->setValue(eventData);
 			if (!eventMessage.empty()) {
 				ui->progress_primary->setFormat(eventMessage.c_str());
 			}
@@ -476,8 +475,8 @@ void MediaPreparer::eventListener(Event *e) {
 		 * (Event) PROGRESS_PRIMARY_MAXIMUM_CHANGED
 		 */
 		case PROGRESS_PRIMARY_MAXIMUM: {
-			int data = boost::any_cast<int>(eventData);
-			ui->progress_primary->setMaximum(data);
+			int eventData = e->getData<int>();
+			ui->progress_primary->setMaximum(eventData);
 			break;
 		}
 		default: {

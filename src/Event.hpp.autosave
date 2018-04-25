@@ -70,6 +70,7 @@ class Event {
 		return message;
 	}
 };
+template <class T> class Ev
 
 /** ================================================================================================
  * (Class) EventHandler
