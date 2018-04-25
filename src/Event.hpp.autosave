@@ -46,6 +46,7 @@ class Event {
 	EventType type;
 	boost::any data;
 	std::string message;
+	auto a = typeId(int);
 
   public:
 	Event(EventType type, boost::any data, std::string message = "") {
@@ -86,7 +87,6 @@ class EventHandler : public QObject {
 
 		std::cout << "Event: " << (size() - 1) << " | ";
 		std::cout << "Type : " << e->getType() << " | ";
-		if (std::is_integral<boost::any>::e->getData())
 		std::cout << "Mesg : " << e->getMessage() << std::endl;
 
 		emit eventAdded(e);
