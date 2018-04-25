@@ -63,7 +63,14 @@ class Event {
 	}
 
 	template <class T> T getData() {
-		return boost::any_cast<T>(data);
+		if (data.type() == typeid(T)) {
+			return boost::any_cast<T>(data);
+		}
+		return NULL;
+	}
+
+	template <class T> bool isType() {
+		return (data.type() == typeid(T));
 	}
 
 	std::string getMessage() {
@@ -86,6 +93,13 @@ class EventHandler : public QObject {
 
 		std::cout << "Event: " << (size() - 1) << " | ";
 		std::cout << "Type : " << e->getType() << " | ";
+		if (e->isType<int>()) {
+			std::cout << "Data(int) : " << e->getData<int>() << " | ";
+		} else if (e->isType<std::string>()) {
+			std::cout << "Data(string) : " << e->getData<std::string>() << " | ";
+		} else {
+			std::cout << "Data(NULL) : Unknown/NULL | ";
+		}
 		std::cout << "Mesg : " << e->getMessage() << std::endl;
 
 		emit eventAdded(e);
