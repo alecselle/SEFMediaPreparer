@@ -43,39 +43,23 @@ enum EventType {
  */
 class Event {
   private:
-	EventType type;
+	const EventType type;
+	const std::string message;
 	boost::container::vector<boost::any> data;
-	std::string message;
-
-	void charToString() {
-		for (int i = 0; i < data.size(); i++) {
-			if (data[i].type() == typeid(const char *)) {
-				data[i] = (std::string)boost::any_cast<const char *>(data[i]);
-			}
-		}
-	}
 
 	template <typename... Args> void assignData(Args... args) {
 		boost::container::vector<boost::any> temp = {args...};
 		for (auto x : temp) {
-			if (x.type() == typeid(EventType)) {
-				type = boost::any_cast<EventType>(x);
-			} else if (x.type() == typeid(const char *)) {
-				data.push_back((std::string)boost::any_cast<const char *>(x));
-			}
+			data.push_back(x);
 		}
 	}
 
   public:
-	template <typename... Args> Event(EventType type, std::string message, Args... args) {
-		this->type	= type;
-		this->message = message;
+	template <typename... Args> Event(EventType type, std::string message, Args... args) : type(type), message(message) {
 		assignData(args...);
 	}
 
-	template <typename... Args> Event(EventType type, Args... args) {
-		this->type	= type;
-		this->message = "";
+	template <typename... Args> Event(EventType type, Args... args) : type(type), message("") {
 		assignData(args...);
 	}
 
@@ -105,10 +89,26 @@ class Event {
 		}
 	}
 
-	std::string &getMessage() {
+	std::string getMessage() {
 		return message;
 	}
 };
+// template <> std::string Event::getData(int i) {
+//	if (i < data.size()) {
+//		if (dataIsType<const char *>(i)) {
+//			return (std::string)boost::any_cast<const char *>(data[i]);
+//		}
+//		return boost::any_cast<std::string>(data[i]);
+//	}
+//}
+// template <> const char *Event::getData(int i) {
+//	if (i < data.size()) {
+//		if (dataIsType<std::string>(i)) {
+//			return boost::any_cast<std::string>(data[i]).c_str();
+//		}
+//		return boost::any_cast<const char *>(data[i]);
+//	}
+//}
 
 /** ================================================================================================
  * (Class) EventHandler
@@ -142,23 +142,14 @@ class EventHandler : public QObject {
 	}
 
   public:
-	void newEvent(EventType type, boost::any data, std::string message = "") {
-		Event *e = new Event(type, data, message);
-		events.push_back(e);
-		onEventAdded(e);
-	}
-
-	void newEvent(EventType type, std::initializer_list<boost::any> data) {
-		Event *e = new Event(type, data);
-		events.push_back(e);
-		onEventAdded(e);
-	}
-
 	template <typename... Args> void newEvent(EventType type, std::string message, Args... args) {
+		Event *e = new Event(type, message, args...);
+		events.push_back(e);
+		onEventAdded(e);
 	}
 
 	template <typename... Args> void newEvent(EventType type, Args... args) {
-		Event *e = new Event(type, args...);
+		Event *e = new Event(type, "", args...);
 		events.push_back(e);
 		onEventAdded(e);
 	}

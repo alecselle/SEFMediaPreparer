@@ -34,8 +34,6 @@ void MediaPreparer::init() {
 	this->setWindowTitle(productName.c_str());
 	initGUI();
 	initSignals();
-
-	eventHandler->newEvent(CUSTOM, "swag", 14, '+', 7, '=', 21);
 }
 
 void MediaPreparer::initGUI() {
@@ -214,14 +212,13 @@ void MediaPreparer::runWorker_cleanup() {
  * (Section) Scan Worker
  */
 void MediaPreparer::scanLibrary() {
-	eventHandler->newEvent(CUSTOM, {1, 3, "dsa"});
-	eventHandler->newEvent(WORKER_SCAN_STARTED, NULL, "Scanning Library");
+	eventHandler->newEvent(WORKER_SCAN_STARTED, "Scanning Library");
 	eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM, 0);
 	library->scan();
 	eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM, library->size());
 	for (int i = 0; !cancelWorker && i < library->size(); i++) {
 		File &f = library->getFile(i);
-		eventHandler->newEvent(WORKER_SCAN_ITEM_STARTED, i, "Scanning File: " + f.name());
+		eventHandler->newEvent(WORKER_SCAN_ITEM_STARTED, "Scanning File: " + f.name(), i);
 		QList<QString> params = {"-v", "quiet", "-show_entries", "format=duration:stream=codec_type:stream=codec_name", "-of", "json", f.path().c_str()};
 		QProcess process;
 		bool r = false;
@@ -245,13 +242,13 @@ void MediaPreparer::scanLibrary() {
  * (Section) Encode Worker
  */
 void MediaPreparer::encodeLibrary() {
-	eventHandler->newEvent(WORKER_ENCODE_STARTED, NULL, "Encoding Library");
+	eventHandler->newEvent(WORKER_ENCODE_STARTED, "Encoding Library");
 	eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM, 0);
 	library->scanEncode();
 	eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM, library->sizeEncode());
 	for (int i = 0; !cancelWorker && i < (int)library->sizeEncode(); i++) {
 		File &f = library->getFileEncode(i);
-		eventHandler->newEvent(WORKER_ENCODE_ITEM_STARTED, i, "Encoding File: " + f.name());
+		eventHandler->newEvent(WORKER_ENCODE_ITEM_STARTED, "Encoding File: " + f.name(), i);
 		QList<QString> params = {"-y", "-v", "quiet", "-stats", "-hwaccel", "dxva2", "-threads", settings->threads.c_str(), "-i", f.path().c_str()};
 		if (f.subtitles() == 1 && settings->subtitles.compare("Embed") == 0) {
 			params += {"-i", f.pathSub().c_str()};
