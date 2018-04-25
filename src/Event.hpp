@@ -4,9 +4,9 @@
 
 #include <Global.hpp>
 #include <QtCore/QObject>
+#include <boost/any.hpp>
 #include <boost/bind.hpp>
 #include <boost/container/vector.hpp>
-#include <functional>
 
 #include <iostream> // For debugging (cout)
 
@@ -37,25 +37,32 @@ enum EventType {
 	CUSTOM = 0xFFFF,
 	ERROR  = 0x0000
 };
-class MediaPreparer;
+
 /** ================================================================================================
  * (Class) Event
  */
 class Event {
   private:
 	EventType type;
+	boost::any data;
 	std::string message;
-	int data;
-	int error;
 
   public:
-	Event();
-	Event(EventType type, std::string message = "", int data = -1, int error = 0);
+	Event(EventType type, boost::any data, std::string message = "") {
+		this->type	= type;
+		this->data	= data;
+		this->message = message;
+	}
 
-	EventType getType();
-	std::string getMessage();
-	int getData();
-	int getError();
+	EventType getType() {
+		return type;
+	}
+	boost::any getData() {
+		return data;
+	}
+	std::string getMessage() {
+		return message;
+	}
 };
 
 /** ================================================================================================
@@ -67,11 +74,32 @@ class EventHandler : public QObject {
 	boost::container::vector<Event *> events;
 
   public:
-	void newEvent(EventType type, std::string message, int data = -1, int error = 0);
-	void newEvent(EventType type, int data = -1, int error = 0);
+	void newEvent(EventType type, boost::any data, std::string message = "") {
+		Event *e = new Event(type, data, message);
+		events.push_back(e);
 
-	Event *getEvent(int pos = NULL);
-	int size();
+		std::cout << "Event: " << (size() - 1) << " | ";
+		std::cout << "Type : " << e->getType() << " | ";
+		std::cout << "Data : " << boost::any_cast<std::string>(e->getData()) << " | ";
+		std::cout << "Mesg : " << e->getMessage() << std::endl;
+
+		emit eventAdded(e);
+		emit eventAdded(size() - 2);
+	}
+
+	Event *getEvent(int pos = NULL) {
+		if (size() > 0) {
+			if (pos == NULL) {
+				return events[size() - 1];
+			}
+			if (pos >= 0 && pos < size()) {
+				return events[pos];
+			}
+		}
+	}
+	int size() {
+		return events.size();
+	}
 
   signals:
 	void eventAdded(Event *event);

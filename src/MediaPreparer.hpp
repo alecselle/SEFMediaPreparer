@@ -15,6 +15,7 @@
 #include <QtWidgets/QtWidgets>
 
 #include <boost/algorithm/string.hpp>
+#include <boost/any.hpp>
 #include <boost/container/vector.hpp>
 #include <boost/filesystem.hpp>
 #include <rapidjson/document.h>
