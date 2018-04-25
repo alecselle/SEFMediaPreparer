@@ -45,6 +45,7 @@ class Event {
   private:
 	EventType type;
 	boost::container::vector<boost::any> data;
+	boost::any d;
 	std::string message;
 
 	void charToString() {
@@ -68,6 +69,9 @@ class Event {
 		this->data.insert(this->data.begin(), data);
 		this->message = message;
 		charToString();
+	}
+
+	Event(EventType type, boost::any d) : type(type), d(d) {
 	}
 
 	EventType getType() {
