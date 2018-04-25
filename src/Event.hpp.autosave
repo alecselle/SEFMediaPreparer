@@ -55,8 +55,13 @@ class Event {
 		}
 	}
 
-	template <typename T> void assignData(T t) {
-		data.push_back(t);
+	template <typename... Args> void assignData(Args... args) {
+		boost::container::vector<boost::any> temp = {args...};
+		for (auto x : temp) {
+			if (x.type() == typeid(EventType)) {
+				type = boost::any_cast<EventType>(x);
+			}
+		}
 	}
 
   public:
@@ -75,9 +80,7 @@ class Event {
 	}
 
 	template <typename... Args> Event(EventType type, Args... args) {
-		this->type = type;
-		data	   = {args...};
-		charToString();
+		assignData(type, args...);
 	}
 
 	EventType getType() {

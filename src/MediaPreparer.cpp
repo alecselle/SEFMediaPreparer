@@ -34,6 +34,8 @@ void MediaPreparer::init() {
 	this->setWindowTitle(productName.c_str());
 	initGUI();
 	initSignals();
+
+	eventHandler->newEvent(CUSTOM, "swag", 14, '+', 7, '=', 21);
 }
 
 void MediaPreparer::initGUI() {
