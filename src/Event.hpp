@@ -80,7 +80,6 @@ class EventHandler : public QObject {
 
 		std::cout << "Event: " << (size() - 1) << " | ";
 		std::cout << "Type : " << e->getType() << " | ";
-		std::cout << "Data : " << boost::any_cast<std::string>(e->getData()) << " | ";
 		std::cout << "Mesg : " << e->getMessage() << std::endl;
 
 		emit eventAdded(e);
