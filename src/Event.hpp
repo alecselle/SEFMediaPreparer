@@ -45,7 +45,7 @@ class Event {
   private:
 	const EventType type;
 	const std::string message;
-	boost::container::vector<boost::any> data;
+	boost::container::vector<boost::any> data = {};
 
 	template <typename... Args> void assignData(Args... args) {
 		boost::container::vector<boost::any> temp = {args...};
@@ -78,8 +78,10 @@ class Event {
 	}
 
 	template <typename T> T getData(int i = 0) {
-		if (i < data.size() && dataIsType<T>()) {
-			return boost::any_cast<T>(data[i]);
+		if (i < data.size()) {
+			if (dataIsType<T>()) {
+				return boost::any_cast<T>(data[i]);
+			}
 		}
 	}
 
@@ -93,22 +95,6 @@ class Event {
 		return message;
 	}
 };
-// template <> std::string Event::getData(int i) {
-//	if (i < data.size()) {
-//		if (dataIsType<const char *>(i)) {
-//			return (std::string)boost::any_cast<const char *>(data[i]);
-//		}
-//		return boost::any_cast<std::string>(data[i]);
-//	}
-//}
-// template <> const char *Event::getData(int i) {
-//	if (i < data.size()) {
-//		if (dataIsType<std::string>(i)) {
-//			return boost::any_cast<std::string>(data[i]).c_str();
-//		}
-//		return boost::any_cast<const char *>(data[i]);
-//	}
-//}
 
 /** ================================================================================================
  * (Class) EventHandler
@@ -127,10 +113,6 @@ class EventHandler : public QObject {
 
 			} else if (e->dataIsType<std::string>(i)) {
 				std::cout << "Data[" << i << "](string): " << e->getData<std::string>(i) << " | ";
-
-			} else if (e->dataIsType<char>(i)) {
-				std::cout << "Data[" << i << "](char): " << e->getData<char>(i) << " | ";
-
 			} else {
 				std::cout << "Data[" << i << "](NULL): Unknown/NULL | ";
 			}
