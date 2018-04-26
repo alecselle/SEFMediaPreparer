@@ -51,12 +51,13 @@ class Event {
 		for (auto x : d) {
 			if (x.type() == typeid(std::string) && message.empty()) {
 				message = boost::any_cast<std::string>(x);
+
+			} else if (x.type() == typeid(const char *) && message.empty()) {
+				message = (std::string)boost::any_cast<const char *>(x);
+
 			} else if (x.type() == typeid(const char *)) {
-				if (message.empty()) {
-					message = boost::any_cast<const char *>(x);
-				} else {
-					data.push_back(x);
-				}
+				data.push_back((std::string)boost::any_cast<const char *>(x));
+
 			} else {
 				data.push_back(x);
 			}
@@ -78,46 +79,61 @@ class Event {
 				return "WORKER_SCAN_STARTED";
 				break;
 			case WORKER_SCAN_FINISHED:
+				return "WORKER_SCAN_FINISHED";
 				break;
 			case WORKER_SCAN_ERRORED:
+				return "WORKER_SCAN_ERRORED";
 				break;
 			case WORKER_SCAN_ITEM_STARTED:
+				return "WORKER_SCAN_ITEM_STARTED";
 				break;
 			case WORKER_SCAN_ITEM_FINISHED:
+				return "WORKER_SCAN_ITEM_FINISHED";
 				break;
-
 			case WORKER_ENCODE_STARTED:
+				return "WORKER_ENCODE_STARTED";
 				break;
 			case WORKER_ENCODE_FINISHED:
+				return "WORKER_ENCODE_FINISHED";
 				break;
 			case WORKER_ENCODE_ERRORED:
+				return "WORKER_ENCODE_ERRORED";
 				break;
 			case WORKER_ENCODE_ITEM_STARTED:
+				return "WORKER_ENCODE_ITEM_STARTED";
 				break;
 			case WORKER_ENCODE_ITEM_FINISHED:
+				return "WORKER_ENCODE_ITEM_FINISHED";
 				break;
-
 			case PROGRESS_PRIMARY_UPDATED:
+				return "PROGRESS_PRIMARY_UPDATED";
 				break;
 			case PROGRESS_PRIMARY_MAXIMUM:
+				return "PROGRESS_PRIMARY_MAXIMUM";
 				break;
-
 			case PROGRESS_SECONDARY_UPDATED:
+				return "PROGRESS_SECONDARY_UPDATED";
 				break;
 			case PROGRESS_SECONDARY_MAXIMUM:
+				return "PROGRESS_SECONDARY_MAXIMUM";
 				break;
-
 			case DIALOG_BROWSE:
+				return "DIALOG_BROWSE";
 				break;
 			case DIALOG_SAVE:
+				return "DIALOG_SAVE";
 				break;
 			case DIALOG_ERROR:
+				return "DIALOG_ERROR";
 				break;
-
 			case CUSTOM:
+				return "CUSTOM";
 				break;
 			case ERROR:
+				return "ERROR";
 				break;
+			default:
+				return "UNKNOWN";
 		}
 	}
 
@@ -160,7 +176,7 @@ class EventHandler : public QObject {
 
 	void onEventAdded(Event *e) {
 		std::cout << "Event: " << (size() - 1) << " | ";
-		std::cout << "Type: " << e->getType() << " | ";
+		std::cout << "Type: " << e->getTypeStr() << " | ";
 		for (int i = 0; i < e->getDataVector().size(); i++) {
 			if (e->dataIsType<int>(i)) {
 				std::cout << "Data[" << i << "](int): " << e->getData<int>(i) << " | ";
@@ -168,7 +184,7 @@ class EventHandler : public QObject {
 			} else if (e->dataIsType<std::string>(i)) {
 				std::cout << "Data[" << i << "](string): " << e->getData<std::string>(i) << " | ";
 			} else {
-				std::cout << "Data[" << i << "](NULL): Unknown/NULL | ";
+				std::cout << "Data[" << i << "](" << e->getData(i).type().name() << "): Unknown | ";
 			}
 		}
 		std::cout << "Mesg: " << e->getMessage() << std::endl;
