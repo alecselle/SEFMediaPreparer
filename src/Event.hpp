@@ -52,9 +52,9 @@ class Event {
 			if (x.type() == typeid(std::string) && message.empty()) {
 				message = boost::any_cast<std::string>(x);
 			} else if (x.type() == typeid(const char *) && message.empty()) {
-				message = (std::string)boost::any_cast<const char *>(x);
+				message = std::string(boost::any_cast<const char *>(x));
 			} else if (x.type() == typeid(const char *)) {
-				data.push_back((std::string)boost::any_cast<const char *>(x));
+				data.push_back(std::string(boost::any_cast<const char *>(x)));
 			} else {
 				data.push_back(x);
 			}

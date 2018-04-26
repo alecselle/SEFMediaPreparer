@@ -20,7 +20,7 @@ MediaPreparer::MediaPreparer(QWidget *parent) : QWidget(parent), ui(new Ui::Medi
 	settings	 = new Settings();
 	library		 = new Library(settings);
 	init();
-	eventHandler->newEvent(CUSTOM, "this is a message?", 0, NULL, "this is data[3]?", settings);
+	eventHandler->newEvent(CUSTOM, "this is a message?", 0, NULL, "this is data?", settings);
 }
 
 MediaPreparer::~MediaPreparer() {
@@ -298,18 +298,6 @@ void MediaPreparer::eventListener(Event *e) {
 	blockSignals(true);
 	EventType eventType = e->getType();
 	string eventMessage = e->getMessage();
-	boost::container::vector<int> eventDataInt;
-	boost::container::vector<string> eventDataString;
-	boost::container::vector<File> eventDataFile;
-	for (int i = 0; i < e->size(); i++) {
-		if (e->dataIsType<int>(i)) {
-			eventDataInt.push_back(e->getData<int>(i));
-		} else if (e->dataIsType<string>(i)) {
-			eventDataString.push_back(e->getData<string>(i));
-		} else if (e->dataIsType<File>(i)) {
-			eventDataFile.push_back(e->getData<File>(i));
-		}
-	}
 	switch (eventType) {
 		/** ============================================================================================
 		 * (Event) WORKER_SCAN_STARTED
@@ -356,8 +344,8 @@ void MediaPreparer::eventListener(Event *e) {
 		 * (Event) WORKER_SCAN_ITEM_STARTED
 		 */
 		case WORKER_SCAN_ITEM_STARTED: {
-			if (e->dataIsType<int>()) {
-				int eventData = e->getData<int>();
+			if (e->dataIsType<int>(0)) {
+				int eventData = e->getData<int>(0);
 				workerItemTimeStamp.start();
 				if (!eventMessage.empty()) {
 					ui->progress_primary->setFormat(eventMessage.c_str());
@@ -371,8 +359,8 @@ void MediaPreparer::eventListener(Event *e) {
 		 * (Event) WORKER_SCAN_ITEM_FINISHED
 		 */
 		case WORKER_SCAN_ITEM_FINISHED: {
-			if (e->dataIsType<int>()) {
-				int eventData = e->getData<int>();
+			if (e->dataIsType<int>(0)) {
+				int eventData = e->getData<int>(0);
 				ui->progress_primary->setValue(eventData);
 				File &eventFile = library->getFile(eventData);
 				ui->list_Library->setRowCount(eventData + 1);
@@ -445,8 +433,8 @@ void MediaPreparer::eventListener(Event *e) {
 		 * (Event) WORKER_ENCODE_ITEM_STARTED
 		 */
 		case WORKER_ENCODE_ITEM_STARTED: {
-			if (e->dataIsType<int>()) {
-				int eventData = e->getData<int>();
+			if (e->dataIsType<int>(0)) {
+				int eventData = e->getData<int>(0);
 				workerItemTimeStamp.start();
 				if (!eventMessage.empty()) {
 					ui->progress_primary->setFormat(eventMessage.c_str());
@@ -471,8 +459,8 @@ void MediaPreparer::eventListener(Event *e) {
 		 * (Event) WORKER_ENCODE_ITEM_FINISHED
 		 */
 		case WORKER_ENCODE_ITEM_FINISHED: {
-			if (e->dataIsType<int>()) {
-				int eventData   = e->getData<int>();
+			if (e->dataIsType<int>(0)) {
+				int eventData   = e->getData<int>(0);
 				File &eventFile = library->getFileEncode(eventData);
 				ui->value_encode_lastFile->setText(QString("%1:%2:%3")
 													   .arg(workerItemTimeStamp.elapsed() / 3600000, 2, 10, QChar('0'))
@@ -485,8 +473,8 @@ void MediaPreparer::eventListener(Event *e) {
 		 * (Event) PROGRESS_PRIMARY_UPDATED
 		 */
 		case PROGRESS_PRIMARY_UPDATED: {
-			if (e->dataIsType<int>()) {
-				int eventData = e->getData<int>();
+			if (e->dataIsType<int>(0)) {
+				int eventData = e->getData<int>(0);
 				ui->progress_primary->setValue(eventData);
 				if (!eventMessage.empty()) {
 					ui->progress_primary->setFormat(eventMessage.c_str());
@@ -498,14 +486,24 @@ void MediaPreparer::eventListener(Event *e) {
 		 * (Event) PROGRESS_PRIMARY_MAXIMUM_CHANGED
 		 */
 		case PROGRESS_PRIMARY_MAXIMUM: {
-			if (e->dataIsType<int>()) {
-				int eventData = e->getData<int>();
+			if (e->dataIsType<int>(0)) {
+				int eventData = e->getData<int>(0);
 				ui->progress_primary->setMaximum(eventData);
 			}
 			break;
 		}
 		default: {
-			cout << "Unhandled Event | Type: " << e->getTypeStr() << " | Message: " << eventMessage << endl;
+			cout << "Unhandled Event | Type: " << e->getTypeStr() << " | ";
+			for (int i = 0; i < e->getDataVector().size(); i++) {
+				if (e->dataIsType<int>(i)) {
+					cout << "Data[" << i << "](int): " << e->getData<int>(i) << " | ";
+				} else if (e->dataIsType<string>(i)) {
+					cout << "Data[" << i << "](string): " << e->getData<string>(i) << " | ";
+				} else {
+					cout << "Data[" << i << "](" << e->getData(i).type().name() << "): Unknown | ";
+				}
+			}
+			cout << "Message: " << eventMessage << endl;
 			break;
 		}
 	}
