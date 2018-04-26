@@ -47,31 +47,23 @@ class Event {
 	std::string message;
 	boost::container::vector<boost::any> data;
 
-	template <typename... Args> void assignData(Args... args) {
-		boost::container::vector<boost::any> temp = {args...};
-		for (auto x : temp) {
-			// std::cout << x.type().name() << std::endl;
-			try {
+	void assignData(boost::container::vector<boost::any> data) {
+		for (auto x : data) {
+			if (x.type() == typeid(std::string) && message.empty()) {
 				message = boost::any_cast<std::string>(x);
-			} catch (...) {
-				// nothing
+			} else {
+				data.push_back(x);
 			}
-			try {
-				message = boost::any_cast<const char *>(x);
-			} catch (...) {
-				// nothing
-			}
-			data.insert(data.end(), boost::any(x));
 		}
 	}
 
   public:
 	Event(EventType type, std::string message, boost::any data0, boost::any data1 = NULL, boost::any data2 = NULL, boost::any data3 = NULL) : type(type), message(message) {
-		data.insert(data.end(), data0);
+		assignData({data0, data1, data2, data3});
 	}
 
 	Event(EventType type, boost::any data0, boost::any data1 = NULL, boost::any data2 = NULL, boost::any data3 = NULL) : type(type), message("") {
-		data.insert(data.end(), data0);
+		assignData({data0, data1, data2, data3});
 	}
 
 	EventType getType() {
