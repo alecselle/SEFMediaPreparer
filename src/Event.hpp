@@ -47,10 +47,16 @@ class Event {
 	std::string message;
 	boost::container::vector<boost::any> data;
 
-	void assignData(boost::container::vector<boost::any> data) {
-		for (auto x : data) {
+	void assignData(boost::container::vector<boost::any> d) {
+		for (auto x : d) {
 			if (x.type() == typeid(std::string) && message.empty()) {
 				message = boost::any_cast<std::string>(x);
+			} else if (x.type() == typeid(const char *)) {
+				if (message.empty()) {
+					message = boost::any_cast<const char *>(x);
+				} else {
+					data.push_back(x);
+				}
 			} else {
 				data.push_back(x);
 			}
@@ -58,18 +64,61 @@ class Event {
 	}
 
   public:
-	Event(EventType type, std::string message, boost::any data0, boost::any data1 = NULL, boost::any data2 = NULL, boost::any data3 = NULL) : type(type), message(message) {
-		std::cout << "[NEW_EVENT_1] " << data0.type().name() << " : " << message << std::endl;
-		assignData({data0, data1, data2, data3});
-	}
-
-	Event(EventType type, boost::any data0, boost::any data1 = NULL, boost::any data2 = NULL, boost::any data3 = NULL) : type(type), message("") {
-		std::cout << "[NEW_EVENT_2] " << data0.type().name() << std::endl;
-		assignData({data0, data1, data2, data3});
+	template <typename... Args> Event(EventType type, Args... args) : type(type) {
+		assignData({args...});
 	}
 
 	EventType getType() {
 		return type;
+	}
+
+	std::string getTypeStr() {
+		switch (type) {
+			case WORKER_SCAN_STARTED:
+				return "WORKER_SCAN_STARTED";
+				break;
+			case WORKER_SCAN_FINISHED:
+				break;
+			case WORKER_SCAN_ERRORED:
+				break;
+			case WORKER_SCAN_ITEM_STARTED:
+				break;
+			case WORKER_SCAN_ITEM_FINISHED:
+				break;
+
+			case WORKER_ENCODE_STARTED:
+				break;
+			case WORKER_ENCODE_FINISHED:
+				break;
+			case WORKER_ENCODE_ERRORED:
+				break;
+			case WORKER_ENCODE_ITEM_STARTED:
+				break;
+			case WORKER_ENCODE_ITEM_FINISHED:
+				break;
+
+			case PROGRESS_PRIMARY_UPDATED:
+				break;
+			case PROGRESS_PRIMARY_MAXIMUM:
+				break;
+
+			case PROGRESS_SECONDARY_UPDATED:
+				break;
+			case PROGRESS_SECONDARY_MAXIMUM:
+				break;
+
+			case DIALOG_BROWSE:
+				break;
+			case DIALOG_SAVE:
+				break;
+			case DIALOG_ERROR:
+				break;
+
+			case CUSTOM:
+				break;
+			case ERROR:
+				break;
+		}
 	}
 
 	boost::container::vector<boost::any> getDataVector() {
@@ -92,7 +141,6 @@ class Event {
 
 	template <typename T> bool dataIsType(int i = 0) {
 		if (i < data.size()) {
-			std::cout << data[i].type().name() << std::endl;
 			return (data[i].type() == typeid(T));
 		}
 	}
@@ -130,20 +178,6 @@ class EventHandler : public QObject {
 	}
 
   public:
-	void newEvent(EventType type, std::string message, boost::any data0, boost::any data1 = NULL, boost::any data2 = NULL, boost::any data3 = NULL) {
-		Event *e = new Event(type, message, data0, data1, data2, data3);
-		events.push_back(e);
-		//		onEventAdded(e);
-		emit eventAdded(e);
-	}
-
-	void newEvent(EventType type, boost::any data0, boost::any data1 = NULL, boost::any data2 = NULL, boost::any data3 = NULL) {
-		Event *e = new Event(type, data0, data1, data2, data3);
-		events.push_back(e);
-		//		onEventAdded(e);
-		emit eventAdded(e);
-	}
-
 	template <typename... Args> void newEvent(EventType type, Args... args) {
 		Event *e = new Event(type, args...);
 		events.push_back(e);
