@@ -51,13 +51,10 @@ class Event {
 		for (auto x : d) {
 			if (x.type() == typeid(std::string) && message.empty()) {
 				message = boost::any_cast<std::string>(x);
-
 			} else if (x.type() == typeid(const char *) && message.empty()) {
 				message = (std::string)boost::any_cast<const char *>(x);
-
 			} else if (x.type() == typeid(const char *)) {
 				data.push_back((std::string)boost::any_cast<const char *>(x));
-
 			} else {
 				data.push_back(x);
 			}
@@ -141,6 +138,10 @@ class Event {
 		return data;
 	}
 
+	int size() {
+		return data.size();
+	}
+
 	boost::any getData(int i = 0) {
 		if (i < data.size()) {
 			return data[i];
@@ -180,7 +181,6 @@ class EventHandler : public QObject {
 		for (int i = 0; i < e->getDataVector().size(); i++) {
 			if (e->dataIsType<int>(i)) {
 				std::cout << "Data[" << i << "](int): " << e->getData<int>(i) << " | ";
-
 			} else if (e->dataIsType<std::string>(i)) {
 				std::cout << "Data[" << i << "](string): " << e->getData<std::string>(i) << " | ";
 			} else {
