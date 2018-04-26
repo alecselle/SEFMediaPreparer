@@ -85,6 +85,7 @@ class Event {
 
 	template <typename T> bool dataIsType(int i = 0) {
 		if (i < data.size()) {
+			if (typename(T) == typenma)
 			return (data[i].type() == typeid(T));
 		}
 	}
@@ -93,22 +94,6 @@ class Event {
 		return message;
 	}
 };
-// template <> std::string Event::getData(int i) {
-//	if (i < data.size()) {
-//		if (dataIsType<const char *>(i)) {
-//			return (std::string)boost::any_cast<const char *>(data[i]);
-//		}
-//		return boost::any_cast<std::string>(data[i]);
-//	}
-//}
-// template <> const char *Event::getData(int i) {
-//	if (i < data.size()) {
-//		if (dataIsType<std::string>(i)) {
-//			return boost::any_cast<std::string>(data[i]).c_str();
-//		}
-//		return boost::any_cast<const char *>(data[i]);
-//	}
-//}
 
 /** ================================================================================================
  * (Class) EventHandler
