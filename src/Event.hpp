@@ -44,13 +44,20 @@ enum EventType {
 class Event {
   private:
 	const EventType type;
-	const std::string message;
+	std::string message;
 	boost::container::vector<boost::any> data;
 
 	template <typename... Args> void assignData(Args... args) {
 		boost::container::vector<boost::any> temp = {args...};
 		for (auto x : temp) {
-			data.insert(data.end(), boost::any(x));
+			std::cout << x.type().name() << std::endl;
+			if (x.type() == typeid(std::string) && message.empty()) {
+				message = boost::any_cast<std::string>(x);
+			} else if ((x.type() == typeid(const char *) || x.type() == typeid(char[])) && message.empty()) {
+				message = (std::string)boost::any_cast<const char *>(x);
+			} else {
+				data.insert(data.end(), boost::any(x));
+			}
 		}
 	}
 
@@ -133,6 +140,13 @@ class EventHandler : public QObject {
 
 	template <typename... Args> void newEvent(EventType type, const char *message, Args... args) {
 		Event *e = new Event(type, message, args...);
+		events.push_back(e);
+		//		onEventAdded(e);
+		emit eventAdded(e);
+	}
+
+	template <typename... Args> void newEvent(EventType type, char message[], Args... args) {
+		Event *e = new Event(type, std::string(message), args...);
 		events.push_back(e);
 		//		onEventAdded(e);
 		emit eventAdded(e);
