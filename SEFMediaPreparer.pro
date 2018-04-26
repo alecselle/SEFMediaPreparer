@@ -17,7 +17,6 @@ SOURCES += \
     $$PWD/src/MediaPreparer.cpp \
     $$PWD/src/Controller.cpp \
     $$PWD/src/Global.cpp \
-    $$PWD/src/Event.cpp \
     $$PWD/src/Settings.cpp \
     $$PWD/src/File.cpp \
     $$PWD/src/Library.cpp

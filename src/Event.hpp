@@ -45,12 +45,12 @@ class Event {
   private:
 	const EventType type;
 	const std::string message;
-	boost::container::vector<boost::any> data = {};
+	boost::container::vector<boost::any> data;
 
 	template <typename... Args> void assignData(Args... args) {
 		boost::container::vector<boost::any> temp = {args...};
 		for (auto x : temp) {
-			data.push_back(x);
+			data.insert(data.end(), boost::any(x));
 		}
 	}
 
@@ -119,7 +119,7 @@ class EventHandler : public QObject {
 		}
 		std::cout << "Mesg: " << e->getMessage() << std::endl;
 
-		emit eventAdded(getEvent());
+		emit eventAdded(e);
 		emit eventAdded(size() - 1);
 	}
 
@@ -127,11 +127,19 @@ class EventHandler : public QObject {
 	template <typename... Args> void newEvent(EventType type, std::string message, Args... args) {
 		Event *e = new Event(type, message, args...);
 		events.push_back(e);
-		onEventAdded(e);
+		//		onEventAdded(e);
+		emit eventAdded(e);
+	}
+
+	template <typename... Args> void newEvent(EventType type, const char *message, Args... args) {
+		Event *e = new Event(type, message, args...);
+		events.push_back(e);
+		//		onEventAdded(e);
+		emit eventAdded(e);
 	}
 
 	template <typename... Args> void newEvent(EventType type, Args... args) {
-		Event *e = new Event(type, "", args...);
+		Event *e = new Event(type, args...);
 		events.push_back(e);
 		onEventAdded(e);
 	}
