@@ -90,7 +90,7 @@ class MediaPreparer : public QWidget {
 	void dialogSave();
 	bool dialogCancel();
 
-	bool cancel();
+	bool cancel(bool force = false);
 
 	void lockUI(bool b = true);
 	void blockSignals(bool b);

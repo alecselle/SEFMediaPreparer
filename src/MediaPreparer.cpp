@@ -16,25 +16,26 @@ namespace SuperEpicFuntime {
  */
 MediaPreparer::MediaPreparer(QWidget *parent) : QWidget(parent), ui(new Ui::MediaPreparer) {
 	ui->setupUi(this);
-	eventHandler = new EventHandler();
-	settings	 = new Settings();
-	library		 = new Library(settings);
 	init();
-	eventHandler->newEvent(INITIALIZED);
 }
 
 MediaPreparer::~MediaPreparer() {
 	saveSettings_config();
 	delete ui;
+	eventHandler->newEvent(TERMINATED, 1);
 }
 
 /** ================================================================================================
  * (Section) Initilization
  */
 void MediaPreparer::init() {
+	eventHandler = new EventHandler();
+	settings	 = new Settings();
+	library		 = new Library(settings);
 	this->setWindowTitle(productName.c_str());
 	initGUI();
 	initSignals();
+	eventHandler->newEvent(INITIALIZED, 0);
 }
 
 void MediaPreparer::initGUI() {
@@ -559,8 +560,8 @@ bool MediaPreparer::dialogCancel() {
 /** ================================================================================================
  * (Section) Utilities
  */
-bool MediaPreparer::cancel() {
-	if (!dialogCancel()) {
+bool MediaPreparer::cancel(bool force) {
+	if (!force && !dialogCancel()) {
 		return false;
 	}
 	if (worker.isRunning()) {
