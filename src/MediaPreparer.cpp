@@ -20,7 +20,7 @@ MediaPreparer::MediaPreparer(QWidget *parent) : QWidget(parent), ui(new Ui::Medi
 	settings	 = new Settings();
 	library		 = new Library(settings);
 	init();
-	eventHandler->newEvent(CUSTOM, "this is a message?", 0, NULL, "this is data?", settings);
+	eventHandler->newEvent(CUSTOM, "this is a message?", "this is data?", 0, NULL, settings);
 }
 
 MediaPreparer::~MediaPreparer() {
@@ -219,7 +219,7 @@ void MediaPreparer::scanLibrary() {
 	eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM, library->size());
 	for (int i = 0; !cancelWorker && i < library->size(); i++) {
 		File &f = library->getFile(i);
-		eventHandler->newEvent(WORKER_SCAN_ITEM_STARTED, "Scanning File: " + f.name(), i, f);
+		eventHandler->newEvent(WORKER_SCAN_ITEM_STARTED, "Scanning File: " + f.name(), i);
 		QList<QString> params = {"-v", "quiet", "-show_entries", "format=duration:stream=codec_type:stream=codec_name", "-of", "json", f.path().c_str()};
 		QProcess process;
 		bool r = false;
@@ -229,7 +229,7 @@ void MediaPreparer::scanLibrary() {
 			StringStream out(process.readAllStandardOutput());
 			r = f.loadFileInfo(out);
 		}
-		eventHandler->newEvent(WORKER_SCAN_ITEM_FINISHED, i, f);
+		eventHandler->newEvent(WORKER_SCAN_ITEM_FINISHED, i);
 	}
 	library->scanEncode();
 	if (cancelWorker) {
@@ -249,7 +249,7 @@ void MediaPreparer::encodeLibrary() {
 	eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM, library->sizeEncode());
 	for (int i = 0; !cancelWorker && i < (int)library->sizeEncode(); i++) {
 		File &f = library->getFileEncode(i);
-		eventHandler->newEvent(WORKER_ENCODE_ITEM_STARTED, "Encoding File: " + f.name(), i, f);
+		eventHandler->newEvent(WORKER_ENCODE_ITEM_STARTED, "Encoding File: " + f.name(), i);
 		QList<QString> params = {"-y", "-v", "quiet", "-stats", "-hwaccel", "dxva2", "-threads", settings->threads.c_str(), "-i", f.path().c_str()};
 		if (f.subtitles() == 1 && settings->subtitles.compare("Embed") == 0) {
 			params += {"-i", f.pathSub().c_str()};
@@ -282,7 +282,7 @@ void MediaPreparer::encodeLibrary() {
 		if (!cancelWorker) {
 			bf::rename(settings->tempDir + "\\" + f.name() + "." + settings->container, settings->outputDir + "\\" + f.name() + "." + settings->container);
 		}
-		eventHandler->newEvent(WORKER_ENCODE_ITEM_FINISHED, i, f);
+		eventHandler->newEvent(WORKER_ENCODE_ITEM_FINISHED, i);
 	}
 	if (cancelWorker) {
 		eventHandler->newEvent(WORKER_ENCODE_ERRORED, "Cancelled Encoding Library");
