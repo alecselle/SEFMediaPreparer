@@ -59,10 +59,12 @@ class Event {
 
   public:
 	Event(EventType type, std::string message, boost::any data0, boost::any data1 = NULL, boost::any data2 = NULL, boost::any data3 = NULL) : type(type), message(message) {
+		std::cout << "[NEW_EVENT_1] " << data0.type().name() << " : " << message << std::endl;
 		assignData({data0, data1, data2, data3});
 	}
 
 	Event(EventType type, boost::any data0, boost::any data1 = NULL, boost::any data2 = NULL, boost::any data3 = NULL) : type(type), message("") {
+		std::cout << "[NEW_EVENT_2] " << data0.type().name() << std::endl;
 		assignData({data0, data1, data2, data3});
 	}
 
