@@ -20,7 +20,7 @@ MediaPreparer::MediaPreparer(QWidget *parent) : QWidget(parent), ui(new Ui::Medi
 	settings	 = new Settings();
 	library		 = new Library(settings);
 	init();
-	eventHandler->newEvent(CUSTOM, "this is a message?", "this is data?", 0, NULL, settings);
+	eventHandler->newEvent(INITIALIZED);
 }
 
 MediaPreparer::~MediaPreparer() {

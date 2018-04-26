@@ -12,6 +12,9 @@
 
 namespace SuperEpicFuntime {
 enum EventType {
+	INITIALIZED = 0x0000,
+	TERMINATED  = 0x0001,
+
 	WORKER_SCAN_STARTED		  = 0xAA01,
 	WORKER_SCAN_FINISHED	  = 0xAA02,
 	WORKER_SCAN_ERRORED		  = 0xAA03,
@@ -34,8 +37,8 @@ enum EventType {
 	DIALOG_SAVE   = 0xFDB0,
 	DIALOG_ERROR  = 0xFD00,
 
-	CUSTOM = 0xFFFF,
-	ERROR  = 0x0000
+	CUSTOM = 0xAAAA,
+	ERROR  = 0xFFFF
 };
 
 /** ================================================================================================
@@ -72,6 +75,12 @@ class Event {
 
 	std::string getTypeStr() {
 		switch (type) {
+			case INITIALIZED:
+
+				break;
+			case TERMINATED:
+
+				break;
 			case WORKER_SCAN_STARTED:
 				return "WORKER_SCAN_STARTED";
 				break;
