@@ -496,9 +496,9 @@ void MediaPreparer::eventListener(Event *e) {
 			cout << "Unhandled Event | Type: " << e->getTypeStr() << " | ";
 			for (int i = 0; i < e->getDataVector().size(); i++) {
 				if (e->dataIsType<int>(i)) {
-					cout << "Data[" << i << "](int): " << e->getData<int>(i) << " | ";
+					cout << "Data[" << i << "](int): " << e->getData<int &>(i) << " | ";
 				} else if (e->dataIsType<string>(i)) {
-					cout << "Data[" << i << "](string): " << e->getData<string>(i) << " | ";
+					cout << "Data[" << i << "](string): " << e->getData<string &>(i) << " | ";
 				} else {
 					cout << "Data[" << i << "](" << e->getData(i).type().name() << "): Unknown | ";
 				}
