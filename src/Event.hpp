@@ -34,6 +34,12 @@ enum EventType {
 	PROGRESS_SECONDARY_UPDATED = 0xBB01,
 	PROGRESS_SECONDARY_MAXIMUM = 0xBB02,
 
+	CONFIG_SAVED  = 0xCA01,
+	CONFIG_LOADED = 0xCA02,
+
+	PRESET_SAVED  = 0xCB01,
+	PRESET_LOADED = 0xCB02,
+
 	CUSTOM = 0xAAAA,
 	ERROR  = 0xFFFF
 };
@@ -120,6 +126,18 @@ class Event {
 				break;
 			case PROGRESS_SECONDARY_MAXIMUM:
 				return "PROGRESS_SECONDARY_MAXIMUM";
+				break;
+			case CONFIG_SAVED:
+				return "CONFIG_SAVED";
+				break;
+			case CONFIG_LOADED:
+				return "CONFIG_LOADED";
+				break;
+			case PRESET_SAVED:
+				return "PRESET_SAVED";
+				break;
+			case PRESET_LOADED:
+				return "PRESET_LOADED";
 				break;
 			case CUSTOM:
 				return "CUSTOM";
@@ -225,7 +243,7 @@ class EventHandler : public QObject {
 	void eventAdded(int pos);
 };
 
-static EventHandler *eventHandler;
+static EventHandler *eventHandler = new EventHandler();
 
 } // namespace SuperEpicFuntime
 #endif // EVENT_HPP

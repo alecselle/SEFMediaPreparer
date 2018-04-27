@@ -31,9 +31,9 @@ MediaPreparer::~MediaPreparer() {
  * (Section) Initilization
  */
 void MediaPreparer::init() {
-	eventHandler = new EventHandler();
-	settings	 = new Settings();
-	library		 = new Library(settings);
+	//	eventHandler = new EventHandler();
+	//	settings	 = new Settings();
+	//	library		 = new Library(settings);
 	this->setWindowTitle(productName.c_str());
 	if (!settings->preserveLog) {
 		bf::remove(settings->baseDir + "\\log.txt");
@@ -525,6 +525,26 @@ void MediaPreparer::eventListener(Event *e) {
 				int eventData = e->getData<int>(0);
 				ui->progress_primary->setMaximum(eventData);
 			}
+			break;
+		}
+		case CONFIG_SAVED: {
+			log(e, false);
+
+			break;
+		}
+		case CONFIG_LOADED: {
+			log(e, false);
+
+			break;
+		}
+		case PRESET_SAVED: {
+			log(e, true);
+
+			break;
+		}
+		case PRESET_LOADED: {
+			log(e, false);
+
 			break;
 		}
 		default: {

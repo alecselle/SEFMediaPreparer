@@ -1,3 +1,4 @@
+#include <Event.hpp>
 #include <Settings.hpp>
 
 namespace bf = boost::filesystem;
@@ -121,6 +122,7 @@ void Settings::loadConfig() {
 	}
 	saveConfig();
 	fclose(fp);
+	eventHandler->newEvent(CONFIG_LOADED, "Loaded Config");
 }
 
 void Settings::saveConfig() {
@@ -169,6 +171,7 @@ void Settings::saveConfig() {
 	PrettyWriter<FileWriteStream> writer(os);
 	d.Accept(writer);
 	fclose(fp);
+	eventHandler->newEvent(CONFIG_SAVED, "Saved Config");
 }
 
 void Settings::createDefaultConfig() {
@@ -252,6 +255,7 @@ void Settings::loadPresetFile(std::string path) {
 			loadPresetFile(DEFAULT_PRESET);
 		}
 	}
+	eventHandler->newEvent(PRESET_LOADED, "Loaded Preset: " + presetName);
 }
 
 void Settings::savePreset() {
@@ -286,6 +290,7 @@ void Settings::savePresetAs(std::string name) {
 	presetName = parsePresetName(name);
 
 	refreshPresets();
+	eventHandler->newEvent(PRESET_SAVED, "Saved Preset: " + presetName);
 }
 
 void Settings::refreshPresets() {
