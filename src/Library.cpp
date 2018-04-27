@@ -14,6 +14,11 @@ Library::Library(Settings *settings) {
 	_settings = settings;
 }
 
+Library::Library(Settings *settings, EventHandler *eventHandler) {
+	_settings	 = settings;
+	_eventHandler = eventHandler;
+}
+
 void Library::scan(bool scanRecursive) {
 	_Library.clear();
 	if (!scanRecursive) {

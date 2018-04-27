@@ -1,4 +1,3 @@
-#include <Event.hpp>
 #include <Settings.hpp>
 
 namespace bf = boost::filesystem;
@@ -13,6 +12,15 @@ namespace SuperEpicFuntime {
  * (Class) Settings
  */
 Settings::Settings() {
+	init();
+}
+
+Settings::Settings(EventHandler *eventHandler) {
+	_eventHandler = eventHandler;
+	init();
+}
+
+void Settings::init() {
 	if (!bf::exists(BASE_DIR)) {
 		bf::create_directories(BASE_DIR);
 	}
@@ -122,7 +130,9 @@ void Settings::loadConfig() {
 	}
 	saveConfig();
 	fclose(fp);
-	eventHandler->newEvent(CONFIG_LOADED, "Loaded Config");
+	if (eventHandler != NULL) {
+		eventHandler->newEvent(CONFIG_LOADED, "Loaded Config");
+	}
 }
 
 void Settings::saveConfig() {
@@ -171,7 +181,9 @@ void Settings::saveConfig() {
 	PrettyWriter<FileWriteStream> writer(os);
 	d.Accept(writer);
 	fclose(fp);
-	eventHandler->newEvent(CONFIG_SAVED, "Saved Config");
+	if (eventHandler != NULL) {
+		eventHandler->newEvent(CONFIG_SAVED, "Saved Config");
+	}
 }
 
 void Settings::createDefaultConfig() {
@@ -255,7 +267,9 @@ void Settings::loadPresetFile(std::string path) {
 			loadPresetFile(DEFAULT_PRESET);
 		}
 	}
-	eventHandler->newEvent(PRESET_LOADED, "Loaded Preset: " + presetName);
+	if (eventHandler != NULL) {
+		eventHandler->newEvent(PRESET_LOADED, "Loaded Preset: " + presetName);
+	}
 }
 
 void Settings::savePreset() {
@@ -290,7 +304,9 @@ void Settings::savePresetAs(std::string name) {
 	presetName = parsePresetName(name);
 
 	refreshPresets();
-	eventHandler->newEvent(PRESET_SAVED, "Saved Preset: " + presetName);
+	if (eventHandler != NULL) {
+		eventHandler->newEvent(PRESET_SAVED, "Saved Preset: " + presetName);
+	}
 }
 
 void Settings::refreshPresets() {

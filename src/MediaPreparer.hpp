@@ -3,11 +3,11 @@
 #pragma once
 
 #include <Global.hpp>
+#include <Settings.hpp>
 
 #include <Event.hpp>
 #include <File.hpp>
 #include <Library.hpp>
-#include <Settings.hpp>
 
 #include <QtConcurrent/QtConcurrent>
 #include <QtCore/QtCore>

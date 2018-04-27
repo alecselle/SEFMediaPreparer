@@ -243,7 +243,7 @@ class EventHandler : public QObject {
 	void eventAdded(int pos);
 };
 
-static EventHandler *eventHandler = new EventHandler();
+static EventHandler *eventHandler;
 
 } // namespace SuperEpicFuntime
 #endif // EVENT_HPP

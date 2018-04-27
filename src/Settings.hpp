@@ -2,6 +2,7 @@
 #define SETTINGS_HPP
 #pragma once
 
+#include <Event.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/container/vector.hpp>
 #include <boost/filesystem.hpp>
@@ -50,10 +51,13 @@ class Settings {
 	const std::string DEFAULT_THREADS	  = "4";
 	const std::string DEFAULT_EXTRA_PARAMS = "-x265-params pools=3";
 
+	EventHandler *_eventHandler;
+
 	std::string parsePath(std::string path);
 	std::string parsePresetPath(std::string path);
 	std::string parsePresetName(std::string path);
 	std::string parsePresetNameFull(std::string name);
+	void init();
 
   public:
 	std::string baseDir, logPath, presetPath, tempDir, libraryDir, outputDir;
@@ -65,6 +69,7 @@ class Settings {
 	bool preserveLog;
 
 	Settings();
+	Settings(EventHandler *eventHandler);
 
 	void loadConfig();
 	void saveConfig();
@@ -79,7 +84,7 @@ class Settings {
 	void createDefaultPreset();
 };
 
-static Settings *settings = new Settings();
+static Settings *settings;
 
 } // namespace SuperEpicFuntime
 #endif // SETTINGS_HPP

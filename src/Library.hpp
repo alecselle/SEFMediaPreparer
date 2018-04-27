@@ -4,6 +4,8 @@
 
 #include <Global.hpp>
 
+#include <Event.hpp>
+
 #include <File.hpp>
 #include <Settings.hpp>
 
@@ -17,6 +19,7 @@ namespace SuperEpicFuntime {
  */
 class Library {
   private:
+	EventHandler *_eventHandler;
 	Settings *_settings;
 
 	boost::container::vector<File> _Library = {};
@@ -29,6 +32,7 @@ class Library {
 
   public:
 	Library(Settings *settings);
+	Library(Settings *settings, EventHandler *eventHandler);
 	void scan(bool scanRecursive = true);
 	int size();
 	int duration();
@@ -64,7 +68,7 @@ class Library {
 	bool skipEncode(std::string filePath);
 };
 
-static Library *library = new Library(settings);
+static Library *library;
 
 } // namespace SuperEpicFuntime
 #endif // LIBRARY_HPP
