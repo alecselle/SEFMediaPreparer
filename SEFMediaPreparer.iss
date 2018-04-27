@@ -38,7 +38,6 @@ SetupIconFile={#ApplicationSource}/seflogo.ico
 Compression=lzma
 SolidCompression=yes
 UsePreviousAppDir=False
-PrivilegesRequired=lowest
 AppCopyright=2018
 VersionInfoCompany={#Publisher}
 VersionInfoCopyright=2018

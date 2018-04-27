@@ -4,6 +4,7 @@
 
 #include <Global.hpp>
 #include <QtCore/QObject>
+#include <QtCore/QTime>
 #include <boost/any.hpp>
 #include <boost/bind.hpp>
 #include <boost/container/vector.hpp>
@@ -33,10 +34,6 @@ enum EventType {
 	PROGRESS_SECONDARY_UPDATED = 0xBB01,
 	PROGRESS_SECONDARY_MAXIMUM = 0xBB02,
 
-	DIALOG_BROWSE = 0xFDA0,
-	DIALOG_SAVE   = 0xFDB0,
-	DIALOG_ERROR  = 0xFD00,
-
 	CUSTOM = 0xAAAA,
 	ERROR  = 0xFFFF
 };
@@ -48,6 +45,7 @@ class Event {
   private:
 	const EventType type;
 	std::string message = "";
+	QTime timestamp		= QTime::currentTime();
 	boost::container::vector<boost::any> data;
 
 	void assignData(boost::container::vector<boost::any> d) {
@@ -123,15 +121,6 @@ class Event {
 			case PROGRESS_SECONDARY_MAXIMUM:
 				return "PROGRESS_SECONDARY_MAXIMUM";
 				break;
-			case DIALOG_BROWSE:
-				return "DIALOG_BROWSE";
-				break;
-			case DIALOG_SAVE:
-				return "DIALOG_SAVE";
-				break;
-			case DIALOG_ERROR:
-				return "DIALOG_ERROR";
-				break;
 			case CUSTOM:
 				return "CUSTOM";
 				break;
@@ -174,6 +163,10 @@ class Event {
 	std::string getMessage() {
 		return message;
 	}
+
+	std::string getTimeStamp() {
+		return timestamp.toString("hh:mm:ss.zzz").toStdString();
+	}
 };
 
 /** ================================================================================================
@@ -185,20 +178,21 @@ class EventHandler : public QObject {
 	boost::container::vector<Event *> events;
 
 	void onEventAdded(Event *e) {
-		std::cout << "Event: " << e->getTypeStr() << " [" << (size() - 1) << "] | ";
-		for (int i = 0; i < e->getDataVector().size(); i++) {
-			if (e->dataIsType<int>(i)) {
-				std::cout << " | Data[" << i << "](int): " << e->getData<int>(i);
-			} else if (e->dataIsType<std::string>(i)) {
-				std::cout << " | Data[" << i << "](string): " << e->getData<std::string>(i);
-			} else {
-				std::cout << " | Data[" << i << "](" << e->getData(i).type().name() << "): Unknown";
-			}
-		}
-		if (!e->getMessage().empty()) {
-			std::cout << " | Mesg: " << e->getMessage();
-		}
-		std::cout << std::endl;
+		//		std::cout << "[" << e->getTimeStamp() << "]";
+		//		std::cout << " Event: " << e->getTypeStr() << " [" << (size() - 1) << "]";
+		//		for (int i = 0; i < e->getDataVector().size(); i++) {
+		//			if (e->dataIsType<int>(i)) {
+		//				std::cout << " | Data[" << i << "](int): " << e->getData<int>(i);
+		//			} else if (e->dataIsType<std::string>(i)) {
+		//				std::cout << " | Data[" << i << "](string): " << e->getData<std::string>(i);
+		//			} else {
+		//				std::cout << " | Data[" << i << "](" << e->getData(i).type().name() << "): Unknown";
+		//			}
+		//		}
+		//		if (!e->getMessage().empty()) {
+		//			std::cout << " | Mesg: " << e->getMessage();
+		//		}
+		//		std::cout << std::endl;
 
 		emit eventAdded(e);
 		emit eventAdded(size() - 1);

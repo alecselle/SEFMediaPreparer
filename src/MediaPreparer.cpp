@@ -17,11 +17,13 @@ namespace SuperEpicFuntime {
 MediaPreparer::MediaPreparer(QWidget *parent) : QWidget(parent), ui(new Ui::MediaPreparer) {
 	ui->setupUi(this);
 	init();
+	eventHandler->newEvent(INITIALIZED, 0);
 }
 
 MediaPreparer::~MediaPreparer() {
 	saveSettings_config();
 	delete ui;
+	cancel(true);
 	eventHandler->newEvent(TERMINATED, 1);
 }
 
@@ -33,9 +35,11 @@ void MediaPreparer::init() {
 	settings	 = new Settings();
 	library		 = new Library(settings);
 	this->setWindowTitle(productName.c_str());
+	if (!settings->preserveLog) {
+		bf::remove(settings->baseDir + "\\log.txt");
+	}
 	initGUI();
 	initSignals();
-	eventHandler->newEvent(INITIALIZED, 0);
 }
 
 void MediaPreparer::initGUI() {
@@ -214,29 +218,35 @@ void MediaPreparer::runWorker_cleanup() {
  * (Section) Scan Worker
  */
 void MediaPreparer::scanLibrary() {
-	eventHandler->newEvent(WORKER_SCAN_STARTED, "Scanning Library");
+	eventHandler->newEvent(WORKER_SCAN_STARTED, "Scanning Library: " + settings->libraryDir);
 	eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM, 0);
 	library->scan();
-	eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM, library->size());
-	for (int i = 0; !cancelWorker && i < library->size(); i++) {
-		File &f = library->getFile(i);
-		eventHandler->newEvent(WORKER_SCAN_ITEM_STARTED, "Scanning File: " + f.name(), i);
-		QList<QString> params = {"-v", "quiet", "-show_entries", "format=duration:stream=codec_type:stream=codec_name", "-of", "json", f.path().c_str()};
-		QProcess process;
-		bool r = false;
-		for (int j = 0; !cancelWorker && !r && j < RETRY_COUNT; j++) {
-			process.start("ffprobe", params);
-			process.waitForFinished();
-			StringStream out(process.readAllStandardOutput());
-			r = f.loadFileInfo(out);
-		}
-		eventHandler->newEvent(WORKER_SCAN_ITEM_FINISHED, i);
-	}
-	library->scanEncode();
-	if (cancelWorker) {
-		eventHandler->newEvent(WORKER_SCAN_ERRORED, "Cancelled Scanning Library");
+	if (library->size() == 0) {
+		eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM, 1);
+		eventHandler->newEvent(WORKER_SCAN_ERRORED, "Invalid Library: " + settings->libraryDir);
 	} else {
-		eventHandler->newEvent(WORKER_SCAN_FINISHED, "Finished Scanning Library", library->size());
+		eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM, library->size());
+		for (int i = 0; !cancelWorker && i < library->size(); i++) {
+			File &f = library->getFile(i);
+			eventHandler->newEvent(WORKER_SCAN_ITEM_STARTED, "Scanning File: " + f.name(), i);
+			QList<QString> params = {"-v", "quiet", "-show_entries", "format=duration:stream=codec_type:stream=codec_name", "-of", "json", f.path().c_str()};
+			QProcess process;
+			bool r = false;
+			for (int j = 0; !cancelWorker && !r && j < RETRY_COUNT; j++) {
+				process.start("ffprobe", params);
+				process.waitForFinished();
+				StringStream out(process.readAllStandardOutput());
+				r = f.loadFileInfo(out);
+			}
+			eventHandler->newEvent(WORKER_SCAN_ITEM_FINISHED, i);
+		}
+		library->scanEncode();
+
+		if (cancelWorker) {
+			eventHandler->newEvent(WORKER_SCAN_ERRORED, "Cancelled Scanning Library: " + settings->libraryDir);
+		} else {
+			eventHandler->newEvent(WORKER_SCAN_FINISHED, "Finished Scanning Library: " + settings->libraryDir, library->size());
+		}
 	}
 }
 
@@ -244,7 +254,7 @@ void MediaPreparer::scanLibrary() {
  * (Section) Encode Worker
  */
 void MediaPreparer::encodeLibrary() {
-	eventHandler->newEvent(WORKER_ENCODE_STARTED, "Encoding Library");
+	eventHandler->newEvent(WORKER_ENCODE_STARTED, "Encoding Library: " + settings->libraryDir);
 	eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM, 0);
 	library->scanEncode();
 	eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM, library->sizeEncode());
@@ -286,9 +296,9 @@ void MediaPreparer::encodeLibrary() {
 		eventHandler->newEvent(WORKER_ENCODE_ITEM_FINISHED, i);
 	}
 	if (cancelWorker) {
-		eventHandler->newEvent(WORKER_ENCODE_ERRORED, "Cancelled Encoding Library");
+		eventHandler->newEvent(WORKER_ENCODE_ERRORED, "Cancelled Encoding Library: " + settings->libraryDir);
 	} else {
-		eventHandler->newEvent(WORKER_ENCODE_FINISHED, "Finished Encoding Library", library->sizeEncode());
+		eventHandler->newEvent(WORKER_ENCODE_FINISHED, "Finished Encoding Library: " + settings->libraryDir, library->sizeEncode());
 	}
 }
 
@@ -301,9 +311,24 @@ void MediaPreparer::eventListener(Event *e) {
 	string eventMessage = e->getMessage();
 	switch (eventType) {
 		/** ============================================================================================
+		 * (Event) INITIALIZED
+		 */
+		case INITIALIZED:
+			log(e, false);
+
+			break;
+		/** ============================================================================================
+		 * (Event) TERMINATED
+		 */
+		case TERMINATED:
+			log(e, false);
+
+			break;
+		/** ============================================================================================
 		 * (Event) WORKER_SCAN_STARTED
 		 */
 		case WORKER_SCAN_STARTED: {
+			log(e, true);
 			updateTimer->start(100);
 			workerType = SCAN;
 			workerTimeStamp.start();
@@ -317,6 +342,7 @@ void MediaPreparer::eventListener(Event *e) {
 		 * (Event) WORKER_SCAN_FINISHED
 		 */
 		case WORKER_SCAN_FINISHED: {
+			log(e, true);
 			updateTimer->stop();
 			if (!eventMessage.empty()) {
 				ui->progress_primary->setFormat(eventMessage.c_str());
@@ -331,6 +357,7 @@ void MediaPreparer::eventListener(Event *e) {
 		 * (Event) WORKER_SCAN_ERRORED
 		 */
 		case WORKER_SCAN_ERRORED: {
+			log(e, true);
 			updateTimer->stop();
 			if (!eventMessage.empty()) {
 				ui->progress_primary->setFormat(eventMessage.c_str());
@@ -345,6 +372,7 @@ void MediaPreparer::eventListener(Event *e) {
 		 * (Event) WORKER_SCAN_ITEM_STARTED
 		 */
 		case WORKER_SCAN_ITEM_STARTED: {
+			log(e, true);
 			if (e->dataIsType<int>(0)) {
 				int eventData = e->getData<int>(0);
 				workerItemTimeStamp.start();
@@ -360,6 +388,7 @@ void MediaPreparer::eventListener(Event *e) {
 		 * (Event) WORKER_SCAN_ITEM_FINISHED
 		 */
 		case WORKER_SCAN_ITEM_FINISHED: {
+			log(e, false);
 			if (e->dataIsType<int>(0)) {
 				int eventData = e->getData<int>(0);
 				ui->progress_primary->setValue(eventData);
@@ -377,6 +406,7 @@ void MediaPreparer::eventListener(Event *e) {
 		 * (Event) WORKER_ENCODE_STARTED
 		 */
 		case WORKER_ENCODE_STARTED: {
+			log(e, true);
 			updateTimer->start(100);
 			workerType = ENCODE;
 			workerTimeStamp.start();
@@ -406,6 +436,7 @@ void MediaPreparer::eventListener(Event *e) {
 		 * (Event) WORKER_ENCODE_FINISHED
 		 */
 		case WORKER_ENCODE_FINISHED: {
+			log(e, true);
 			updateTimer->stop();
 			if (!eventMessage.empty()) {
 				ui->progress_primary->setFormat(eventMessage.c_str());
@@ -420,6 +451,7 @@ void MediaPreparer::eventListener(Event *e) {
 		 * (Event) WORKER_ENCODE_ERRORED
 		 */
 		case WORKER_ENCODE_ERRORED: {
+			log(e, true);
 			updateTimer->stop();
 			if (!eventMessage.empty()) {
 				ui->progress_primary->setFormat(eventMessage.c_str());
@@ -434,6 +466,7 @@ void MediaPreparer::eventListener(Event *e) {
 		 * (Event) WORKER_ENCODE_ITEM_STARTED
 		 */
 		case WORKER_ENCODE_ITEM_STARTED: {
+			log(e, true);
 			if (e->dataIsType<int>(0)) {
 				int eventData = e->getData<int>(0);
 				workerItemTimeStamp.start();
@@ -460,6 +493,7 @@ void MediaPreparer::eventListener(Event *e) {
 		 * (Event) WORKER_ENCODE_ITEM_FINISHED
 		 */
 		case WORKER_ENCODE_ITEM_FINISHED: {
+			log(e, false);
 			if (e->dataIsType<int>(0)) {
 				int eventData   = e->getData<int>(0);
 				File &eventFile = library->getFileEncode(eventData);
@@ -494,17 +528,7 @@ void MediaPreparer::eventListener(Event *e) {
 			break;
 		}
 		default: {
-			cout << "Unhandled Event | Type: " << e->getTypeStr() << " | ";
-			for (int i = 0; i < e->getDataVector().size(); i++) {
-				if (e->dataIsType<int>(i)) {
-					cout << "Data[" << i << "](int): " << e->getData<int &>(i) << " | ";
-				} else if (e->dataIsType<string>(i)) {
-					cout << "Data[" << i << "](string): " << e->getData<string &>(i) << " | ";
-				} else {
-					cout << "Data[" << i << "](" << e->getData(i).type().name() << "): Unknown | ";
-				}
-			}
-			cout << "Message: " << eventMessage << endl;
+			log(e, "Unhandled Event", false);
 			break;
 		}
 	}
@@ -569,16 +593,25 @@ bool MediaPreparer::cancel(bool force) {
 		cancelWorker = true;
 		switch (workerType) {
 			case SCAN:
-				kill.start(QString("taskkill /F /T /IM ffprobe.exe"));
-				kill.waitForFinished();
-				worker.waitForFinished();
+				if (force) {
+					kill.startDetached(QString("taskkill /F /T /IM ffprobe.exe"));
+				} else {
+					kill.start(QString("taskkill /F /T /IM ffprobe.exe"));
+					kill.waitForFinished();
+					worker.waitForFinished();
+				}
 				break;
 			case ENCODE:
-				kill.start(QString("taskkill /F /T /IM ffmpeg.exe"));
-				kill.waitForFinished();
-				worker.waitForFinished();
-				if (bf::exists(settings->tempDir + "\\" + workerItem.name() + "." + settings->container)) {
-					bf::remove(settings->tempDir + "\\" + workerItem.name() + "." + settings->container);
+				if (force) {
+					kill.startDetached(QString("taskkill /F /T /IM ffmpeg.exe"));
+				} else {
+					kill.start(QString("taskkill /F /T /IM ffmpeg.exe"));
+					kill.waitForFinished();
+					worker.waitForFinished();
+
+					if (bf::exists(settings->tempDir + "\\" + workerItem.name() + "." + settings->container)) {
+						bf::remove(settings->tempDir + "\\" + workerItem.name() + "." + settings->container);
+					}
 				}
 				break;
 			default:
@@ -608,6 +641,60 @@ void MediaPreparer::lockUI(bool b) {
 	if (b) {
 		ui->button_encode->setText("Cancel");
 		ui->button_encode->setEnabled(true);
+	}
+}
+
+void MediaPreparer::log(QString message, bool toFile) {
+	bf::fstream fs;
+	if (toFile) {
+		fs.open(settings->logPath, bf::fstream::in | bf::fstream::out | bf::fstream::app);
+	}
+
+	std::string logStr = "[" + QTime::currentTime().toString("hh:mm:ss.zzz").toStdString() + "] " + message.toStdString();
+
+	std::cout << logStr << endl;
+	if (toFile) {
+		fs << logStr << endl;
+		fs.close();
+	}
+}
+
+void MediaPreparer::log(Event *e, bool toFile) {
+	log(e, "", toFile);
+}
+
+void MediaPreparer::log(Event *e, string optMessage, bool toFile) {
+	bf::fstream fs;
+	if (toFile) {
+		fs.open(settings->logPath, bf::fstream::in | bf::fstream::out | bf::fstream::app);
+	}
+
+	std::string logStr = "[" + e->getTimeStamp() + "]";
+	if (!optMessage.empty()) {
+		logStr += " " + optMessage;
+		if (!e->getMessage().empty()) {
+			logStr += " |";
+		}
+	}
+	if (!e->getMessage().empty()) {
+		logStr += " " + e->getMessage();
+	}
+	logStr += " (Event: " + e->getTypeStr();
+	for (int i = 0; i < e->getDataVector().size(); i++) {
+		if (e->dataIsType<int>(i)) {
+			logStr += ", Data[" + std::to_string(i) + "](int): " + std::to_string(e->getData<int>(i));
+		} else if (e->dataIsType<std::string>(i)) {
+			logStr += ", Data[" + std::to_string(i) + "](string): " + e->getData<std::string>(i);
+		} else {
+			logStr += ", Data[" + std::to_string(i) + "](" + e->getData(i).type().name() + "): Unknown";
+		}
+	}
+	logStr += ")";
+
+	std::cout << logStr << endl;
+	if (toFile) {
+		fs << logStr << endl;
+		fs.close();
 	}
 }
 
