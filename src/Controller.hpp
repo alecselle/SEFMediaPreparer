@@ -2,10 +2,12 @@
 #define CONTROLLER_HPP
 
 #include <Event.hpp>
+
+#include <Settings.hpp>
+
 #include <Library.hpp>
 #include <MediaPreparer.hpp>
 #include <QtWidgets/QWidget>
-#include <Settings.hpp>
 
 #include <iostream> // For debugging (cout)
 

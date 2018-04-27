@@ -31,6 +31,9 @@ MediaPreparer::~MediaPreparer() {
  * (Section) Initilization
  */
 void MediaPreparer::init() {
+	eventHandler = new EventHandler();
+	settings	 = new Settings(eventHandler);
+	library		 = new Library(settings, eventHandler);
 	this->setWindowTitle(productName.c_str());
 	if (!settings->preserveLog) {
 		bf::remove(settings->baseDir + "\\log.txt");

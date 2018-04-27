@@ -11,6 +11,9 @@ namespace SuperEpicFuntime {
  */
 Controller::Controller() {
 	mediaPreparer = new MediaPreparer();
+	//	eventHandler  = new EventHandler();
+	//	settings	  = new Settings(eventHandler);
+	//	library		  = new Library(settings, eventHandler);
 }
 
 void Controller::show() {
