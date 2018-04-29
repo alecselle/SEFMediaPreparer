@@ -32,10 +32,14 @@ class MediaPreparer;
 /** ================================================================================================
  * (Class) MediaPreparer
  */
-class MediaPreparer : public QWidget {
+class MediaPreparer : public QMainWindow {
 	Q_OBJECT
   public:
 	Ui::MediaPreparer *ui;
+	QMenu *fileMenu;
+	QMenu *editMenu;
+	QMenu *helpMenu;
+
 	QSignalMapper *signalMapper = new QSignalMapper(this);
 
 	QWidget *containerEncode;

@@ -14,7 +14,7 @@ namespace SuperEpicFuntime {
 /** ================================================================================================
  * (Class) MediaPreparer
  */
-MediaPreparer::MediaPreparer(QWidget *parent) : QWidget(parent), ui(new Ui::MediaPreparer) {
+MediaPreparer::MediaPreparer(QWidget *parent) : QMainWindow(parent), ui(new Ui::MediaPreparer) {
 	ui->setupUi(this);
 	init();
 	eventHandler->newEvent(INITIALIZED, 0);
@@ -51,6 +51,10 @@ void MediaPreparer::initGUI() {
 	ui->list_Library->setColumnWidth(2, 70);
 	ui->list_Library->setColumnWidth(3, 70);
 	ui->list_Library->setColumnWidth(4, 70);
+
+	fileMenu = menuBar()->addMenu(tr("&File"));
+	editMenu = menuBar()->addMenu(tr("&Edit"));
+	helpMenu = menuBar()->addMenu(tr("&Help"));
 
 	updateGUI_timers();
 }

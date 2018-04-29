@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>SuperEpicFuntime::MediaPreparer</class>
- <widget class="QWidget" name="SuperEpicFuntime::MediaPreparer">
+ <widget class="QMainWindow" name="SuperEpicFuntime::MediaPreparer">
   <property name="enabled">
    <bool>true</bool>
   </property>
@@ -10,19 +10,19 @@
     <x>0</x>
     <y>0</y>
     <width>480</width>
-    <height>480</height>
+    <height>495</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>480</width>
-    <height>480</height>
+    <height>495</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>480</width>
-    <height>480</height>
+    <height>495</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -32,15 +32,7 @@
    <iconset>
     <normaloff>seflogo.png</normaloff>seflogo.png</iconset>
   </property>
-  <widget class="QWidget" name="container_main" native="true">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>480</width>
-     <height>480</height>
-    </rect>
-   </property>
+  <widget class="QWidget" name="container_main">
    <widget class="QWidget" name="layoutWidget1">
     <property name="geometry">
      <rect>
