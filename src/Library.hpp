@@ -12,8 +12,6 @@
 #include <boost/container/vector.hpp>
 #include <boost/filesystem.hpp>
 
-#include <QtCore/QProcess>
-
 namespace SuperEpicFuntime {
 
 /** ================================================================================================
@@ -30,13 +28,7 @@ class Library {
 
 	const boost::container::vector<std::string> _extensions = {".wmv", ".avi", ".divx", ".mkv", ".mka", ".mks", ".webm", ".mp4", ".mpeg", ".mpg", ".mov", ".qt", ".flv"};
 
-	const QList<QString> _scanParams = {"-v", "quiet", "-show_entries", "format=duration:stream=codec_type:stream=codec_name", "-of", "json"};
-
 	int _duration = -1;
-
-	void scanDirectory(bool scanRecursive = true);
-	void scanFile(int i);
-	void scanFile(File &f);
 
   public:
 	bool cancelScan = false;

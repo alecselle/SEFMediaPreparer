@@ -8,6 +8,7 @@
 #include <Event.hpp>
 #include <File.hpp>
 #include <Library.hpp>
+#include <Worker.hpp>
 
 #include <QtConcurrent/QtConcurrent>
 #include <QtCore/QtCore>

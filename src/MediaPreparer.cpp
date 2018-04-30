@@ -221,7 +221,9 @@ void MediaPreparer::updateGUI_timers() {
 void MediaPreparer::runWorker_scan() {
 	if (!worker.isRunning()) {
 		loadSettings_gui();
-		worker = QtConcurrent::run(this, &MediaPreparer::scanLibrary);
+		//		worker = QtConcurrent::run(this, &MediaPreparer::scanLibrary);
+		// Worker w = Worker(SCAN, eventHandler, settings, library);
+		worker = QtConcurrent::run(Worker(SCAN), &Worker::run);
 	}
 }
 
