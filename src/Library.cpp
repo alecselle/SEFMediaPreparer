@@ -20,17 +20,12 @@ Library::Library(Settings *settings, EventHandler *eventHandler) {
 }
 
 void Library::scan(bool scanRecursive) {
+	scanDirectory(scanRecursive);
+}
+
+void Library::scanDirectory(bool scanRecursive) {
 	_Library.clear();
-	if (!scanRecursive) {
-		for (bf::directory_entry &x : bf::directory_iterator(_settings->libraryDir)) {
-			for (int i = 0; i < _extensions.size(); i++) {
-				if (x.path().extension().string() == _extensions[i]) {
-					File file = File(x.path().string());
-					_Library.push_back(file);
-				}
-			}
-		}
-	} else {
+	if (scanRecursive) {
 		for (bf::directory_entry &x : bf::recursive_directory_iterator(_settings->libraryDir)) {
 			if (x.path().parent_path().filename().string().compare("Converted") != 0) {
 				for (int i = 0; i < _extensions.size(); i++) {
@@ -38,6 +33,15 @@ void Library::scan(bool scanRecursive) {
 						File file = File(x.path().string());
 						_Library.push_back(file);
 					}
+				}
+			}
+		}
+	} else {
+		for (bf::directory_entry &x : bf::directory_iterator(_settings->libraryDir)) {
+			for (int i = 0; i < _extensions.size(); i++) {
+				if (x.path().extension().string() == _extensions[i]) {
+					File file = File(x.path().string());
+					_Library.push_back(file);
 				}
 			}
 		}

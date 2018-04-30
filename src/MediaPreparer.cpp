@@ -28,12 +28,15 @@ MediaPreparer::MediaPreparer(QWidget *parent) : QMainWindow(parent), ui(new Ui::
 MediaPreparer::MediaPreparer(EventHandler *evn, Settings *set, Library *lib, QWidget *parent) : QMainWindow(parent), ui(new Ui::MediaPreparer) {
 	ui->setupUi(this);
 
-	eventHandler = new EventHandler();
+	eventHandler = evn;
 	if (set == NULL) {
 		settings = new Settings(eventHandler);
 		if (lib == NULL) {
 			library = new Library(settings, eventHandler);
 		}
+	} else {
+		settings = set;
+		library  = lib;
 	}
 
 	init();

@@ -30,6 +30,9 @@ class Library {
 
 	int _duration = -1;
 
+	void scanDirectory(bool scanRecursive = true);
+	void scanFile();
+
   public:
 	Library(Settings *settings);
 	Library(Settings *settings, EventHandler *eventHandler);
