@@ -23,6 +23,22 @@ void Library::scan(bool scanRecursive) {
 	scanDirectory(scanRecursive);
 }
 
+void Library::scanFile(int i) {
+	File &f = getFile(i);
+	_eventHandler->newEvent(WORKER_SCAN_ITEM_STARTED, "Scanning File: " + f.name(), i);
+	QList<QString> params = _scanParams;
+	params.append(f.path().c_str());
+	QProcess process;
+	bool r = false;
+	for (int j = 0; !cancelScan && !r && j < RETRY_COUNT; j++) {
+		process.start("ffprobe", params);
+		process.waitForFinished();
+		StringStream out(process.readAllStandardOutput());
+		r = f.loadFileInfo(out);
+	}
+	eventHandler->newEvent(WORKER_SCAN_ITEM_FINISHED, i);
+}
+
 void Library::scanDirectory(bool scanRecursive) {
 	_Library.clear();
 	if (scanRecursive) {
