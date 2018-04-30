@@ -16,6 +16,26 @@ namespace SuperEpicFuntime {
  */
 MediaPreparer::MediaPreparer(QWidget *parent) : QMainWindow(parent), ui(new Ui::MediaPreparer) {
 	ui->setupUi(this);
+
+	eventHandler = new EventHandler();
+	settings	 = new Settings(eventHandler);
+	library		 = new Library(settings, eventHandler);
+
+	init();
+	eventHandler->newEvent(INITIALIZED, 0);
+}
+
+MediaPreparer::MediaPreparer(EventHandler *evn, Settings *set, Library *lib, QWidget *parent) : QMainWindow(parent), ui(new Ui::MediaPreparer) {
+	ui->setupUi(this);
+
+	eventHandler = new EventHandler();
+	if (set == NULL) {
+		settings = new Settings(eventHandler);
+		if (lib == NULL) {
+			library = new Library(settings, eventHandler);
+		}
+	}
+
 	init();
 	eventHandler->newEvent(INITIALIZED, 0);
 }
@@ -31,9 +51,6 @@ MediaPreparer::~MediaPreparer() {
  * (Section) Initilization
  */
 void MediaPreparer::init() {
-	eventHandler = new EventHandler();
-	settings	 = new Settings(eventHandler);
-	library		 = new Library(settings, eventHandler);
 	this->setWindowTitle(productName.c_str());
 	if (!settings->preserveLog) {
 		bf::remove(settings->baseDir + "\\log.txt");

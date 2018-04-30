@@ -68,6 +68,7 @@ class MediaPreparer : public QMainWindow {
 	bool cancelWorker = false;
 
 	explicit MediaPreparer(QWidget *parent = 0);
+	explicit MediaPreparer(EventHandler *eventHandler, Settings *settings = NULL, Library *library = NULL, QWidget *parent = 0);
 	~MediaPreparer();
 
   public slots:

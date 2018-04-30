@@ -6,8 +6,8 @@
 #include <Settings.hpp>
 
 #include <Library.hpp>
+
 #include <MediaPreparer.hpp>
-#include <QtWidgets/QWidget>
 
 #include <iostream> // For debugging (cout)
 
