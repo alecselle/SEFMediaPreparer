@@ -142,8 +142,10 @@ void MediaPreparer::loadSettings_preset(QString preset) {
 	blockSignals(true);
 	loadSettings_presets();
 	settings->loadPreset(preset.toStdString());
+	//	ui->setting_preset->blockSignals(true);
 	ui->setting_preset->setCurrentText(settings->presetName.c_str());
 	ui->setting_preset->setToolTip(settings->presetPath.c_str());
+	//	ui->setting_preset->blockSignals(false);
 	ui->setting_vCodec->setCurrentText(settings->vCodec.c_str());
 	ui->setting_aCodec->setCurrentText(settings->aCodec.c_str());
 	ui->setting_vQuality->setValue(stoi(settings->vQuality));
@@ -247,24 +249,9 @@ void MediaPreparer::eventListener(Event *e) {
 	string eventMessage = e->getMessage();
 	switch (eventType) {
 		/** ============================================================================================
-		 * (Event) INITIALIZED
-		 */
-		case INITIALIZED:
-			// log(e, false);
-
-			break;
-		/** ============================================================================================
-		 * (Event) TERMINATED
-		 */
-		case TERMINATED:
-			// log(e, false);
-
-			break;
-		/** ============================================================================================
 		 * (Event) WORKER_SCAN_STARTED
 		 */
 		case WORKER_SCAN_STARTED: {
-			log(e, true);
 			updateTimer->start(100);
 			workerType = SCAN;
 			workerTimeStamp.start();
@@ -278,7 +265,6 @@ void MediaPreparer::eventListener(Event *e) {
 		 * (Event) WORKER_SCAN_FINISHED
 		 */
 		case WORKER_SCAN_FINISHED: {
-			log(e, true);
 			updateTimer->stop();
 			if (!eventMessage.empty()) {
 				ui->progress_primary->setFormat(eventMessage.c_str());
@@ -293,7 +279,6 @@ void MediaPreparer::eventListener(Event *e) {
 		 * (Event) WORKER_SCAN_ERRORED
 		 */
 		case WORKER_SCAN_ERRORED: {
-			log(e, true);
 			updateTimer->stop();
 			if (!eventMessage.empty()) {
 				ui->progress_primary->setFormat(eventMessage.c_str());
@@ -308,7 +293,6 @@ void MediaPreparer::eventListener(Event *e) {
 		 * (Event) WORKER_SCAN_ITEM_STARTED
 		 */
 		case WORKER_SCAN_ITEM_STARTED: {
-			log(e, true);
 			if (e->dataIsType<int>(0)) {
 				int eventData = e->getData<int>(0);
 				workerItemTimeStamp.start();
@@ -324,7 +308,6 @@ void MediaPreparer::eventListener(Event *e) {
 		 * (Event) WORKER_SCAN_ITEM_FINISHED
 		 */
 		case WORKER_SCAN_ITEM_FINISHED: {
-			log(e, false);
 			if (e->dataIsType<int>(0)) {
 				int eventData = e->getData<int>(0);
 				ui->progress_primary->setValue(eventData);
@@ -342,7 +325,6 @@ void MediaPreparer::eventListener(Event *e) {
 		 * (Event) WORKER_ENCODE_STARTED
 		 */
 		case WORKER_ENCODE_STARTED: {
-			log(e, true);
 			updateTimer->start(100);
 			workerType = ENCODE;
 			workerTimeStamp.start();
@@ -372,7 +354,6 @@ void MediaPreparer::eventListener(Event *e) {
 		 * (Event) WORKER_ENCODE_FINISHED
 		 */
 		case WORKER_ENCODE_FINISHED: {
-			log(e, true);
 			updateTimer->stop();
 			if (!eventMessage.empty()) {
 				ui->progress_primary->setFormat(eventMessage.c_str());
@@ -387,7 +368,6 @@ void MediaPreparer::eventListener(Event *e) {
 		 * (Event) WORKER_ENCODE_ERRORED
 		 */
 		case WORKER_ENCODE_ERRORED: {
-			log(e, true);
 			updateTimer->stop();
 			if (!eventMessage.empty()) {
 				ui->progress_primary->setFormat(eventMessage.c_str());
@@ -402,7 +382,6 @@ void MediaPreparer::eventListener(Event *e) {
 		 * (Event) WORKER_ENCODE_ITEM_STARTED
 		 */
 		case WORKER_ENCODE_ITEM_STARTED: {
-			log(e, true);
 			if (e->dataIsType<int>(0)) {
 				int eventData = e->getData<int>(0);
 				workerItemTimeStamp.start();
@@ -429,7 +408,6 @@ void MediaPreparer::eventListener(Event *e) {
 		 * (Event) WORKER_ENCODE_ITEM_FINISHED
 		 */
 		case WORKER_ENCODE_ITEM_FINISHED: {
-			log(e, false);
 			if (e->dataIsType<int>(0)) {
 				int eventData   = e->getData<int>(0);
 				File &eventFile = library->getFileEncode(eventData);
@@ -464,29 +442,22 @@ void MediaPreparer::eventListener(Event *e) {
 			break;
 		}
 		case CONFIG_SAVED: {
-			// log(e, false);
 
 			break;
 		}
 		case CONFIG_LOADED: {
-			// log(e, false);
 
 			break;
 		}
 		case PRESET_SAVED: {
-			// log(e, true);
 
 			break;
 		}
 		case PRESET_LOADED: {
-			// log(e, false);
 
 			break;
 		}
-		default: {
-			log(e, "Unhandled Event", false);
-			break;
-		}
+		default: { break; }
 	}
 	blockSignals(false);
 }
@@ -601,63 +572,8 @@ void MediaPreparer::lockUI(bool b) {
 	}
 }
 
-void MediaPreparer::log(QString message, bool toFile) {
-	bf::fstream fs;
-	if (toFile) {
-		fs.open(settings->logPath, bf::fstream::in | bf::fstream::out | bf::fstream::app);
-	}
-
-	std::string logStr = "[" + QTime::currentTime().toString("hh:mm:ss.zzz").toStdString() + "] " + message.toStdString();
-
-	std::cout << logStr << endl;
-	if (toFile) {
-		fs << logStr << endl;
-		fs.close();
-	}
-}
-
-void MediaPreparer::log(Event *e, bool toFile) {
-	log(e, "", toFile);
-}
-
-void MediaPreparer::log(Event *e, string optMessage, bool toFile) {
-	bf::fstream fs;
-	if (toFile) {
-		fs.open(settings->logPath, bf::fstream::in | bf::fstream::out | bf::fstream::app);
-	}
-
-	std::string logStr = "[" + e->getTimeStamp() + "]";
-	if (!optMessage.empty()) {
-		logStr += " " + optMessage;
-		if (!e->getMessage().empty()) {
-			logStr += " |";
-		}
-	}
-	if (!e->getMessage().empty()) {
-		logStr += " " + e->getMessage();
-	}
-	logStr += " (Event: " + e->getTypeStr();
-	for (int i = 0; i < e->getDataVector().size(); i++) {
-		if (e->dataIsType<int>(i)) {
-			logStr += ", Data[" + std::to_string(i) + "](int): " + std::to_string(e->getData<int>(i));
-		} else if (e->dataIsType<std::string>(i)) {
-			logStr += ", Data[" + std::to_string(i) + "](string): " + e->getData<std::string>(i);
-		} else {
-			logStr += ", Data[" + std::to_string(i) + "](" + e->getData(i).type().name() + "): Unknown";
-		}
-	}
-	logStr += ")";
-
-	std::cout << logStr << endl;
-	if (toFile) {
-		fs << logStr << endl;
-		fs.close();
-	}
-}
-
 void MediaPreparer::blockSignals(bool b) {
-	QList<QWidget *> widgets = ui->container_main->findChildren<QWidget *>();
-	foreach (QWidget *x, widgets) { x->blockSignals(b); }
+	foreach (QWidget *x, ui->container_main->findChildren<QWidget *>()) { x->blockSignals(b); }
 }
 
 void MediaPreparer::closeEvent(QCloseEvent *e) {

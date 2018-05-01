@@ -30,16 +30,100 @@ void Controller::eventListener(Event *e) {
 		 * (Event) INITIALIZED
 		 */
 		case INITIALIZED:
-			log(e, false);
+			log(e, true);
 
 			break;
 		/** ============================================================================================
 		 * (Event) TERMINATED
 		 */
 		case TERMINATED:
-			log(e, false);
+			log(e, true);
 
 			break;
+		/** ============================================================================================
+		 * (Event) WORKER_SCAN_STARTED
+		 */
+		case WORKER_SCAN_STARTED: {
+			log(e, true);
+			break;
+		}
+		/** ============================================================================================
+		 * (Event) WORKER_SCAN_FINISHED
+		 */
+		case WORKER_SCAN_FINISHED: {
+			log(e, true);
+			break;
+		}
+		/** ============================================================================================
+		 * (Event) WORKER_SCAN_ERRORED
+		 */
+		case WORKER_SCAN_ERRORED: {
+			log(e, true);
+			break;
+		}
+		/** ================================================================================================
+		 * (Event) WORKER_SCAN_ITEM_STARTED
+		 */
+		case WORKER_SCAN_ITEM_STARTED: {
+			log(e, true);
+			break;
+		}
+		/** ================================================================================================
+		 * (Event) WORKER_SCAN_ITEM_FINISHED
+		 */
+		case WORKER_SCAN_ITEM_FINISHED: {
+			log(e, false);
+			break;
+		}
+		/** ============================================================================================
+		 * (Event) WORKER_ENCODE_STARTED
+		 */
+		case WORKER_ENCODE_STARTED: {
+			log(e, true);
+			break;
+		}
+		/** ============================================================================================
+		 * (Event) WORKER_ENCODE_FINISHED
+		 */
+		case WORKER_ENCODE_FINISHED: {
+			log(e, true);
+			break;
+		}
+		/** ============================================================================================
+		 * (Event) WORKER_ENCODE_ERRORED
+		 */
+		case WORKER_ENCODE_ERRORED: {
+			log(e, true);
+			break;
+		}
+		/** ============================================================================================
+		 * (Event) WORKER_ENCODE_ITEM_STARTED
+		 */
+		case WORKER_ENCODE_ITEM_STARTED: {
+			log(e, true);
+			break;
+		}
+		/** ============================================================================================
+		 * (Event) WORKER_ENCODE_ITEM_FINISHED
+		 */
+		case WORKER_ENCODE_ITEM_FINISHED: {
+			log(e, false);
+			break;
+		}
+		/** ============================================================================================
+		 * (Event) PROGRESS_PRIMARY_UPDATED
+		 */
+		case PROGRESS_PRIMARY_UPDATED: {
+
+			break;
+		}
+		/** ============================================================================================
+		 * (Event) PROGRESS_PRIMARY_MAXIMUM_CHANGED
+		 */
+		case PROGRESS_PRIMARY_MAXIMUM: {
+
+			break;
+		}
 		/** ============================================================================================
 		 * (Event) CONFIG_SAVED
 		 */
@@ -72,8 +156,10 @@ void Controller::eventListener(Event *e) {
 
 			break;
 		}
-		default:
+		default: {
+			log(e, "Unhandled Event", false);
 			break;
+		}
 	}
 }
 

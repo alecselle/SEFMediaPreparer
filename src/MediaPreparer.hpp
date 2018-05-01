@@ -93,9 +93,6 @@ class MediaPreparer : public QMainWindow {
 
 	bool cancel(bool force = false);
 
-	void log(QString message, bool toFile = true);
-	void log(Event *event, bool toFile = true);
-	void log(Event *event, std::string optMessage, bool toFile = true);
 	void lockUI(bool b = true);
 	void blockSignals(bool b);
 };
