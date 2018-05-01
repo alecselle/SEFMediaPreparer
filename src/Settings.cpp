@@ -67,7 +67,8 @@ string Settings::parsePresetName(string name) {
 }
 
 void Settings::loadConfig() {
-	FILE *fp = fopen(parsePath(CONFIG_FILE).c_str(), "rb");
+	bool save = false;
+	FILE *fp  = fopen(parsePath(CONFIG_FILE).c_str(), "rb");
 	char readBuffer[65536];
 	FileReadStream is(fp, readBuffer, sizeof(readBuffer));
 	Document d;
@@ -77,6 +78,7 @@ void Settings::loadConfig() {
 		presetPath = parsePresetPath(d["preset"].GetString());
 	} else {
 		presetPath = DEFAULT_PRESET;
+		save	   = true;
 	}
 	presetName = bf::path(presetPath).filename().replace_extension().string();
 	if (d.HasMember("tempDir") && d["tempDir"].IsString()) {
@@ -86,21 +88,25 @@ void Settings::loadConfig() {
 		}
 	} else {
 		tempDir = DEFAULT_TEMP_DIR;
+		save	= true;
 	}
 	if (d.HasMember("libraryDir") && d["libraryDir"].IsString()) {
 		libraryDir = parsePath(d["libraryDir"].GetString());
 	} else {
 		libraryDir = DEFAULT_LIBRARY_DIR;
+		save	   = true;
 	}
 	if (d.HasMember("outputDir") && d["outputDir"].IsString()) {
 		outputDir = parsePath(d["outputDir"].GetString());
 	} else {
 		outputDir = libraryDir + DEFAULT_OUTPUT_FOLDER;
+		save	  = true;
 	}
 	if (d.HasMember("preserveLog") && d["preserveLog"].IsBool()) {
 		preserveLog = d["preserveLog"].GetBool();
 	} else {
 		preserveLog = DEFAULT_PRESERVE_LOG;
+		save		= true;
 	}
 	if (d.HasMember("vCodecs") && d["vCodecs"].IsArray()) {
 		vCodecList.clear();
@@ -112,6 +118,7 @@ void Settings::loadConfig() {
 		}
 	} else {
 		vCodecList = DEFAULT_VCODECS;
+		save	   = true;
 	}
 	if (d.HasMember("aCodecs") && d["aCodecs"].IsArray()) {
 		aCodecList.clear();
@@ -123,6 +130,7 @@ void Settings::loadConfig() {
 		}
 	} else {
 		aCodecList = DEFAULT_ACODECS;
+		save	   = true;
 	}
 	if (d.HasMember("containers") && d["containers"].IsArray()) {
 		for (int i = 0; i < (int)d["containers"].GetArray().Size(); i++) {
@@ -130,11 +138,14 @@ void Settings::loadConfig() {
 		}
 	} else {
 		containerList = DEFAULT_CONTAINERS;
+		save		  = true;
 	}
-	saveConfig();
 	fclose(fp);
 	if (_eventHandler != NULL) {
 		_eventHandler->newEvent(CONFIG_LOADED, "Loaded Config");
+	}
+	if (save) {
+		saveConfig();
 	}
 }
 
