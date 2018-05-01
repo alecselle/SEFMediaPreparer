@@ -27,11 +27,11 @@ void Settings::init() {
 	if (!bf::exists(PRESET_DIR)) {
 		bf::create_directories(PRESET_DIR);
 	}
-	if (!bf::exists(CONFIG_FILE)) {
-		createDefaultConfig();
-	}
 	if (!bf::exists(DEFAULT_PRESET)) {
 		createDefaultPreset();
+	}
+	if (!bf::exists(CONFIG_FILE)) {
+		createDefaultConfig();
 	}
 	baseDir = BASE_DIR;
 	logPath = LOG_FILE;
@@ -67,75 +67,74 @@ string Settings::parsePresetName(string name) {
 }
 
 void Settings::loadConfig() {
-	FILE *fp;
-	if ((fp = fopen(parsePath(CONFIG_FILE).c_str(), "rb"))) {
-		char readBuffer[65536];
-		FileReadStream is(fp, readBuffer, sizeof(readBuffer));
-		Document d;
-		d.ParseStream(is);
+	FILE *fp = fopen(parsePath(CONFIG_FILE).c_str(), "rb");
+	char readBuffer[65536];
+	FileReadStream is(fp, readBuffer, sizeof(readBuffer));
+	Document d;
+	d.ParseStream(is);
 
-		if (d.HasMember("preset") && d["preset"].IsString()) {
-			presetPath = parsePresetPath(d["preset"].GetString());
-		} else {
-			presetPath = DEFAULT_PRESET;
+	if (d.HasMember("preset") && d["preset"].IsString()) {
+		presetPath = parsePresetPath(d["preset"].GetString());
+	} else {
+		presetPath = DEFAULT_PRESET;
+	}
+	presetName = bf::path(presetPath).filename().replace_extension().string();
+	if (d.HasMember("tempDir") && d["tempDir"].IsString()) {
+		tempDir = parsePath(d["tempDir"].GetString());
+		if (!bf::exists(tempDir)) {
+			bf::create_directories(tempDir);
 		}
-		presetName = bf::path(presetPath).filename().replace_extension().string();
-		if (d.HasMember("tempDir") && d["tempDir"].IsString()) {
-			tempDir = parsePath(d["tempDir"].GetString());
-			if (!bf::exists(tempDir)) {
-				bf::create_directories(tempDir);
+	} else {
+		tempDir = DEFAULT_TEMP_DIR;
+	}
+	if (d.HasMember("libraryDir") && d["libraryDir"].IsString()) {
+		libraryDir = parsePath(d["libraryDir"].GetString());
+	} else {
+		libraryDir = DEFAULT_LIBRARY_DIR;
+	}
+	if (d.HasMember("outputDir") && d["outputDir"].IsString()) {
+		outputDir = parsePath(d["outputDir"].GetString());
+	} else {
+		outputDir = libraryDir + DEFAULT_OUTPUT_FOLDER;
+	}
+	if (d.HasMember("preserveLog") && d["preserveLog"].IsBool()) {
+		preserveLog = d["preserveLog"].GetBool();
+	} else {
+		preserveLog = DEFAULT_PRESERVE_LOG;
+	}
+	if (d.HasMember("vCodecs") && d["vCodecs"].IsArray()) {
+		vCodecList.clear();
+		for (int i = 0; i < (int)d["vCodecs"].GetArray().Size(); i++) {
+			vCodecList.push_back({});
+			for (int j = 0; j < (int)d["vCodecs"].GetArray()[i].GetArray().Size(); j++) {
+				vCodecList[i].push_back(d["vCodecs"].GetArray()[i].GetArray()[j].GetString());
 			}
-		} else {
-			tempDir = DEFAULT_TEMP_DIR;
 		}
-		if (d.HasMember("libraryDir") && d["libraryDir"].IsString()) {
-			libraryDir = parsePath(d["libraryDir"].GetString());
-		} else {
-			libraryDir = DEFAULT_LIBRARY_DIR;
-		}
-		if (d.HasMember("outputDir") && d["outputDir"].IsString()) {
-			outputDir = parsePath(d["outputDir"].GetString());
-		} else {
-			outputDir = libraryDir + DEFAULT_OUTPUT_FOLDER;
-		}
-		if (d.HasMember("preserveLog") && d["preserveLog"].IsBool()) {
-			preserveLog = d["preserveLog"].GetBool();
-		} else {
-			preserveLog = DEFAULT_PRESERVE_LOG;
-		}
-		if (d.HasMember("vCodecs") && d["vCodecs"].IsArray()) {
-			vCodecList.clear();
-			for (int i = 0; i < (int)d["vCodecs"].GetArray().Size(); i++) {
-				vCodecList.push_back({});
-				for (int j = 0; j < (int)d["vCodecs"].GetArray()[i].GetArray().Size(); j++) {
-					vCodecList[i].push_back(d["vCodecs"].GetArray()[i].GetArray()[j].GetString());
-				}
+	} else {
+		vCodecList = DEFAULT_VCODECS;
+	}
+	if (d.HasMember("aCodecs") && d["aCodecs"].IsArray()) {
+		aCodecList.clear();
+		for (int i = 0; i < (int)d["aCodecs"].GetArray().Size(); i++) {
+			aCodecList.push_back({});
+			for (int j = 0; j < (int)d["aCodecs"].GetArray()[i].GetArray().Size(); j++) {
+				aCodecList[i].push_back(d["aCodecs"].GetArray()[i].GetArray()[j].GetString());
 			}
-		} else {
-			vCodecList = DEFAULT_VCODECS;
 		}
-		if (d.HasMember("aCodecs") && d["aCodecs"].IsArray()) {
-			aCodecList.clear();
-			for (int i = 0; i < (int)d["aCodecs"].GetArray().Size(); i++) {
-				aCodecList.push_back({});
-				for (int j = 0; j < (int)d["aCodecs"].GetArray()[i].GetArray().Size(); j++) {
-					aCodecList[i].push_back(d["aCodecs"].GetArray()[i].GetArray()[j].GetString());
-				}
-			}
-		} else {
-			aCodecList = DEFAULT_ACODECS;
+	} else {
+		aCodecList = DEFAULT_ACODECS;
+	}
+	if (d.HasMember("containers") && d["containers"].IsArray()) {
+		for (int i = 0; i < (int)d["containers"].GetArray().Size(); i++) {
+			containerList.push_back(d["containers"].GetArray()[i].GetString());
 		}
-		if (d.HasMember("containers") && d["containers"].IsArray()) {
-			for (int i = 0; i < (int)d["containers"].GetArray().Size(); i++) {
-				containerList.push_back(d["containers"].GetArray()[i].GetString());
-			}
-		} else {
-			containerList = DEFAULT_CONTAINERS;
-		}
-		fclose(fp);
-		if (_eventHandler != NULL) {
-			_eventHandler->newEvent(CONFIG_LOADED, "Loaded Config");
-		}
+	} else {
+		containerList = DEFAULT_CONTAINERS;
+	}
+	saveConfig();
+	fclose(fp);
+	if (_eventHandler != NULL) {
+		_eventHandler->newEvent(CONFIG_LOADED, "Loaded Config");
 	}
 }
 
@@ -179,16 +178,14 @@ void Settings::saveConfig() {
 		d["containers"].PushBack(Value().SetString(StringRef(containerList[i].c_str())), alloc);
 	}
 
-	FILE *fp;
-	if ((fp = fopen(parsePath(CONFIG_FILE).c_str(), "wb"))) {
-		char writeBuffer[65536];
-		FileWriteStream os(fp, writeBuffer, sizeof(writeBuffer));
-		PrettyWriter<FileWriteStream> writer(os);
-		d.Accept(writer);
-		fclose(fp);
-		if (_eventHandler != NULL) {
-			_eventHandler->newEvent(CONFIG_SAVED, "Saved Config");
-		}
+	FILE *fp = fopen(parsePath(CONFIG_FILE).c_str(), "wb");
+	char writeBuffer[65536];
+	FileWriteStream os(fp, writeBuffer, sizeof(writeBuffer));
+	PrettyWriter<FileWriteStream> writer(os);
+	d.Accept(writer);
+	fclose(fp);
+	if (_eventHandler != NULL) {
+		_eventHandler->newEvent(CONFIG_SAVED, "Saved Config");
 	}
 }
 
@@ -214,8 +211,10 @@ void Settings::loadPreset(std::string name) {
 }
 
 void Settings::loadPresetFile(std::string path) {
-	FILE *fp;
-	if ((fp = fopen(parsePresetPath(path).c_str(), "rb"))) {
+	bf::path p(parsePresetPath(path).c_str());
+	if (bf::exists(p) && bf::is_regular_file(p)) {
+
+		FILE *fp = fopen(p.string().c_str(), "rb");
 		char readBuffer[65536];
 		FileReadStream is(fp, readBuffer, sizeof(readBuffer));
 		Document d;
@@ -261,12 +260,19 @@ void Settings::loadPresetFile(std::string path) {
 		} else {
 			extraParams = DEFAULT_EXTRA_PARAMS;
 		}
+		fclose(fp);
 		presetPath = parsePresetPath(path);
 		presetName = parsePresetName(path);
-		fclose(fp);
-		if (_eventHandler != NULL) {
-			_eventHandler->newEvent(PRESET_LOADED, "Loaded Preset: " + presetName);
+	} else {
+		if (!bf::exists(DEFAULT_PRESET)) {
+			createDefaultPreset();
 		}
+		if (bf::exists(DEFAULT_PRESET)) {
+			loadPresetFile(DEFAULT_PRESET);
+		}
+	}
+	if (_eventHandler != NULL) {
+		_eventHandler->newEvent(PRESET_LOADED, "Loaded Preset: " + presetName);
 	}
 }
 
@@ -291,21 +297,19 @@ void Settings::savePresetAs(std::string name) {
 	d.AddMember(StringRef("threads"), Value(StringRef(threads.c_str())), alloc);
 	d.AddMember(StringRef("extraParams"), Value(StringRef(extraParams.c_str())), alloc);
 
-	FILE *fp;
-	if ((fp = fopen(parsePresetPath(name).c_str(), "wb"))) {
-		char writeBuffer[65536];
-		FileWriteStream os(fp, writeBuffer, sizeof(writeBuffer));
-		PrettyWriter<FileWriteStream> writer(os);
-		d.Accept(writer);
-		fclose(fp);
+	FILE *fp = fopen(parsePresetPath(name).c_str(), "wb");
+	char writeBuffer[65536];
+	FileWriteStream os(fp, writeBuffer, sizeof(writeBuffer));
+	PrettyWriter<FileWriteStream> writer(os);
+	d.Accept(writer);
+	fclose(fp);
 
-		presetPath = parsePresetPath(name);
-		presetName = parsePresetName(name);
+	presetPath = parsePresetPath(name);
+	presetName = parsePresetName(name);
 
-		refreshPresets();
-		if (_eventHandler != NULL) {
-			_eventHandler->newEvent(PRESET_SAVED, "Saved Preset: " + presetName);
-		}
+	refreshPresets();
+	if (_eventHandler != NULL) {
+		_eventHandler->newEvent(PRESET_SAVED, "Saved Preset: " + presetName);
 	}
 }
 

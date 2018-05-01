@@ -115,7 +115,6 @@ void MediaPreparer::loadSettings_gui() {
 	settings->threads	 = ba::trim_copy(ui->setting_threads->text().toStdString());
 	settings->extraParams = ba::trim_copy(ui->setting_extraParams->text().toStdString());
 	settings->saveConfig();
-	loadSettings_config();
 }
 
 void MediaPreparer::loadSettings_config() {
