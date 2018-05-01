@@ -142,10 +142,10 @@ void MediaPreparer::loadSettings_preset(QString preset) {
 	blockSignals(true);
 	loadSettings_presets();
 	settings->loadPreset(preset.toStdString());
-	//	ui->setting_preset->blockSignals(true);
+	ui->setting_preset->blockSignals(true);
 	ui->setting_preset->setCurrentText(settings->presetName.c_str());
 	ui->setting_preset->setToolTip(settings->presetPath.c_str());
-	//	ui->setting_preset->blockSignals(false);
+	ui->setting_preset->blockSignals(false);
 	ui->setting_vCodec->setCurrentText(settings->vCodec.c_str());
 	ui->setting_aCodec->setCurrentText(settings->aCodec.c_str());
 	ui->setting_vQuality->setValue(stoi(settings->vQuality));

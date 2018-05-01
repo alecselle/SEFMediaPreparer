@@ -6,7 +6,7 @@ QMAKE_CXXFLAGS += -std=c++17 -static-libstdc++ -static-libgcc -Wpedantic -Wno-un
 
 !defined(VER_MAJ):VER_MAJ = 3
 !defined(VER_MIN):VER_MIN = 4
-!defined(VER_PAT):VER_PAT = 5
+!defined(VER_PAT):VER_PAT = 7
 VERSION = $${VER_MAJ}.$${VER_MIN}.$${VER_PAT}
 
 DESTDIR = $$PWD/bin
@@ -17,10 +17,7 @@ SOURCES += \
     $$PWD/src/MediaPreparer.cpp \
     $$PWD/src/Controller.cpp \
     $$PWD/src/Global.cpp \
-    $$PWD/src/Settings.cpp \
-    $$PWD/src/File.cpp \
-    $$PWD/src/Library.cpp \
-    src/Worker.cpp
+    $$PWD/src/Settings.cpp
 
 HEADERS += \
     $$PWD/src/product_info.hpp \
@@ -31,7 +28,7 @@ HEADERS += \
     $$PWD/src/Settings.hpp \
     $$PWD/src/File.hpp \
     $$PWD/src/Library.hpp \
-    src/Worker.hpp
+    $$PWD/src/Worker.hpp
 
 FORMS += \
     $$PWD/src/MediaPreparer.ui
