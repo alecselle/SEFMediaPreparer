@@ -128,11 +128,11 @@ void Settings::loadConfig() {
 	} else {
 		containerList = DEFAULT_CONTAINERS;
 	}
-	saveConfig();
 	fclose(fp);
 	if (_eventHandler != NULL) {
 		_eventHandler->newEvent(CONFIG_LOADED, "Loaded Config");
 	}
+	saveConfig();
 }
 
 void Settings::saveConfig() {
@@ -259,6 +259,7 @@ void Settings::loadPresetFile(std::string path) {
 		}
 		presetPath = parsePresetPath(path);
 		presetName = parsePresetName(path);
+		fclose(fp);
 	} else {
 		if (!bf::exists(DEFAULT_PRESET)) {
 			createDefaultPreset();

@@ -18,8 +18,9 @@ MediaPreparer::MediaPreparer(QWidget *parent) : QMainWindow(parent), ui(new Ui::
 	ui->setupUi(this);
 
 	eventHandler = new EventHandler();
-	settings	 = new Settings(eventHandler);
-	library		 = new Library(settings, eventHandler);
+	connect(eventHandler, SIGNAL(eventAdded(Event *)), this, SLOT(eventListener(Event *)), Qt::UniqueConnection);
+	settings = new Settings(eventHandler);
+	library  = new Library(settings, eventHandler);
 
 	init();
 	eventHandler->newEvent(INITIALIZED, 0);
@@ -29,6 +30,7 @@ MediaPreparer::MediaPreparer(EventHandler *evn, Settings *set, Library *lib, QWi
 	ui->setupUi(this);
 
 	eventHandler = evn;
+	connect(eventHandler, SIGNAL(eventAdded(Event *)), this, SLOT(eventListener(Event *)), Qt::UniqueConnection);
 	if (set == NULL) {
 		settings = new Settings(eventHandler);
 	} else {
@@ -82,22 +84,20 @@ void MediaPreparer::initSignals() {
 
 	connect(ui->button_encode, SIGNAL(clicked()), this, SLOT(runWorker_encode()), Qt::UniqueConnection);
 
-	connect(ui->button_savePreset, SIGNAL(clicked()), this, SLOT(dialogSave()));
+	connect(ui->button_savePreset, SIGNAL(clicked()), this, SLOT(dialogSave()), Qt::UniqueConnection);
 
-	connect(ui->button_browse_directory, SIGNAL(clicked()), signalMapper, SLOT(map()));
+	connect(ui->button_browse_directory, SIGNAL(clicked()), signalMapper, SLOT(map()), Qt::UniqueConnection);
 	signalMapper->setMapping(ui->button_browse_directory, 0);
-	connect(ui->button_browse_dirOutput, SIGNAL(clicked()), signalMapper, SLOT(map()));
+	connect(ui->button_browse_dirOutput, SIGNAL(clicked()), signalMapper, SLOT(map()), Qt::UniqueConnection);
 	signalMapper->setMapping(ui->button_browse_dirOutput, 1);
-	connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(dialogBrowse(int)));
+	connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(dialogBrowse(int)), Qt::UniqueConnection);
 
-	connect(ui->setting_vCodec, SIGNAL(currentIndexChanged(int)), this, SLOT(loadSettings_gui()));
-	connect(ui->setting_aCodec, SIGNAL(currentIndexChanged(int)), this, SLOT(loadSettings_gui()));
-	connect(ui->setting_container, SIGNAL(currentIndexChanged(int)), this, SLOT(loadSettings_gui()));
-	connect(ui->setting_preset, SIGNAL(currentTextChanged(QString)), this, SLOT(loadSettings_preset(QString)));
+	connect(ui->setting_vCodec, SIGNAL(currentIndexChanged(int)), this, SLOT(loadSettings_gui()), Qt::UniqueConnection);
+	connect(ui->setting_aCodec, SIGNAL(currentIndexChanged(int)), this, SLOT(loadSettings_gui()), Qt::UniqueConnection);
+	connect(ui->setting_container, SIGNAL(currentIndexChanged(int)), this, SLOT(loadSettings_gui()), Qt::UniqueConnection);
+	connect(ui->setting_preset, SIGNAL(currentTextChanged(QString)), this, SLOT(loadSettings_preset(QString)), Qt::UniqueConnection);
 
 	connect(updateTimer, SIGNAL(timeout()), this, SLOT(updateGUI_timers()));
-
-	connect(eventHandler, SIGNAL(eventAdded(Event *)), this, SLOT(eventListener(Event *)), Qt::UniqueConnection);
 }
 
 /** ================================================================================================
@@ -114,6 +114,8 @@ void MediaPreparer::loadSettings_gui() {
 	settings->outputDir   = ba::trim_copy(ui->setting_dirOutput->text().toStdString());
 	settings->threads	 = ba::trim_copy(ui->setting_threads->text().toStdString());
 	settings->extraParams = ba::trim_copy(ui->setting_extraParams->text().toStdString());
+	settings->saveConfig();
+	loadSettings_config();
 }
 
 void MediaPreparer::loadSettings_config() {
@@ -249,14 +251,14 @@ void MediaPreparer::eventListener(Event *e) {
 		 * (Event) INITIALIZED
 		 */
 		case INITIALIZED:
-			log(e, false);
+			// log(e, false);
 
 			break;
 		/** ============================================================================================
 		 * (Event) TERMINATED
 		 */
 		case TERMINATED:
-			log(e, false);
+			// log(e, false);
 
 			break;
 		/** ============================================================================================
@@ -463,22 +465,22 @@ void MediaPreparer::eventListener(Event *e) {
 			break;
 		}
 		case CONFIG_SAVED: {
-			log(e, false);
+			// log(e, false);
 
 			break;
 		}
 		case CONFIG_LOADED: {
-			log(e, false);
+			// log(e, false);
 
 			break;
 		}
 		case PRESET_SAVED: {
-			log(e, true);
+			// log(e, true);
 
 			break;
 		}
 		case PRESET_LOADED: {
-			log(e, false);
+			// log(e, false);
 
 			break;
 		}
@@ -504,6 +506,7 @@ void MediaPreparer::dialogBrowse(int type) {
 		switch (type) {
 			case 0: {
 				ui->setting_directory->setText(dir[0]);
+				ui->setting_dirOutput->setText(dir[0] + "/Converted");
 				runWorker_scan();
 				break;
 			}
