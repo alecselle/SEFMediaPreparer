@@ -53,20 +53,15 @@ class MediaPreparer : public QMainWindow {
 	void initGUI();
 	void initSignals();
 
-	void scanLibrary();
-	void scanFile(File &file);
-
-	void encodeLibrary();
-
 	void closeEvent(QCloseEvent *e);
 
 	QTimer *updateTimer = new QTimer(this);
-	QFuture<void> worker;
+	QFuture<void> workerThread;
+	Worker worker = Worker(NONE);
 	QTime workerTimeStamp;
 	WorkerType workerType;
 	File workerItem;
 	QTime workerItemTimeStamp;
-	bool cancelWorker = false;
 
 	explicit MediaPreparer(QWidget *parent = 0);
 	explicit MediaPreparer(EventHandler *eventHandler, Settings *settings = NULL, Library *library = NULL, QWidget *parent = 0);

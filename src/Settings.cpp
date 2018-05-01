@@ -130,8 +130,8 @@ void Settings::loadConfig() {
 	}
 	saveConfig();
 	fclose(fp);
-	if (eventHandler != NULL) {
-		eventHandler->newEvent(CONFIG_LOADED, "Loaded Config");
+	if (_eventHandler != NULL) {
+		_eventHandler->newEvent(CONFIG_LOADED, "Loaded Config");
 	}
 }
 
@@ -181,8 +181,8 @@ void Settings::saveConfig() {
 	PrettyWriter<FileWriteStream> writer(os);
 	d.Accept(writer);
 	fclose(fp);
-	if (eventHandler != NULL) {
-		eventHandler->newEvent(CONFIG_SAVED, "Saved Config");
+	if (_eventHandler != NULL) {
+		_eventHandler->newEvent(CONFIG_SAVED, "Saved Config");
 	}
 }
 
@@ -267,8 +267,8 @@ void Settings::loadPresetFile(std::string path) {
 			loadPresetFile(DEFAULT_PRESET);
 		}
 	}
-	if (eventHandler != NULL) {
-		eventHandler->newEvent(PRESET_LOADED, "Loaded Preset: " + presetName);
+	if (_eventHandler != NULL) {
+		_eventHandler->newEvent(PRESET_LOADED, "Loaded Preset: " + presetName);
 	}
 }
 
@@ -304,8 +304,8 @@ void Settings::savePresetAs(std::string name) {
 	presetName = parsePresetName(name);
 
 	refreshPresets();
-	if (eventHandler != NULL) {
-		eventHandler->newEvent(PRESET_SAVED, "Saved Preset: " + presetName);
+	if (_eventHandler != NULL) {
+		_eventHandler->newEvent(PRESET_SAVED, "Saved Preset: " + presetName);
 	}
 }
 

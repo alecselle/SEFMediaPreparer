@@ -31,12 +31,13 @@ MediaPreparer::MediaPreparer(EventHandler *evn, Settings *set, Library *lib, QWi
 	eventHandler = evn;
 	if (set == NULL) {
 		settings = new Settings(eventHandler);
-		if (lib == NULL) {
-			library = new Library(settings, eventHandler);
-		}
 	} else {
 		settings = set;
-		library  = lib;
+	}
+	if (lib == NULL) {
+		library = new Library(settings, eventHandler);
+	} else {
+		library = lib;
 	}
 
 	init();
@@ -71,10 +72,6 @@ void MediaPreparer::initGUI() {
 	ui->list_Library->setColumnWidth(2, 70);
 	ui->list_Library->setColumnWidth(3, 70);
 	ui->list_Library->setColumnWidth(4, 70);
-
-	fileMenu = menuBar()->addMenu(tr("&File"));
-	editMenu = menuBar()->addMenu(tr("&Edit"));
-	helpMenu = menuBar()->addMenu(tr("&Help"));
 
 	updateGUI_timers();
 }
@@ -197,7 +194,7 @@ void MediaPreparer::updateGUI_settings() {
 }
 
 void MediaPreparer::updateGUI_timers() {
-	if (worker.isRunning() && workerType == ENCODE) {
+	if (workerThread.isRunning() && workerType == ENCODE) {
 		if (workerTimeStamp.isValid()) {
 			ui->value_encode_runtime->setText(QString("%1:%2:%3")
 												  .arg(workerTimeStamp.elapsed() / 3600000, 2, 10, QChar('0'))
@@ -219,113 +216,25 @@ void MediaPreparer::updateGUI_timers() {
  * (Section) Workers
  */
 void MediaPreparer::runWorker_scan() {
-	if (!worker.isRunning()) {
+	if (!workerThread.isRunning()) {
 		loadSettings_gui();
-		//		worker = QtConcurrent::run(this, &MediaPreparer::scanLibrary);
-		// Worker w = Worker(SCAN, eventHandler, settings, library);
-		worker = QtConcurrent::run(Worker(SCAN), &Worker::run);
+		worker		 = Worker(SCAN);
+		workerThread = QtConcurrent::run(worker, &Worker::run);
 	}
 }
 
 void MediaPreparer::runWorker_encode() {
-	if (!worker.isRunning()) {
+	if (!workerThread.isRunning()) {
 		loadSettings_gui();
 		ui->container_settings_tabs->setCurrentIndex(3);
-		worker = QtConcurrent::run(this, &MediaPreparer::encodeLibrary);
+		worker		 = Worker(ENCODE);
+		workerThread = QtConcurrent::run(worker, &Worker::run);
 	} else {
 		cancel();
 	}
 }
 
 void MediaPreparer::runWorker_cleanup() {
-}
-
-/** ================================================================================================
- * (Section) Scan Worker
- */
-void MediaPreparer::scanLibrary() {
-	eventHandler->newEvent(WORKER_SCAN_STARTED, "Scanning Library: " + settings->libraryDir);
-	eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM, 0);
-	library->scan();
-	if (library->size() == 0) {
-		eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM, 1);
-		eventHandler->newEvent(WORKER_SCAN_ERRORED, "Invalid Library: " + settings->libraryDir);
-	} else {
-		eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM, library->size());
-		for (int i = 0; !cancelWorker && i < library->size(); i++) {
-			File &f = library->getFile(i);
-			eventHandler->newEvent(WORKER_SCAN_ITEM_STARTED, "Scanning File: " + f.name(), i);
-			QList<QString> params = {"-v", "quiet", "-show_entries", "format=duration:stream=codec_type:stream=codec_name", "-of", "json", f.path().c_str()};
-			QProcess process;
-			bool r = false;
-			for (int j = 0; !cancelWorker && !r && j < RETRY_COUNT; j++) {
-				process.start("ffprobe", params);
-				process.waitForFinished();
-				StringStream out(process.readAllStandardOutput());
-				r = f.loadFileInfo(out);
-			}
-			eventHandler->newEvent(WORKER_SCAN_ITEM_FINISHED, i);
-		}
-		library->scanEncode();
-
-		if (cancelWorker) {
-			eventHandler->newEvent(WORKER_SCAN_ERRORED, "Cancelled Scanning Library: " + settings->libraryDir);
-		} else {
-			eventHandler->newEvent(WORKER_SCAN_FINISHED, "Finished Scanning Library: " + settings->libraryDir, library->size());
-		}
-	}
-}
-
-/** ================================================================================================
- * (Section) Encode Worker
- */
-void MediaPreparer::encodeLibrary() {
-	eventHandler->newEvent(WORKER_ENCODE_STARTED, "Encoding Library: " + settings->libraryDir);
-	eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM, 0);
-	library->scanEncode();
-	eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM, library->sizeEncode());
-	for (int i = 0; !cancelWorker && i < (int)library->sizeEncode(); i++) {
-		File &f = library->getFileEncode(i);
-		eventHandler->newEvent(WORKER_ENCODE_ITEM_STARTED, "Encoding File: " + f.name(), i);
-		QList<QString> params = {"-y", "-v", "quiet", "-stats", "-hwaccel", "dxva2", "-threads", settings->threads.c_str(), "-i", f.path().c_str()};
-		if (f.subtitles() == 1 && settings->subtitles.compare("Embed") == 0) {
-			params += {"-i", f.pathSub().c_str()};
-		}
-		params += {"-map", "0:0", "-map", "0:1?"};
-		if (f.subtitles() == 1 && settings->subtitles.compare("Embed") == 0) {
-			params += {"-map", "1:0"};
-		}
-		if (f.subtitles() > 0 && settings->subtitles.compare("Remove") != 0) {
-			params += {"-map", "0:2?", "-c:s", "srt", "-metadata:s:s:0", "language=eng", "-disposition:s:0", "default"};
-		}
-		params += {"-c:v", settings->vCodec.c_str(), "-crf", settings->vQuality.c_str(), "-c:a", settings->aCodec.c_str(), "-b:a", (settings->aQuality + "k").c_str()};
-		if (!settings->extraParams.empty()) {
-			char s[2048];
-			strcpy(s, settings->extraParams.c_str());
-			for (char *p = strtok(s, " "); p != NULL; p = strtok(NULL, " ")) {
-				params.push_back(p);
-			}
-		}
-		params += {"-metadata",
-				   ("title=" + f.name()).c_str(),
-				   "-metadata",
-				   "comment=Processed by SuperEpicFuntime Media Preparer",
-				   "-strict",
-				   "-2",
-				   (settings->tempDir + "\\" + f.name() + "." + settings->container).c_str()};
-		QProcess process;
-		process.start("ffmpeg", params);
-		process.waitForFinished(-1);
-		if (!cancelWorker) {
-			bf::rename(settings->tempDir + "\\" + f.name() + "." + settings->container, settings->outputDir + "\\" + f.name() + "." + settings->container);
-		}
-		eventHandler->newEvent(WORKER_ENCODE_ITEM_FINISHED, i);
-	}
-	if (cancelWorker) {
-		eventHandler->newEvent(WORKER_ENCODE_ERRORED, "Cancelled Encoding Library: " + settings->libraryDir);
-	} else {
-		eventHandler->newEvent(WORKER_ENCODE_FINISHED, "Finished Encoding Library: " + settings->libraryDir, library->sizeEncode());
-	}
 }
 
 /** ================================================================================================
@@ -634,7 +543,7 @@ bool MediaPreparer::cancel(bool force) {
 	if (!force && !dialogCancel()) {
 		return false;
 	}
-	if (worker.isRunning()) {
+	if (workerThread.isRunning()) {
 		QProcess kill;
 		cancelWorker = true;
 		switch (workerType) {
@@ -644,7 +553,7 @@ bool MediaPreparer::cancel(bool force) {
 				} else {
 					kill.start(QString("taskkill /F /T /IM ffprobe.exe"));
 					kill.waitForFinished();
-					worker.waitForFinished();
+					workerThread.waitForFinished();
 				}
 				break;
 			case ENCODE:
@@ -653,7 +562,7 @@ bool MediaPreparer::cancel(bool force) {
 				} else {
 					kill.start(QString("taskkill /F /T /IM ffmpeg.exe"));
 					kill.waitForFinished();
-					worker.waitForFinished();
+					workerThread.waitForFinished();
 
 					if (bf::exists(settings->tempDir + "\\" + workerItem.name() + "." + settings->container)) {
 						bf::remove(settings->tempDir + "\\" + workerItem.name() + "." + settings->container);
@@ -750,7 +659,7 @@ void MediaPreparer::blockSignals(bool b) {
 }
 
 void MediaPreparer::closeEvent(QCloseEvent *e) {
-	if (!worker.isRunning() || cancel()) {
+	if (!workerThread.isRunning() || cancel()) {
 		e->accept();
 	} else {
 		e->ignore();
