@@ -17,7 +17,7 @@
 
 #include <QtCore/QProcess>
 
-namespace SuperEpicFuntime {
+namespace SuperEpicFuntime::MediaPreparer {
 class Worker {
   private:
 	WorkerType type;

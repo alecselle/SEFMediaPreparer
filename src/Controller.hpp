@@ -10,7 +10,7 @@
 
 #include <iostream> // For debugging (cout)
 
-namespace SuperEpicFuntime {
+namespace SuperEpicFuntime::MediaPreparer {
 
 /** ================================================================================================
  * (Class) MediaPreparerController

@@ -7,7 +7,7 @@
 #include <boost/filesystem.hpp>
 #include <rapidjson/document.h>
 
-namespace SuperEpicFuntime {
+namespace SuperEpicFuntime::MediaPreparer {
 
 /** ================================================================================================
  * (Class) File

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>SuperEpicFuntime::MediaPreparer</class>
+ <class>SuperEpicFuntime::MediaPreparer::MediaPreparer</class>
  <widget class="QMainWindow" name="SuperEpicFuntime::MediaPreparer">
   <property name="enabled">
    <bool>true</bool>

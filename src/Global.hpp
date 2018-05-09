@@ -4,7 +4,7 @@
 
 #include <product_info.hpp>
 
-namespace SuperEpicFuntime {
+namespace SuperEpicFuntime::MediaPreparer {
 
 enum WorkerType { NONE = 0, SCAN = 1, ENCODE = 2 };
 

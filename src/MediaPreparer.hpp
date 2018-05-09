@@ -24,7 +24,7 @@
 
 #include <iostream> // For debugging (cout)
 
-namespace SuperEpicFuntime {
+namespace SuperEpicFuntime::MediaPreparer {
 
 namespace Ui {
 class MediaPreparer;

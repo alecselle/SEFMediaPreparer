@@ -11,7 +11,7 @@
 
 #include <iostream> // For debugging (cout)
 
-namespace SuperEpicFuntime {
+namespace SuperEpicFuntime::MediaPreparer {
 enum EventType {
 	INITIALIZED = 0x0000,
 	TERMINATED  = 0x0001,

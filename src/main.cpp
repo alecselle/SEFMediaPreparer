@@ -5,7 +5,7 @@
 int main(int argc, char *argv[]) {
 	QApplication app(argc, argv);
 
-	SuperEpicFuntime::Controller c = SuperEpicFuntime::Controller();
+	SuperEpicFuntime::MediaPreparer::Controller c = SuperEpicFuntime::MediaPreparer::Controller();
 
 	c.show();
 

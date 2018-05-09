@@ -6,7 +6,7 @@ namespace ba = boost::algorithm;
 using namespace rapidjson;
 using std::string;
 
-namespace SuperEpicFuntime {
+namespace SuperEpicFuntime::MediaPreparer {
 
 /** ================================================================================================
  * (Class) Settings

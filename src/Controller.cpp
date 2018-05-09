@@ -4,7 +4,7 @@ using std::string;
 
 using namespace std; // For debugging (cout)
 
-namespace SuperEpicFuntime {
+namespace SuperEpicFuntime::MediaPreparer {
 
 /** ================================================================================================
  * (Class) MediaPreparerController

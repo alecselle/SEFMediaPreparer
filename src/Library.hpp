@@ -12,7 +12,7 @@
 #include <boost/container/vector.hpp>
 #include <boost/filesystem.hpp>
 
-namespace SuperEpicFuntime {
+namespace SuperEpicFuntime::MediaPreparer {
 
 /** ================================================================================================
  * (Class) Library
@@ -85,15 +85,15 @@ class Library {
 		clearEncode();
 	}
 
-	boost::container::vector<SuperEpicFuntime::File> &getFiles() {
+	boost::container::vector<File> &getFiles() {
 		return _Library;
 	}
-	SuperEpicFuntime::File &getFile(int filePosition) {
+	File &getFile(int filePosition) {
 		if (filePosition < _Library.size()) {
 			return _Library[filePosition];
 		}
 	}
-	int findFile(SuperEpicFuntime::File fileObject) {
+	int findFile(File fileObject) {
 		for (int i = 0; i < size(); i++) {
 			if (getFile(i).path() == fileObject.path())
 				return i;
@@ -104,7 +104,7 @@ class Library {
 		return findFile(File(filePath));
 	}
 
-	bool addFile(SuperEpicFuntime::File fileObject) {
+	bool addFile(File fileObject) {
 		if (boost::filesystem::exists(fileObject.path().c_str())) {
 			_Library.push_back(fileObject);
 			return true;
@@ -118,7 +118,7 @@ class Library {
 	bool removeFile(File fileObject);
 	bool removeFile(std::string filePath);
 
-	bool checkEncode(SuperEpicFuntime::File fileObject) {
+	bool checkEncode(File fileObject) {
 		if (fileObject.isLoaded()) {
 			bool matches[3] = {false, false, false};
 			for (int j = 0; j < _settings->vCodecList.size(); j++) {
@@ -204,15 +204,15 @@ class Library {
 		_LibraryEncode.clear();
 	}
 
-	boost::container::vector<SuperEpicFuntime::File> &getFilesEncode() {
+	boost::container::vector<File> &getFilesEncode() {
 		return _LibraryEncode;
 	}
-	SuperEpicFuntime::File &getFileEncode(int filePosition) {
+	File &getFileEncode(int filePosition) {
 		if (filePosition < _LibraryEncode.size()) {
 			return _LibraryEncode[filePosition];
 		}
 	}
-	int findFileEncode(SuperEpicFuntime::File fileObject) {
+	int findFileEncode(File fileObject) {
 		for (int i = 0; i < sizeEncode(); i++) {
 			if (getFileEncode(i).path().compare(fileObject.path()) == 0)
 				return i;
@@ -223,7 +223,7 @@ class Library {
 		return findFileEncode(File(filePath));
 	}
 
-	bool forceEncode(SuperEpicFuntime::File fileObject) {
+	bool forceEncode(File fileObject) {
 		int i = findFile(fileObject);
 		if (i >= 0 && findFileEncode(fileObject) < 0) {
 			_LibraryEncode.push_back(fileObject);
@@ -235,7 +235,7 @@ class Library {
 		return forceEncode(File(filePath));
 	}
 
-	bool skipEncode(SuperEpicFuntime::File fileObject) {
+	bool skipEncode(File fileObject) {
 		int i = findFileEncode(fileObject);
 		if (i >= 0) {
 			_LibraryEncode.erase(_LibraryEncode.begin() + i);
@@ -250,5 +250,5 @@ class Library {
 
 static Library *library;
 
-} // namespace SuperEpicFuntime
+} // namespace SuperEpicFuntime::MediaPreparer
 #endif // LIBRARY_HPP
