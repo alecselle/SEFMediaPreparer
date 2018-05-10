@@ -2,6 +2,8 @@
 #define EVENT_HPP
 #pragma once
 
+#include <SuperEpicFuntime/SEFLib.hpp>
+
 #include <Global.hpp>
 #include <QtCore/QObject>
 #include <QtCore/QTime>
@@ -10,6 +12,7 @@
 #include <boost/container/vector.hpp>
 
 #include <iostream> // For debugging (cout)
+using SuperEpicFuntime::SEFLib::Map, SuperEpicFuntime::SEFLib::Pair, std::string;
 
 namespace SuperEpicFuntime::MediaPreparer {
 enum EventType {
@@ -43,6 +46,37 @@ enum EventType {
 	CUSTOM = 0xAAAA,
 	ERROR  = 0xFFFF
 };
+
+static Map<int, string> EventTypeString = {Pair<int, string>(INITIALIZED, "INITIALIZED"),
+										   Pair<int, string>(TERMINATED, "TERMINATED"),
+										   Pair<int, string>(WORKER_SCAN_STARTED, "WORKER_SCAN_STARTED"),
+										   Pair<int, string>(WORKER_SCAN_FINISHED, "WORKER_SCAN_FINISHED"),
+										   Pair<int, string>(WORKER_SCAN_ERRORED, "WORKER_SCAN_ERRORED"),
+										   Pair<int, string>(WORKER_SCAN_ITEM_STARTED, "WORKER_SCAN_ITEM_STARTED"),
+										   Pair<int, string>(WORKER_SCAN_ITEM_FINISHED, "WORKER_SCAN_ITEM_FINISHED"),
+										   Pair<int, string>(WORKER_ENCODE_STARTED, "WORKER_ENCODE_STARTED"),
+										   Pair<int, string>(WORKER_ENCODE_FINISHED, "WORKER_ENCODE_FINISHED"),
+										   Pair<int, string>(WORKER_ENCODE_ERRORED, "WORKER_ENCODE_ERRORED"),
+										   Pair<int, string>(WORKER_ENCODE_ITEM_STARTED, "WORKER_ENCODE_ITEM_STARTED"),
+										   Pair<int, string>(WORKER_ENCODE_ITEM_FINISHED, "WORKER_ENCODE_ITEM_FINISHED"),
+										   Pair<int, string>(PROGRESS_PRIMARY_UPDATED, "PROGRESS_PRIMARY_UPDATED"),
+										   Pair<int, string>(PROGRESS_PRIMARY_MAXIMUM, "PROGRESS_PRIMARY_MAXIMUM"),
+										   Pair<int, string>(PROGRESS_SECONDARY_UPDATED, "PROGRESS_SECONDARY_UPDATED"),
+										   Pair<int, string>(PROGRESS_SECONDARY_MAXIMUM, "PROGRESS_SECONDARY_MAXIMUM"),
+										   Pair<int, string>(CONFIG_SAVED, "CONFIG_SAVED"),
+										   Pair<int, string>(CONFIG_LOADED, "CONFIG_LOADED"),
+										   Pair<int, string>(PRESET_SAVED, "PRESET_SAVED"),
+										   Pair<int, string>(PRESET_LOADED, "PRESET_LOADED"),
+										   Pair<int, string>(CUSTOM, "CUSTOM"),
+										   Pair<int, string>(ERROR, "ERROR")};
+static Map<string, int> StringEventType = EventTypeString.reverse();
+
+static string parseEventType(int eventType) {
+	return EventTypeString[eventType];
+}
+static EventType parseEventType(string eventTypeStr) {
+	return (EventType)StringEventType[eventTypeStr];
+}
 
 /** ================================================================================================
  * (Class) Event
@@ -78,76 +112,7 @@ class Event {
 	}
 
 	std::string getTypeStr() {
-		switch (type) {
-			case INITIALIZED:
-				return "INITIALIZED";
-				break;
-			case TERMINATED:
-				return "TERMINATED";
-				break;
-			case WORKER_SCAN_STARTED:
-				return "WORKER_SCAN_STARTED";
-				break;
-			case WORKER_SCAN_FINISHED:
-				return "WORKER_SCAN_FINISHED";
-				break;
-			case WORKER_SCAN_ERRORED:
-				return "WORKER_SCAN_ERRORED";
-				break;
-			case WORKER_SCAN_ITEM_STARTED:
-				return "WORKER_SCAN_ITEM_STARTED";
-				break;
-			case WORKER_SCAN_ITEM_FINISHED:
-				return "WORKER_SCAN_ITEM_FINISHED";
-				break;
-			case WORKER_ENCODE_STARTED:
-				return "WORKER_ENCODE_STARTED";
-				break;
-			case WORKER_ENCODE_FINISHED:
-				return "WORKER_ENCODE_FINISHED";
-				break;
-			case WORKER_ENCODE_ERRORED:
-				return "WORKER_ENCODE_ERRORED";
-				break;
-			case WORKER_ENCODE_ITEM_STARTED:
-				return "WORKER_ENCODE_ITEM_STARTED";
-				break;
-			case WORKER_ENCODE_ITEM_FINISHED:
-				return "WORKER_ENCODE_ITEM_FINISHED";
-				break;
-			case PROGRESS_PRIMARY_UPDATED:
-				return "PROGRESS_PRIMARY_UPDATED";
-				break;
-			case PROGRESS_PRIMARY_MAXIMUM:
-				return "PROGRESS_PRIMARY_MAXIMUM";
-				break;
-			case PROGRESS_SECONDARY_UPDATED:
-				return "PROGRESS_SECONDARY_UPDATED";
-				break;
-			case PROGRESS_SECONDARY_MAXIMUM:
-				return "PROGRESS_SECONDARY_MAXIMUM";
-				break;
-			case CONFIG_SAVED:
-				return "CONFIG_SAVED";
-				break;
-			case CONFIG_LOADED:
-				return "CONFIG_LOADED";
-				break;
-			case PRESET_SAVED:
-				return "PRESET_SAVED";
-				break;
-			case PRESET_LOADED:
-				return "PRESET_LOADED";
-				break;
-			case CUSTOM:
-				return "CUSTOM";
-				break;
-			case ERROR:
-				return "ERROR";
-				break;
-			default:
-				return "UNKNOWN";
-		}
+		return EventTypeString[type];
 	}
 
 	boost::container::vector<boost::any> getDataVector() {
@@ -229,5 +194,5 @@ class EventHandler : public QObject {
 
 static EventHandler *eventHandler;
 
-} // namespace SuperEpicFuntime
+} // namespace SuperEpicFuntime::MediaPreparer
 #endif // EVENT_HPP
