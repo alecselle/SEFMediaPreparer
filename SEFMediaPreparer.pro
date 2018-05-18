@@ -46,12 +46,14 @@ LIBS += \
 	-L$$(LIBS) -lboost_filesystem-mt \
 	-L$$(LIBS) -lboost_container-mt \
 	-L$$(LIBS) -lboost_system-mt \
+	-LF:/Workspace/Cpp/SEFLib/lib -lSEFLib \
 	-L$$(SEFLIBS) -lSEFLib \
 	-L$$PWD/lib/
 
 INCLUDEPATH += \
 	$$PWD/src \
 	$$PWD/include \
+	F:/Workspace/Cpp/SEFLib/include \
 	$$(SEFINCLUDE) \
 	$$(INCLUDE)
 
