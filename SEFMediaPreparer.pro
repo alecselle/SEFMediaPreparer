@@ -1,12 +1,12 @@
 QT += core gui widgets
 TEMPLATE = app
 
-CONFIG += c++17 embed_manifest_exe
-QMAKE_CXXFLAGS += -std=c++17 -static-libstdc++ -static-libgcc -Wpedantic -Wno-unknown-pragmas -Wno-suggest-override -Wno-conversion-null -Wno-return-type -Wno-unused-variable -Wno-sign-compare
+CONFIG += c++17 embed_manifest_exe static
+QMAKE_CXXFLAGS += -std=c++17 -static-libstdc++ -static-libgcc -Wpedantic -Wno-unknown-pragmas -Wno-suggest-override -Wno-conversion-null -Wno-return-type -Wno-unused-function -Wno-unused-variable -Wno-sign-compare
 
 !defined(VER_MAJ):VER_MAJ = 3
 !defined(VER_MIN):VER_MIN = 4
-!defined(VER_PAT):VER_PAT = 7
+!defined(VER_PAT):VER_PAT = 8
 VERSION = $${VER_MAJ}.$${VER_MIN}.$${VER_PAT}
 
 DESTDIR = $$PWD/bin
@@ -28,8 +28,7 @@ HEADERS += \
         $$PWD/src/Settings.hpp \
         $$PWD/src/File.hpp \
         $$PWD/src/Library.hpp \
-        $$PWD/src/Worker.hpp \
-        $$PWD/src/src/SEFLib.hpp
+        $$PWD/src/Worker.hpp
 
 FORMS += \
         $$PWD/src/MediaPreparer.ui
@@ -44,9 +43,9 @@ DISTFILES += \
         $$PWD/version.txt
 
 LIBS += \
-        -L$$(LIBS) -lboost_filesystem-mt \
-        -L$$(LIBS) -lboost_container-mt \
-        -L$$(LIBS) -lboost_system-mt
+        -LC:/MSYS/mingw64/lib -lboost_filesystem-mt \
+        -LC:/MSYS/mingw64/lib -lboost_container-mt \
+        -LC:/MSYS/mingw64/lib -lboost_system-mt
 
 INCLUDEPATH += \
         $$PWD/src \

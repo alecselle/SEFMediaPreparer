@@ -63,8 +63,11 @@ class MediaPreparer : public QMainWindow {
 	File workerItem;
 	QTime workerItemTimeStamp;
 
-	explicit MediaPreparer(QWidget *parent = 0);
-	explicit MediaPreparer(EventHandler *eventHandler, Settings *settings = NULL, Library *library = NULL, QWidget *parent = 0);
+	explicit MediaPreparer(QWidget *parent = nullptr);
+	explicit MediaPreparer(EventHandler *eventHandler,
+						   Settings *settings = nullptr,
+						   Library *library = nullptr,
+						   QWidget *parent = nullptr);
 	~MediaPreparer();
 
   public slots:

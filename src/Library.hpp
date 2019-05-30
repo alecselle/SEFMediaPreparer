@@ -43,29 +43,30 @@ class Library {
 
 	void scan(bool scanRecursive = true) {
 		_Library.clear();
-		if (scanRecursive) {
-			for (boost::filesystem::directory_entry &x : boost::filesystem::recursive_directory_iterator(_settings->libraryDir)) {
-				if (x.path().parent_path().filename().string().compare("Converted") != 0) {
+		if (boost::filesystem::exists(_settings->libraryDir)) {
+			if (scanRecursive) {
+				for (boost::filesystem::directory_entry &x : boost::filesystem::recursive_directory_iterator(_settings->libraryDir)) {
+					if (x.path().parent_path().filename().string().compare("Converted") != 0) {
+						for (int i = 0; i < _extensions.size(); i++) {
+							if (x.path().extension().string().compare(_extensions[i]) == 0) {
+								File file = File(x.path().string());
+								_Library.push_back(file);
+							}
+						}
+					}
+				}
+			} else {
+				for (boost::filesystem::directory_entry &x : boost::filesystem::directory_iterator(_settings->libraryDir)) {
 					for (int i = 0; i < _extensions.size(); i++) {
-						if (x.path().extension().string().compare(_extensions[i]) == 0) {
+						if (x.path().extension().string() == _extensions[i]) {
 							File file = File(x.path().string());
 							_Library.push_back(file);
 						}
 					}
 				}
 			}
-		} else {
-			for (boost::filesystem::directory_entry &x : boost::filesystem::directory_iterator(_settings->libraryDir)) {
-				for (int i = 0; i < _extensions.size(); i++) {
-					if (x.path().extension().string() == _extensions[i]) {
-						File file = File(x.path().string());
-						_Library.push_back(file);
-					}
-				}
-			}
 		}
 	}
-
 	int size() {
 		return _Library.size();
 	}

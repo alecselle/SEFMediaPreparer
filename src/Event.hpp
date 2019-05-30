@@ -17,18 +17,18 @@ using SuperEpicFuntime::SEFLib::Map, SuperEpicFuntime::SEFLib::Pair, std::string
 namespace SuperEpicFuntime::MediaPreparer {
 enum EventType {
 	INITIALIZED = 0x0000,
-	TERMINATED  = 0x0001,
+	TERMINATED = 0x0001,
 
-	WORKER_SCAN_STARTED		  = 0xAA01,
-	WORKER_SCAN_FINISHED	  = 0xAA02,
-	WORKER_SCAN_ERRORED		  = 0xAA03,
-	WORKER_SCAN_ITEM_STARTED  = 0xAA11,
+	WORKER_SCAN_STARTED = 0xAA01,
+	WORKER_SCAN_FINISHED = 0xAA02,
+	WORKER_SCAN_ERRORED = 0xAA03,
+	WORKER_SCAN_ITEM_STARTED = 0xAA11,
 	WORKER_SCAN_ITEM_FINISHED = 0xAA12,
 
-	WORKER_ENCODE_STARTED		= 0xAB01,
-	WORKER_ENCODE_FINISHED		= 0xAB02,
-	WORKER_ENCODE_ERRORED		= 0xAB03,
-	WORKER_ENCODE_ITEM_STARTED  = 0xAB11,
+	WORKER_ENCODE_STARTED = 0xAB01,
+	WORKER_ENCODE_FINISHED = 0xAB02,
+	WORKER_ENCODE_ERRORED = 0xAB03,
+	WORKER_ENCODE_ITEM_STARTED = 0xAB11,
 	WORKER_ENCODE_ITEM_FINISHED = 0xAB12,
 
 	PROGRESS_PRIMARY_UPDATED = 0xBA01,
@@ -37,14 +37,14 @@ enum EventType {
 	PROGRESS_SECONDARY_UPDATED = 0xBB01,
 	PROGRESS_SECONDARY_MAXIMUM = 0xBB02,
 
-	CONFIG_SAVED  = 0xCA01,
+	CONFIG_SAVED = 0xCA01,
 	CONFIG_LOADED = 0xCA02,
 
-	PRESET_SAVED  = 0xCB01,
+	PRESET_SAVED = 0xCB01,
 	PRESET_LOADED = 0xCB02,
 
 	CUSTOM = 0xAAAA,
-	ERROR  = 0xFFFF
+	ERROR = 0xFFFF
 };
 
 static Map<int, string> EventTypeString = {Pair<int, string>(INITIALIZED, "INITIALIZED"),
@@ -75,7 +75,7 @@ static string parseEventType(int eventType) {
 	return EventTypeString[eventType];
 }
 static EventType parseEventType(string eventTypeStr) {
-	return (EventType)StringEventType[eventTypeStr];
+	return static_cast<EventType>(StringEventType[eventTypeStr]);
 }
 
 /** ================================================================================================
