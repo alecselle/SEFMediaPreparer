@@ -15,5 +15,3 @@ SEFMediaPreparer-*-Setup.exe
 
 tools/deploy.bat
 tools/commit.bat
-
-.jenkins/.data/**
