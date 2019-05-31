@@ -35,6 +35,7 @@ DisableWelcomePage=no
 OutputDir={#ApplicationSource}/
 OutputBaseFilename=SEFMediaPreparer-{#ApplicationVersion}-Setup
 SetupIconFile={#ApplicationSource}/seflogo.ico
+PrivilegesRequired=lowest
 Compression=lzma
 SolidCompression=yes
 UsePreviousAppDir=False

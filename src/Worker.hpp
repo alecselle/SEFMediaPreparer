@@ -104,6 +104,7 @@ class Worker {
 				   "-2",
 				   (settings->tempDir + "\\" + f.name() + "." + settings->container).c_str()};
 		QProcess process;
+		process.setStandardErrorFile((settings->tempDir + "\\" + f.name() + ".txt").c_str());
 		process.start("ffmpeg", params);
 		process.waitForFinished(-1);
 		if (!cancelWorker) {
