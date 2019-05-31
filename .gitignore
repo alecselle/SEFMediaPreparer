@@ -1,10 +1,6 @@
 SEFMediaPreparer.pro.user
 
-.cproject
-.externalToolBuilders/
-.project
 .settings/
-.vs
 *.lnk
 
 build/
@@ -12,6 +8,3 @@ bin/
 version.txt
 
 SEFMediaPreparer-*-Setup.exe
-
-tools/deploy.bat
-tools/commit.bat

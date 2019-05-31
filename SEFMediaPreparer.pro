@@ -43,14 +43,13 @@ DISTFILES += \
         $$PWD/version.txt
 
 LIBS += \
-        -LC:/MSYS/mingw64/lib -lboost_filesystem-mt \
-        -LC:/MSYS/mingw64/lib -lboost_container-mt \
-        -LC:/MSYS/mingw64/lib -lboost_system-mt
+        -L$$PWD/lib -lboost_filesystem-mt \
+        -L$$PWD/lib -lboost_container-mt \
+        -L$$PWD/lib -lboost_system-mt
 
 INCLUDEPATH += \
         $$PWD/src \
-        $$PWD/include \
-        E:/Workspace/cpp/SEFLib/include
+        $$PWD/include
 
 DEPENDPATH += \
         $$PWD/src \
@@ -63,4 +62,4 @@ DEFINES += \
         VERSION=$$VERSION
 
 RC_FILE = $$PWD/src/SEFMediaPreparer.exe.rc
-system(echo|set /p="$${VERSION}" >"$$PWD/version.txt")
+system(echo|set /p="$${VERSION}">"$$PWD/version.txt")
