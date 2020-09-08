@@ -108,6 +108,24 @@ void Settings::loadConfig() {
 		preserveLog = DEFAULT_PRESERVE_LOG;
 		save		= true;
 	}
+    if (d.HasMember("forceEncode") && d["forceEncode"].IsBool()) {
+        preserveLog = d["forceEncode"].GetBool();
+    } else {
+        preserveLog = DEFAULT_FORCE_ENCODE;
+        save		= true;
+    }
+    if (d.HasMember("fixMetadata") && d["fixMetadata"].IsBool()) {
+        fixMetadata = d["fixMetadata"].GetBool();
+    } else {
+        fixMetadata = DEFAULT_FIX_METADATA;
+        save		= true;
+    }
+    if (d.HasMember("subfolders") && d["subfolders"].IsBool()) {
+        subfolders = d["subfolders"].GetBool();
+    } else {
+        subfolders = DEFAULT_SUBFOLDERS;
+        save		= true;
+    }
 	if (d.HasMember("vCodecs") && d["vCodecs"].IsArray()) {
 		vCodecList.clear();
 		for (int i = 0; i < (int)d["vCodecs"].GetArray().Size(); i++) {
@@ -162,6 +180,9 @@ void Settings::saveConfig() {
 	d.AddMember(StringRef("tempDir"), Value(StringRef(tempDir.c_str())), alloc);
 	d.AddMember(StringRef("outputDir"), Value(StringRef(outputDir.c_str())), alloc);
 	d.AddMember(StringRef("preserveLog"), Value(preserveLog), alloc);
+    d.AddMember(StringRef("forceEncode"), Value(forceEncode), alloc);
+    d.AddMember(StringRef("fixMetadata"), Value(fixMetadata), alloc);
+    d.AddMember(StringRef("subfolders"), Value(subfolders), alloc);
 	d.AddMember(StringRef("vCodecs"), Value(), alloc);
 	d["vCodecs"].SetArray();
 	d.AddMember(StringRef("aCodecs"), Value(), alloc);

@@ -34,9 +34,12 @@ class Settings {
 	const std::string DEFAULT_OUTPUT_FOLDER = "\\Converted";
 	const std::string DEFAULT_OUTPUT_DIR	= DEFAULT_LIBRARY_DIR + DEFAULT_OUTPUT_FOLDER;
 	const bool DEFAULT_PRESERVE_LOG			= false;
+    const bool DEFAULT_FORCE_ENCODE         = false;
+    const bool DEFAULT_FIX_METADATA         = false;
+    const bool DEFAULT_SUBFOLDERS           = false;
 
 	const boost::container::vector<boost::container::vector<std::string>> DEFAULT_VCODECS = {
-		{"libx265", "hevc", "x265", "h265"}, {"libx264", "x264", "h264"}, {"libvpx", "libvpx-vp9", "vp9", "vpx"}};
+        {"libx265", "hevc", "x265", "h265"}, {"hevc_amf", "libx265", "hevc", "x265", "h265"}, {"hevc_nvenc", "libx265", "hevc", "x265", "h265"}, {"libx264", "x264", "h264"}, {"h264_amf", "libx264", "x264", "h264"}, {"h264_nvenc", "libx264", "x264", "h264"}, {"libvpx", "libvpx-vp9", "vp9", "vpx"}};
 
 	const boost::container::vector<boost::container::vector<std::string>> DEFAULT_ACODECS = {{"aac"}, {"ac3"}, {"libopus", "opus"}, {"libmp3lame", "mp3", "libmp3"}};
 
@@ -66,7 +69,7 @@ class Settings {
 	boost::container::vector<std::string> presetPathList;
 	boost::container::vector<std::string> presetNameList;
 	std::string presetName, vCodec, aCodec, vQuality, aQuality, subtitles, extraParams, threads, container;
-	bool preserveLog;
+    bool preserveLog, forceEncode, fixMetadata, subfolders;
 
 	Settings();
 	Settings(EventHandler *eventHandler);

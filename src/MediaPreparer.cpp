@@ -114,6 +114,9 @@ void MediaPreparer::loadSettings_gui() {
 	settings->outputDir   = ba::trim_copy(ui->setting_dirOutput->text().toStdString());
 	settings->threads	 = ba::trim_copy(ui->setting_threads->text().toStdString());
 	settings->extraParams = ba::trim_copy(ui->setting_extraParams->text().toStdString());
+    settings->forceEncode = ui->setting_forceEncode->isChecked();
+    settings->fixMetadata = ui->setting_fixMetadata->isChecked();
+    settings->subfolders = ui->setting_subfolders->isChecked();
 	settings->saveConfig();
 }
 
@@ -566,6 +569,9 @@ void MediaPreparer::lockUI(bool b) {
 	ui->setting_threads->setEnabled(!b);
 	ui->setting_extraParams->setEnabled(!b);
 	ui->setting_preset->setEnabled(!b);
+    ui->setting_forceEncode->setEnabled(!b);
+    ui->setting_fixMetadata->setEnabled(!b);
+    ui->setting_subfolders->setEnabled(!b);
 	if (b) {
 		ui->button_encode->setText("Cancel");
 		ui->button_encode->setEnabled(true);

@@ -36,7 +36,7 @@ class MediaPreparer;
 class MediaPreparer : public QMainWindow {
 	Q_OBJECT
   public:
-	Ui::MediaPreparer *ui;
+    Ui::MediaPreparer *ui;
 	QMenu *fileMenu;
 	QMenu *editMenu;
 	QMenu *helpMenu;

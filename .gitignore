@@ -4,7 +4,6 @@ SEFMediaPreparer.pro.user
 *.lnk
 
 build/
-bin/
 version.txt
 
 SEFMediaPreparer-*-Setup.exe

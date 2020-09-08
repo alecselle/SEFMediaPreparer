@@ -54,7 +54,7 @@ class Worker {
 			process.start("ffprobe", params);
 			process.waitForFinished();
 			rapidjson::StringStream out(process.readAllStandardOutput());
-			r = f.loadFileInfo(out);
+            r = f.loadFileInfo(out);
 		}
 		eventHandler->newEvent(WORKER_SCAN_ITEM_FINISHED, i);
 	}
@@ -88,7 +88,11 @@ class Worker {
 		if (f.subtitles() > 0 && settings->subtitles.compare("Remove") != 0) {
 			params += {"-map", "0:2?", "-c:s", "srt", "-metadata:s:s:0", "language=eng", "-disposition:s:0", "default"};
 		}
-		params += {"-c:v", settings->vCodec.c_str(), "-crf", settings->vQuality.c_str(), "-c:a", settings->aCodec.c_str(), "-b:a", (settings->aQuality + "k").c_str()};
+        if (settings->fixMetadata) {
+            params += {"-codec", "copy"};
+        } else {
+            params += {"-c:v", settings->vCodec.c_str(), "-crf", settings->vQuality.c_str(), "-c:a", settings->aCodec.c_str(), "-b:a", (settings->aQuality + "k").c_str()};
+        }
 		if (!settings->extraParams.empty()) {
 			char s[2048];
 			strcpy(s, settings->extraParams.c_str());
@@ -104,11 +108,17 @@ class Worker {
 				   "-2",
 				   (settings->tempDir + "\\" + f.name() + "." + settings->container).c_str()};
 		QProcess process;
-		process.setStandardErrorFile((settings->tempDir + "\\" + f.name() + ".txt").c_str());
-		process.start("ffmpeg", params);
+        process.setStandardErrorFile((settings->tempDir + "\\" + f.name() + ".txt").c_str());
+        process.start("ffmpeg", params);
 		process.waitForFinished(-1);
-		if (!cancelWorker) {
-			boost::filesystem::rename(settings->tempDir + "\\" + f.name() + "." + settings->container, settings->outputDir + "\\" + f.name() + "." + settings->container);
+        if (!cancelWorker) {
+            if (!boost::filesystem::is_directory(settings->outputDir)) boost::filesystem::create_directory(settings->outputDir);
+            if (settings->subfolders) {
+                if (!boost::filesystem::is_directory(settings->outputDir + "\\" + f.name())) boost::filesystem::create_directory(settings->outputDir + "\\" + f.name());
+                boost::filesystem::rename(settings->tempDir + "\\" + f.name() + "." + settings->container, settings->outputDir + "\\" + f.name() + "\\" + f.name() + "." + settings->container);
+            } else {
+                boost::filesystem::rename(settings->tempDir + "\\" + f.name() + "." + settings->container, settings->outputDir + "\\" + f.name() + "." + settings->container);
+            }
 		}
 		eventHandler->newEvent(WORKER_ENCODE_ITEM_FINISHED, i);
 	}

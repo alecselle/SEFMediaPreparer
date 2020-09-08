@@ -180,7 +180,7 @@ class Library {
 				if (f.extension().compare("." + _settings->container) == 0) {
 					matches[2] = true;
 				}
-				if ((!matches[0] || !matches[1] || !matches[2]) && findFileEncode(f) == -1) {
+                if (((!matches[0] || !matches[1] || !matches[2]) && findFileEncode(f) == -1) || _settings->forceEncode == true) {
 					_LibraryEncode.push_back(f);
 				}
 			}
