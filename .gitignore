@@ -4,6 +4,9 @@ SEFMediaPreparer.pro.user
 *.lnk
 
 build/
+bin/
+include/boost/
+include/rapidjson/
 version.txt
 
 SEFMediaPreparer-*-Setup.exe
