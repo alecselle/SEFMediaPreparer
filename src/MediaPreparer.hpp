@@ -36,7 +36,7 @@ class MediaPreparer;
 class MediaPreparer : public QMainWindow {
 	Q_OBJECT
   public:
-    Ui::MediaPreparer *ui;
+	Ui::MediaPreparer *ui;
 	QMenu *fileMenu;
 	QMenu *editMenu;
 	QMenu *helpMenu;
@@ -55,13 +55,14 @@ class MediaPreparer : public QMainWindow {
 
 	void closeEvent(QCloseEvent *e);
 
-	QTimer *updateTimer = new QTimer(this);
+	QTimer *updateTimer {new QTimer(this)};
 	QFuture<void> workerThread;
-	Worker worker = Worker(NONE);
-	QTime workerTimeStamp;
+	Worker worker {NONE};
+	QElapsedTimer workerTimeStamp;
 	WorkerType workerType;
 	File workerItem;
-	QTime workerItemTimeStamp;
+	QElapsedTimer workerItemTimeStamp;
+
 
 	explicit MediaPreparer(QWidget *parent = nullptr);
 	explicit MediaPreparer(EventHandler *eventHandler,

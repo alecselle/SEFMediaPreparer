@@ -114,9 +114,9 @@ void MediaPreparer::loadSettings_gui() {
 	settings->outputDir   = ba::trim_copy(ui->setting_dirOutput->text().toStdString());
 	settings->threads	 = ba::trim_copy(ui->setting_threads->text().toStdString());
 	settings->extraParams = ba::trim_copy(ui->setting_extraParams->text().toStdString());
-    settings->forceEncode = ui->setting_forceEncode->isChecked();
-    settings->fixMetadata = ui->setting_fixMetadata->isChecked();
-    settings->subfolders = ui->setting_subfolders->isChecked();
+	settings->forceEncode = ui->setting_forceEncode->isChecked();
+	settings->fixMetadata = ui->setting_fixMetadata->isChecked();
+	settings->subfolders = ui->setting_subfolders->isChecked();
 	settings->saveConfig();
 }
 
@@ -129,13 +129,13 @@ void MediaPreparer::loadSettings_config() {
 	ui->setting_directory->setText(settings->libraryDir.c_str());
 	ui->setting_dirOutput->setText(settings->outputDir.c_str());
 
-	for (int i = 0; i < (int)settings->vCodecList.size(); i++) {
+	for (int i {0}; i < (int)settings->vCodecList.size(); i++) {
 		ui->setting_vCodec->addItem(settings->vCodecList[i][0].c_str());
 	}
-	for (int i = 0; i < (int)settings->aCodecList.size(); i++) {
+	for (int i {0}; i < (int)settings->aCodecList.size(); i++) {
 		ui->setting_aCodec->addItem(settings->aCodecList[i][0].c_str());
 	}
-	for (int i = 0; i < (int)settings->containerList.size(); i++) {
+	for (int i {0}; i < (int)settings->containerList.size(); i++) {
 		ui->setting_container->addItem(settings->containerList[i].c_str());
 	}
 	blockSignals(false);
@@ -167,7 +167,7 @@ void MediaPreparer::loadSettings_preset() {
 void MediaPreparer::loadSettings_presets() {
 	ui->setting_preset->clear();
 	settings->refreshPresets();
-	for (int i = 0; i < (int)settings->presetNameList.size(); i++) {
+	for (int i {0}; i < (int)settings->presetNameList.size(); i++) {
 		ui->setting_preset->addItem(settings->presetNameList[i].c_str());
 	}
 }
@@ -196,6 +196,7 @@ void MediaPreparer::saveSettings_preset() {
 /** ================================================================================================
  * (Section) Update GUI
  */
+
 void MediaPreparer::updateGUI_settings() {
 }
 
@@ -212,6 +213,7 @@ void MediaPreparer::updateGUI_timers() {
 												  .arg(workerItemTimeStamp.elapsed() / 3600000, 2, 10, QChar('0'))
 												  .arg((workerItemTimeStamp.elapsed() % 3600000) / 60000, 2, 10, QChar('0'))
 												  .arg(((workerItemTimeStamp.elapsed() % 3600000) % 60000) / 1000, 2, 10, QChar('0')));
+
 			ui->progress_secondary->setValue(workerItemTimeStamp.elapsed());
 			ui->progress_secondary->repaint();
 		}
@@ -248,8 +250,8 @@ void MediaPreparer::runWorker_cleanup() {
  */
 void MediaPreparer::eventListener(Event *e) {
 	blockSignals(true);
-	EventType eventType = e->getType();
-	string eventMessage = e->getMessage();
+	EventType eventType {e->getType()};
+	string eventMessage {e->getMessage()};
 	switch (eventType) {
 		/** ============================================================================================
 		 * (Event) WORKER_SCAN_STARTED
@@ -297,7 +299,7 @@ void MediaPreparer::eventListener(Event *e) {
 		 */
 		case WORKER_SCAN_ITEM_STARTED: {
 			if (e->dataIsType<int>(0)) {
-				int eventData = e->getData<int>(0);
+				int eventData {e->getData<int>(0)};
 				workerItemTimeStamp.start();
 				if (!eventMessage.empty()) {
 					ui->progress_primary->setFormat(eventMessage.c_str());
@@ -312,9 +314,9 @@ void MediaPreparer::eventListener(Event *e) {
 		 */
 		case WORKER_SCAN_ITEM_FINISHED: {
 			if (e->dataIsType<int>(0)) {
-				int eventData = e->getData<int>(0);
+				int eventData {e->getData<int>(0)};
 				ui->progress_primary->setValue(eventData);
-				File &eventFile = library->getFile(eventData);
+				File &eventFile {library->getFile(eventData)};
 				ui->list_Library->setRowCount(eventData + 1);
 				ui->list_Library->setItem(eventData, 0, new QTableWidgetItem(QString(eventFile.name().c_str())));
 				ui->list_Library->setItem(eventData, 1, new QTableWidgetItem(QString(eventFile.vcodec().c_str())));
@@ -342,8 +344,8 @@ void MediaPreparer::eventListener(Event *e) {
 			ui->value_encode_aQuality->setText(settings->aQuality.c_str());
 			ui->value_encode_container->setText(settings->container.c_str());
 			ui->value_encode_subtitles->setText(settings->subtitles.c_str());
-			for (int i = 0; i < library->sizeEncode(); i++) {
-				File &f = library->getFileEncode(i);
+			for (int i {0}; i < library->sizeEncode(); i++) {
+				File &f {library->getFileEncode(i)};
 				ui->list_encode_Library->setRowCount(i + 1);
 				ui->list_encode_Library->setItem(i, 0, new QTableWidgetItem(QString(f.name().c_str())));
 				ui->list_encode_Library->setItem(i, 1, new QTableWidgetItem(QString(f.vcodec().c_str())));
@@ -386,7 +388,7 @@ void MediaPreparer::eventListener(Event *e) {
 		 */
 		case WORKER_ENCODE_ITEM_STARTED: {
 			if (e->dataIsType<int>(0)) {
-				int eventData = e->getData<int>(0);
+				int eventData {e->getData<int>(0)};
 				workerItemTimeStamp.start();
 				if (!eventMessage.empty()) {
 					ui->progress_primary->setFormat(eventMessage.c_str());
@@ -412,8 +414,8 @@ void MediaPreparer::eventListener(Event *e) {
 		 */
 		case WORKER_ENCODE_ITEM_FINISHED: {
 			if (e->dataIsType<int>(0)) {
-				int eventData   = e->getData<int>(0);
-				File &eventFile = library->getFileEncode(eventData);
+				//int eventData {e->getData<int>(0)};
+				//File &eventFile {library->getFileEncode(eventData)};
 				ui->value_encode_lastFile->setText(QString("%1:%2:%3")
 													   .arg(workerItemTimeStamp.elapsed() / 3600000, 2, 10, QChar('0'))
 													   .arg((workerItemTimeStamp.elapsed() % 3600000) / 60000, 2, 10, QChar('0'))
@@ -426,7 +428,7 @@ void MediaPreparer::eventListener(Event *e) {
 		 */
 		case PROGRESS_PRIMARY_UPDATED: {
 			if (e->dataIsType<int>(0)) {
-				int eventData = e->getData<int>(0);
+				int eventData {e->getData<int>(0)};
 				ui->progress_primary->setValue(eventData);
 				if (!eventMessage.empty()) {
 					ui->progress_primary->setFormat(eventMessage.c_str());
@@ -439,7 +441,7 @@ void MediaPreparer::eventListener(Event *e) {
 		 */
 		case PROGRESS_PRIMARY_MAXIMUM: {
 			if (e->dataIsType<int>(0)) {
-				int eventData = e->getData<int>(0);
+				int eventData {e->getData<int>(0)};
 				ui->progress_primary->setMaximum(eventData);
 			}
 			break;
@@ -470,12 +472,13 @@ void MediaPreparer::eventListener(Event *e) {
  */
 void MediaPreparer::dialogBrowse(int type) {
 	QFileDialog dialog(this);
-	dialog.setFileMode(QFileDialog::DirectoryOnly);
+	dialog.setFileMode(QFileDialog::Directory);
+	dialog.setOption(QFileDialog::ShowDirsOnly, true);
 	dialog.setViewMode(QFileDialog::Detail);
 	dialog.setDirectory(QDir(ui->setting_directory->text()));
 	dialog.exec();
 	if (dialog.result() == QDialog::Accepted) {
-		QStringList dir = dialog.selectedFiles();
+		QStringList dir {dialog.selectedFiles()};
 		switch (type) {
 			case 0: {
 				ui->setting_directory->setText(dir[0]);
@@ -492,20 +495,19 @@ void MediaPreparer::dialogBrowse(int type) {
 }
 
 void MediaPreparer::dialogSave() {
-	QString fileName =
-		QFileDialog::getSaveFileName(this, "Save Preset - Will only be loaded from preset directory", (settings->baseDir + "//presets//Custom").c_str(), "SEF Preset (*.preset)");
+	QString fileName {QFileDialog::getSaveFileName(this, "Save Preset - Will only be loaded from preset directory", (settings->baseDir + "//presets//Custom").c_str(), "SEF Preset (*.preset)")};
 	if (!fileName.isEmpty()) {
 		saveSettings_preset(fileName);
 	}
 }
 
 bool MediaPreparer::dialogCancel() {
-	QMessageBox confirm;
+	QMessageBox confirm {};
 	confirm.setText("Are you sure?");
 	confirm.setInformativeText("Any unfinished progress will be lost.");
 	confirm.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
 	confirm.setDefaultButton(QMessageBox::No);
-	int opt = confirm.exec();
+	int opt {confirm.exec()};
 	if (opt == QMessageBox::No) {
 		return false;
 	}
@@ -520,23 +522,23 @@ bool MediaPreparer::cancel(bool force) {
 		return false;
 	}
 	if (workerThread.isRunning()) {
-		QProcess kill;
+		QProcess kill{};
 		cancelWorker = true;
 		switch (workerType) {
 			case SCAN:
 				if (force) {
-					kill.startDetached(QString("taskkill /F /T /IM ffprobe.exe"));
+					kill.startDetached("taskkill", {"/F", "/T", "/IM", "ffprobe.exe"});
 				} else {
-					kill.start(QString("taskkill /F /T /IM ffprobe.exe"));
+					kill.start("taskkill", {"/F", "/T", "/IM", "ffprobe.exe"});
 					kill.waitForFinished();
 					workerThread.waitForFinished();
 				}
 				break;
 			case ENCODE:
 				if (force) {
-					kill.startDetached(QString("taskkill /F /T /IM ffmpeg.exe"));
+					kill.startDetached("taskkill", {"/F", "/T", "/IM", "ffmpeg.exe"});
 				} else {
-					kill.start(QString("taskkill /F /T /IM ffmpeg.exe"));
+					kill.start("taskkill", {"/F", "/T", "/IM", "ffmpeg.exe"});
 					kill.waitForFinished();
 					workerThread.waitForFinished();
 
@@ -569,9 +571,9 @@ void MediaPreparer::lockUI(bool b) {
 	ui->setting_threads->setEnabled(!b);
 	ui->setting_extraParams->setEnabled(!b);
 	ui->setting_preset->setEnabled(!b);
-    ui->setting_forceEncode->setEnabled(!b);
-    ui->setting_fixMetadata->setEnabled(!b);
-    ui->setting_subfolders->setEnabled(!b);
+	ui->setting_forceEncode->setEnabled(!b);
+	ui->setting_fixMetadata->setEnabled(!b);
+	ui->setting_subfolders->setEnabled(!b);
 	if (b) {
 		ui->button_encode->setText("Cancel");
 		ui->button_encode->setEnabled(true);

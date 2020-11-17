@@ -174,7 +174,7 @@
         </sizepolicy>
        </property>
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="container_settings_basic">
         <attribute name="title">
@@ -324,6 +324,9 @@
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="label_subtitles">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Only supported with mkv, mp4, or mov containers.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="text">
              <string>Subtitles:</string>
             </property>
@@ -331,6 +334,9 @@
           </item>
           <item row="1" column="1">
            <widget class="QComboBox" name="setting_subtitles">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Only supported with mkv, mp4, or mov containers.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <item>
              <property name="text">
               <string>Embed</string>

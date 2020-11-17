@@ -84,9 +84,9 @@ static EventType parseEventType(string eventTypeStr) {
 class Event {
   private:
 	const EventType type;
-	std::string message = "";
-	QTime timestamp		= QTime::currentTime();
-	boost::container::vector<boost::any> data;
+	std::string message {""};
+	QTime timestamp {QTime::currentTime()};
+	boost::container::vector<boost::any> data {};
 
 	void assignData(boost::container::vector<boost::any> d) {
 		for (auto x : d) {
@@ -123,13 +123,13 @@ class Event {
 		return data.size();
 	}
 
-	boost::any getData(int i = 0) {
+	boost::any getData(unsigned int i =0) {
 		if (i < data.size()) {
 			return data[i];
 		}
 	}
 
-	template <typename T> T getData(int i = 0) {
+	template <typename T> T getData(unsigned int i = 0) {
 		if (i < data.size()) {
 			if (dataIsType<T>()) {
 				return boost::any_cast<T>(data[i]);
@@ -137,7 +137,7 @@ class Event {
 		}
 	}
 
-	template <typename T> bool dataIsType(int i = 0) {
+	template <typename T> bool dataIsType(unsigned int i = 0) {
 		if (i < data.size()) {
 			return (data[i].type() == typeid(T));
 		}
@@ -158,7 +158,7 @@ class Event {
 class EventHandler : public QObject {
 	Q_OBJECT
   private:
-	boost::container::vector<Event *> events;
+	boost::container::vector<Event *> events {};
 
 	void onEventAdded(Event *e) {
 		emit eventAdded(e);

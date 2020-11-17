@@ -199,7 +199,7 @@ void Controller::log(Event *e, std::string optMessage, bool toFile) {
 		logStr += " " + e->getMessage();
 	}
 	logStr += " (Event: " + e->getTypeStr();
-	for (int i = 0; i < e->getDataVector().size(); i++) {
+	for (unsigned int i {0}; i < e->getDataVector().size(); i++) {
 		if (e->dataIsType<int>(i)) {
 			logStr += ", Data[" + std::to_string(i) + "](int): " + std::to_string(e->getData<int>(i));
 		} else if (e->dataIsType<std::string>(i)) {

@@ -20,7 +20,7 @@
 namespace SuperEpicFuntime::MediaPreparer {
 class Worker {
   private:
-	WorkerType type;
+	WorkerType type {NONE};
 
 	void worker_scan() {
 		eventHandler->newEvent(WORKER_SCAN_STARTED, "Scanning Library: " + settings->libraryDir);
@@ -31,7 +31,7 @@ class Worker {
 			eventHandler->newEvent(WORKER_SCAN_ERRORED, "Invalid Library: " + settings->libraryDir);
 		} else {
 			eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM, library->size());
-			for (int i = 0; !cancelWorker && i < library->size(); i++) {
+			for (unsigned int i {0}; !cancelWorker && i < library->size(); i++) {
 				worker_scan_item(i);
 			}
 			library->scanEncode();
@@ -45,16 +45,16 @@ class Worker {
 	}
 
 	void worker_scan_item(int i) {
-		File &f = library->getFile(i);
+		File &f {library->getFile(i)};
 		eventHandler->newEvent(WORKER_SCAN_ITEM_STARTED, "Scanning File: " + f.name(), i);
-		QList<QString> params = {"-v", "quiet", "-show_entries", "format=duration:stream=codec_type:stream=codec_name", "-of", "json", f.path().c_str()};
-		QProcess process;
-		bool r = false;
-		for (int j = 0; !cancelWorker && !r && j < RETRY_COUNT; j++) {
+		QStringList params {"-v", "quiet", "-show_entries", "format=duration:stream=codec_type:stream=codec_name", "-of", "json", f.path().c_str()};
+		QProcess process {};
+		bool r {false};
+		for (int j {0}; !cancelWorker && !r && j < RETRY_COUNT; j++) {
 			process.start("ffprobe", params);
 			process.waitForFinished();
 			rapidjson::StringStream out(process.readAllStandardOutput());
-            r = f.loadFileInfo(out);
+			r = f.loadFileInfo(out);
 		}
 		eventHandler->newEvent(WORKER_SCAN_ITEM_FINISHED, i);
 	}
@@ -64,7 +64,7 @@ class Worker {
 		eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM, 0);
 		library->scanEncode();
 		eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM, library->sizeEncode());
-		for (int i = 0; !cancelWorker && i < (int)library->sizeEncode(); i++) {
+		for (int i {0}; !cancelWorker && i < (int)library->sizeEncode(); i++) {
 			worker_encode_item(i);
 		}
 		if (cancelWorker) {
@@ -75,9 +75,9 @@ class Worker {
 	}
 
 	void worker_encode_item(int i) {
-		File &f = library->getFileEncode(i);
+		File &f {library->getFileEncode(i)};
 		eventHandler->newEvent(WORKER_ENCODE_ITEM_STARTED, "Encoding File: " + f.name(), i);
-		QList<QString> params = {"-y", "-v", "quiet", "-stats", "-hwaccel", "dxva2", "-threads", settings->threads.c_str(), "-i", f.path().c_str()};
+		QStringList params {"-y", "-v", "quiet", "-stats", "-hwaccel", "dxva2", "-threads", settings->threads.c_str(), "-i", f.path().c_str()};
 		if (f.subtitles() == 1 && settings->subtitles.compare("Embed") == 0) {
 			params += {"-i", f.pathSub().c_str()};
 		}
@@ -85,14 +85,19 @@ class Worker {
 		if (f.subtitles() == 1 && settings->subtitles.compare("Embed") == 0) {
 			params += {"-map", "1:0"};
 		}
-		if (f.subtitles() > 0 && settings->subtitles.compare("Remove") != 0) {
+		if (f.subtitles() > 0 && settings->subtitles.compare("Remove") != 0 && settings->container == "mkv") {
 			params += {"-map", "0:2?", "-c:s", "srt", "-metadata:s:s:0", "language=eng", "-disposition:s:0", "default"};
+		} else if (f.subtitles() > 0 && settings->subtitles.compare("Remove") != 0 && (settings->container == "mp4" || settings->container == "mov")) {
+			params += {"-map", "0:2?", "-c:s", "mov_text", "-metadata:s:s:0", "language=eng", "-disposition:s:0", "default"};
 		}
-        if (settings->fixMetadata) {
-            params += {"-codec", "copy"};
-        } else {
-            params += {"-c:v", settings->vCodec.c_str(), "-crf", settings->vQuality.c_str(), "-c:a", settings->aCodec.c_str(), "-b:a", (settings->aQuality + "k").c_str()};
-        }
+		if (settings->fixMetadata) {
+			params += {"-codec", "copy"};
+		} else {
+			params += {"-c:v", settings->vCodec.c_str(), "-crf", settings->vQuality.c_str(), "-c:a", settings->aCodec.c_str(), "-b:a", (settings->aQuality + "k").c_str()};
+			if (settings->vCodec == "hevc_amf") {
+				params += {"-gops_per_idr", "1"};
+			}
+		}
 		if (!settings->extraParams.empty()) {
 			char s[2048];
 			strcpy(s, settings->extraParams.c_str());
@@ -107,18 +112,18 @@ class Worker {
 				   "-strict",
 				   "-2",
 				   (settings->tempDir + "\\" + f.name() + "." + settings->container).c_str()};
-		QProcess process;
-        process.setStandardErrorFile((settings->tempDir + "\\" + f.name() + ".txt").c_str());
-        process.start("ffmpeg", params);
+		QProcess process {};
+		process.setStandardErrorFile((settings->tempDir + "\\" + f.name() + ".txt").c_str());
+		process.start("ffmpeg", params);
 		process.waitForFinished(-1);
-        if (!cancelWorker) {
-            if (!boost::filesystem::is_directory(settings->outputDir)) boost::filesystem::create_directory(settings->outputDir);
-            if (settings->subfolders) {
-                if (!boost::filesystem::is_directory(settings->outputDir + "\\" + f.name())) boost::filesystem::create_directory(settings->outputDir + "\\" + f.name());
-                boost::filesystem::rename(settings->tempDir + "\\" + f.name() + "." + settings->container, settings->outputDir + "\\" + f.name() + "\\" + f.name() + "." + settings->container);
-            } else {
-                boost::filesystem::rename(settings->tempDir + "\\" + f.name() + "." + settings->container, settings->outputDir + "\\" + f.name() + "." + settings->container);
-            }
+		if (!cancelWorker) {
+			if (!boost::filesystem::is_directory(settings->outputDir)) boost::filesystem::create_directory(settings->outputDir);
+			if (settings->subfolders) {
+				if (!boost::filesystem::is_directory(settings->outputDir + "\\" + f.name())) boost::filesystem::create_directory(settings->outputDir + "\\" + f.name());
+				boost::filesystem::rename(settings->tempDir + "\\" + f.name() + "." + settings->container, settings->outputDir + "\\" + f.name() + "\\" + f.name() + "." + settings->container);
+			} else {
+				boost::filesystem::rename(settings->tempDir + "\\" + f.name() + "." + settings->container, settings->outputDir + "\\" + f.name() + "." + settings->container);
+			}
 		}
 		eventHandler->newEvent(WORKER_ENCODE_ITEM_FINISHED, i);
 	}
