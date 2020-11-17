@@ -39,15 +39,28 @@ class Settings {
 	const bool DEFAULT_SUBFOLDERS {false};
 
 	const boost::container::vector<boost::container::vector<std::string>> DEFAULT_VCODECS {
-		{"libx265", "hevc", "x265", "h265"}, {"hevc_amf", "libx265", "hevc", "x265", "h265"},
-		{"hevc_nvenc", "libx265", "hevc", "x265", "h265"}, {"libx264", "x264", "h264"},
-		{"h264_amf", "libx264", "x264", "h264"}, {"h264_nvenc", "libx264", "x264", "h264"},
-		{"libvpx", "libvpx-vp9", "vp9", "vpx"}};
+		{
+			{"libx265", "hevc", "x265", "h265"},
+			{"hevc_amf", "libx265", "hevc", "x265", "h265"},
+			{"hevc_nvenc", "libx265", "hevc", "x265", "h265"},
+			{"libx264", "x264", "h264"},
+			{"h264_amf", "libx264", "x264", "h264"},
+			{"h264_nvenc", "libx264", "x264", "h264"},
+			{"libvpx", "libvpx-vp9", "vp9", "vpx"}
+		}
+	};
 
 	const boost::container::vector<boost::container::vector<std::string>> DEFAULT_ACODECS {
-		{"aac"}, {"ac3"}, {"libopus", "opus"}, {"libmp3lame", "mp3", "libmp3"}};
+		{
+			{"aac"}, {"ac3"},
+			{"libopus", "opus"},
+			{"libmp3lame", "mp3", "libmp3"}
+		}
+	};
 
-	const boost::container::vector<std::string> DEFAULT_CONTAINERS {"mkv", "mp4", "mpeg", "avi", "mov", "webm"};
+	const boost::container::vector<std::string> DEFAULT_CONTAINERS {
+		{"mkv", "mp4", "mpeg", "avi", "mov", "webm"}
+	};
 
 	const std::string DEFAULT_VCODEC {"libx265"};
 	const std::string DEFAULT_ACODEC {"aac"};
@@ -67,6 +80,9 @@ class Settings {
 	void init();
 
   public:
+	const boost::container::vector<std::string> SUBTITLE_CONTAINERS {
+		{"mkv", "mp4", "mov"}
+	};
 	std::string baseDir, logPath, presetPath, tempDir, libraryDir, outputDir;
 	boost::container::vector<boost::container::vector<std::string>> vCodecList, aCodecList;
 	boost::container::vector<std::string> containerList;

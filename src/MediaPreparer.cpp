@@ -95,6 +95,7 @@ void MediaPreparer::initSignals() {
 	connect(ui->setting_vCodec, SIGNAL(currentIndexChanged(int)), this, SLOT(loadSettings_gui()), Qt::UniqueConnection);
 	connect(ui->setting_aCodec, SIGNAL(currentIndexChanged(int)), this, SLOT(loadSettings_gui()), Qt::UniqueConnection);
 	connect(ui->setting_container, SIGNAL(currentIndexChanged(int)), this, SLOT(loadSettings_gui()), Qt::UniqueConnection);
+	connect(ui->setting_container, SIGNAL(currentIndexChanged(int)), this, SLOT(updateGUI_settings_container()), Qt::UniqueConnection);
 	connect(ui->setting_preset, SIGNAL(currentTextChanged(QString)), this, SLOT(loadSettings_preset(QString)), Qt::UniqueConnection);
 
 	connect(updateTimer, SIGNAL(timeout()), this, SLOT(updateGUI_timers()));
@@ -197,7 +198,18 @@ void MediaPreparer::saveSettings_preset() {
  * (Section) Update GUI
  */
 
-void MediaPreparer::updateGUI_settings() {
+void MediaPreparer::updateGUI_settings_container() {
+	bool enableSub {false};
+	for (unsigned int i {0}; i < settings->SUBTITLE_CONTAINERS.size(); i++) {
+		if (ui->setting_container->currentText().toStdString() == settings->SUBTITLE_CONTAINERS[i]) enableSub = true;
+	}
+	if (!enableSub) {
+		ui->setting_subtitles->setCurrentIndex(2);
+		ui->setting_subtitles->setDisabled(true);
+	} else {
+		ui->setting_subtitles->setCurrentIndex(0);
+		ui->setting_subtitles->setDisabled(false);
+	}
 }
 
 void MediaPreparer::updateGUI_timers() {
@@ -416,7 +428,7 @@ void MediaPreparer::eventListener(Event *e) {
 												   .arg(workerItemTimeStamp.elapsed() / 3600000, 2, 10, QChar('0'))
 												   .arg((workerItemTimeStamp.elapsed() % 3600000) / 60000, 2, 10, QChar('0'))
 												   .arg(((workerItemTimeStamp.elapsed() % 3600000) % 60000) / 1000, 2, 10, QChar('0')));
-
+			ui->list_encode_Library->removeRow(eventData);
 			ui->list_complete_Library->setRowCount(eventData + 1);
 			ui->list_complete_Library->setItem(eventData, 0, new QTableWidgetItem(QString(eventFile.name().c_str())));
 			ui->list_complete_Library->setItem(eventData, 1, new QTableWidgetItem(QString("%1:%2:%3")

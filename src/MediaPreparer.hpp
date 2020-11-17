@@ -82,7 +82,7 @@ class MediaPreparer : public QMainWindow {
 	void saveSettings_preset(QString preset);
 	void saveSettings_preset();
 
-	void updateGUI_settings();
+	void updateGUI_settings_container();
 	void updateGUI_timers();
 
 	void runWorker_scan();
