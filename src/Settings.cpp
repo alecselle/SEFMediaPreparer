@@ -41,15 +41,15 @@ void Settings::init() {
 }
 
 string Settings::parsePath(string path) {
-	string t = path;
+	string t {path};
 	ba::ireplace_all(path, "%APPDATA%", APPDATA.c_str());
 	ba::ireplace_all(path, "%USERPROFILE%", USERPROFILE.c_str());
 	return t;
 }
 
 string Settings::parsePresetPath(string path) {
-	string p = parsePath(path);
-	string t = "";
+	string p {parsePath(path)};
+	string t {""};
 	if (p.find(":/") == p.npos && p.find(":\\") == p.npos) {
 		t += PRESET_DIR + "\\";
 	}
@@ -61,14 +61,14 @@ string Settings::parsePresetPath(string path) {
 }
 
 string Settings::parsePresetName(string name) {
-	bf::path p = parsePresetPath(name);
-	string t   = p.filename().replace_extension().string();
+	bf::path p {parsePresetPath(name)};
+	string t {p.filename().replace_extension().string()};
 	return t;
 }
 
 void Settings::loadConfig() {
-	bool save = false;
-	FILE *fp  = fopen(parsePath(CONFIG_FILE).c_str(), "rb");
+	bool save {false};
+	FILE *fp {fopen(parsePath(CONFIG_FILE).c_str(), "rb")};
 	char readBuffer[65536];
 	FileReadStream is(fp, readBuffer, sizeof(readBuffer));
 	Document d;
@@ -108,9 +108,27 @@ void Settings::loadConfig() {
 		preserveLog = DEFAULT_PRESERVE_LOG;
 		save		= true;
 	}
+	if (d.HasMember("forceEncode") && d["forceEncode"].IsBool()) {
+		preserveLog = d["forceEncode"].GetBool();
+	} else {
+		preserveLog = DEFAULT_FORCE_ENCODE;
+		save		= true;
+	}
+	if (d.HasMember("fixMetadata") && d["fixMetadata"].IsBool()) {
+		fixMetadata = d["fixMetadata"].GetBool();
+	} else {
+		fixMetadata = DEFAULT_FIX_METADATA;
+		save		= true;
+	}
+	if (d.HasMember("subfolders") && d["subfolders"].IsBool()) {
+		subfolders = d["subfolders"].GetBool();
+	} else {
+		subfolders = DEFAULT_SUBFOLDERS;
+		save		= true;
+	}
 	if (d.HasMember("vCodecs") && d["vCodecs"].IsArray()) {
 		vCodecList.clear();
-		for (int i = 0; i < (int)d["vCodecs"].GetArray().Size(); i++) {
+		for (int i {0}; i < (int)d["vCodecs"].GetArray().Size(); i++) {
 			vCodecList.push_back({});
 			for (int j = 0; j < (int)d["vCodecs"].GetArray()[i].GetArray().Size(); j++) {
 				vCodecList[i].push_back(d["vCodecs"].GetArray()[i].GetArray()[j].GetString());
@@ -122,7 +140,7 @@ void Settings::loadConfig() {
 	}
 	if (d.HasMember("aCodecs") && d["aCodecs"].IsArray()) {
 		aCodecList.clear();
-		for (int i = 0; i < (int)d["aCodecs"].GetArray().Size(); i++) {
+		for (int i {0}; i < (int)d["aCodecs"].GetArray().Size(); i++) {
 			aCodecList.push_back({});
 			for (int j = 0; j < (int)d["aCodecs"].GetArray()[i].GetArray().Size(); j++) {
 				aCodecList[i].push_back(d["aCodecs"].GetArray()[i].GetArray()[j].GetString());
@@ -133,7 +151,7 @@ void Settings::loadConfig() {
 		save	   = true;
 	}
 	if (d.HasMember("containers") && d["containers"].IsArray()) {
-		for (int i = 0; i < (int)d["containers"].GetArray().Size(); i++) {
+		for (int i {0}; i < (int)d["containers"].GetArray().Size(); i++) {
 			containerList.push_back(d["containers"].GetArray()[i].GetString());
 		}
 	} else {
@@ -150,11 +168,11 @@ void Settings::loadConfig() {
 }
 
 void Settings::saveConfig() {
-	string json = "{}";
+	string json {"{}"};
 	StringStream s(json.c_str());
 
 	Document d;
-	Document::AllocatorType &alloc = d.GetAllocator();
+	Document::AllocatorType &alloc {d.GetAllocator()};
 	d.ParseStream(s);
 
 	d.AddMember(StringRef("preset"), Value(StringRef(presetPath.c_str())), alloc);
@@ -162,6 +180,9 @@ void Settings::saveConfig() {
 	d.AddMember(StringRef("tempDir"), Value(StringRef(tempDir.c_str())), alloc);
 	d.AddMember(StringRef("outputDir"), Value(StringRef(outputDir.c_str())), alloc);
 	d.AddMember(StringRef("preserveLog"), Value(preserveLog), alloc);
+	d.AddMember(StringRef("forceEncode"), Value(forceEncode), alloc);
+	d.AddMember(StringRef("fixMetadata"), Value(fixMetadata), alloc);
+	d.AddMember(StringRef("subfolders"), Value(subfolders), alloc);
 	d.AddMember(StringRef("vCodecs"), Value(), alloc);
 	d["vCodecs"].SetArray();
 	d.AddMember(StringRef("aCodecs"), Value(), alloc);
@@ -169,7 +190,7 @@ void Settings::saveConfig() {
 	d.AddMember(StringRef("containers"), Value(), alloc);
 	d["containers"].SetArray();
 
-	for (int i = 0; i < (int)vCodecList.size(); i++) {
+	for (int i {0}; i < (int)vCodecList.size(); i++) {
 		Value a(kArrayType);
 		for (int j = 0; j < (int)vCodecList[i].size(); j++) {
 			a.PushBack(Value().SetString(StringRef(vCodecList[i][j].c_str())), alloc);
@@ -177,7 +198,7 @@ void Settings::saveConfig() {
 		d["vCodecs"].PushBack(a, alloc);
 	}
 
-	for (int i = 0; i < (int)aCodecList.size(); i++) {
+	for (int i {0}; i < (int)aCodecList.size(); i++) {
 		Value a(kArrayType);
 		for (int j = 0; j < (int)aCodecList[i].size(); j++) {
 			a.PushBack(Value().SetString(StringRef(aCodecList[i][j].c_str())), alloc);
@@ -185,11 +206,11 @@ void Settings::saveConfig() {
 		d["aCodecs"].PushBack(a, alloc);
 	}
 
-	for (int i = 0; i < (int)containerList.size(); i++) {
+	for (int i {0}; i < (int)containerList.size(); i++) {
 		d["containers"].PushBack(Value().SetString(StringRef(containerList[i].c_str())), alloc);
 	}
 
-	FILE *fp = fopen(parsePath(CONFIG_FILE).c_str(), "wb");
+	FILE *fp {fopen(parsePath(CONFIG_FILE).c_str(), "wb")};
 	char writeBuffer[65536];
 	FileWriteStream os(fp, writeBuffer, sizeof(writeBuffer));
 	PrettyWriter<FileWriteStream> writer(os);
@@ -225,7 +246,7 @@ void Settings::loadPresetFile(std::string path) {
 	bf::path p(parsePresetPath(path).c_str());
 	if (bf::exists(p) && bf::is_regular_file(p)) {
 
-		FILE *fp = fopen(p.string().c_str(), "rb");
+		FILE *fp {fopen(p.string().c_str(), "rb")};
 		char readBuffer[65536];
 		FileReadStream is(fp, readBuffer, sizeof(readBuffer));
 		Document d;
@@ -292,11 +313,11 @@ void Settings::savePreset() {
 }
 
 void Settings::savePresetAs(std::string name) {
-	string json = "{}";
+	string json {"{}"};
 	StringStream s(json.c_str());
 
 	Document d;
-	Document::AllocatorType &alloc = d.GetAllocator();
+	Document::AllocatorType &alloc {d.GetAllocator()};
 	d.ParseStream(s);
 
 	d.AddMember(StringRef("vCodec"), Value(StringRef(vCodec.c_str())), alloc);
@@ -308,7 +329,7 @@ void Settings::savePresetAs(std::string name) {
 	d.AddMember(StringRef("threads"), Value(StringRef(threads.c_str())), alloc);
 	d.AddMember(StringRef("extraParams"), Value(StringRef(extraParams.c_str())), alloc);
 
-	FILE *fp = fopen(parsePresetPath(name).c_str(), "wb");
+	FILE *fp {fopen(parsePresetPath(name).c_str(), "wb")};
 	char writeBuffer[65536];
 	FileWriteStream os(fp, writeBuffer, sizeof(writeBuffer));
 	PrettyWriter<FileWriteStream> writer(os);

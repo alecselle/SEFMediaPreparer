@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>SuperEpicFuntime::MediaPreparer::MediaPreparer</class>
- <widget class="QMainWindow" name="SuperEpicFuntime::MediaPreparer">
+ <widget class="QMainWindow" name="SuperEpicFuntime::MediaPreparer::MediaPreparer">
   <property name="enabled">
    <bool>true</bool>
   </property>
@@ -128,10 +128,10 @@
      </rect>
     </property>
     <layout class="QGridLayout" name="container_settings">
-     <item row="0" column="2">
-      <widget class="QComboBox" name="setting_preset">
-       <property name="currentText">
-        <string/>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_settings">
+       <property name="text">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Settings:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
       </widget>
      </item>
@@ -148,17 +148,17 @@
        </property>
       </spacer>
      </item>
+     <item row="0" column="2">
+      <widget class="QComboBox" name="setting_preset">
+       <property name="currentText">
+        <string/>
+       </property>
+      </widget>
+     </item>
      <item row="0" column="3">
       <widget class="QPushButton" name="button_savePreset">
        <property name="text">
         <string>Save</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="label_settings">
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Settings:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
       </widget>
      </item>
@@ -324,6 +324,9 @@
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="label_subtitles">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Only supported with mkv, mp4, or mov containers.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="text">
              <string>Subtitles:</string>
             </property>
@@ -331,6 +334,9 @@
           </item>
           <item row="1" column="1">
            <widget class="QComboBox" name="setting_subtitles">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Only supported with mkv, mp4, or mov containers.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <item>
              <property name="text">
               <string>Embed</string>
@@ -355,7 +361,58 @@
         <attribute name="title">
          <string>Advanced</string>
         </attribute>
-        <widget class="QWidget" name="formLayoutWidget_3">
+        <widget class="QWidget" name="formLayoutWidget_11">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>100</y>
+           <width>431</width>
+           <height>80</height>
+          </rect>
+         </property>
+         <layout class="QFormLayout" name="formLayout_11">
+          <property name="formAlignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+          </property>
+          <item row="1" column="0" colspan="2">
+           <widget class="QCheckBox" name="setting_fixMetadata">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Intended only to fix issues with metadata.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>Fix Metadata Only</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0" colspan="2">
+           <widget class="QCheckBox" name="setting_forceEncode">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Encodes any supported video files, regardless of format. &lt;/p&gt;&lt;p&gt;WARNING: REPEAT ENCODING OF A FILE WILL CAUSE DEGRADATION OF QUALITY&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="statusTip">
+             <string/>
+            </property>
+            <property name="whatsThis">
+             <string/>
+            </property>
+            <property name="text">
+             <string>Force Encode</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0" colspan="2">
+           <widget class="QCheckBox" name="setting_subfolders">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Nests output one folder deep, with the same title as the input.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>Create Subfolders</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="formLayoutWidget_12">
          <property name="geometry">
           <rect>
            <x>10</x>
@@ -364,7 +421,7 @@
            <height>71</height>
           </rect>
          </property>
-         <layout class="QFormLayout" name="formLayout_3">
+         <layout class="QFormLayout" name="formLayout_12">
           <property name="formAlignment">
            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
           </property>
@@ -441,26 +498,26 @@
          <attribute name="horizontalHeaderCascadingSectionResizes">
           <bool>false</bool>
          </attribute>
+         <attribute name="horizontalHeaderMinimumSectionSize">
+          <number>25</number>
+         </attribute>
          <attribute name="horizontalHeaderDefaultSectionSize">
           <number>74</number>
          </attribute>
          <attribute name="horizontalHeaderHighlightSections">
           <bool>false</bool>
          </attribute>
-         <attribute name="horizontalHeaderMinimumSectionSize">
-          <number>25</number>
-         </attribute>
          <attribute name="verticalHeaderVisible">
           <bool>false</bool>
+         </attribute>
+         <attribute name="verticalHeaderMinimumSectionSize">
+          <number>20</number>
          </attribute>
          <attribute name="verticalHeaderDefaultSectionSize">
           <number>25</number>
          </attribute>
          <attribute name="verticalHeaderHighlightSections">
           <bool>false</bool>
-         </attribute>
-         <attribute name="verticalHeaderMinimumSectionSize">
-          <number>20</number>
          </attribute>
          <attribute name="verticalHeaderShowSortIndicator" stdset="0">
           <bool>false</bool>
@@ -899,26 +956,26 @@
          <attribute name="horizontalHeaderCascadingSectionResizes">
           <bool>false</bool>
          </attribute>
+         <attribute name="horizontalHeaderMinimumSectionSize">
+          <number>25</number>
+         </attribute>
          <attribute name="horizontalHeaderDefaultSectionSize">
           <number>88</number>
          </attribute>
          <attribute name="horizontalHeaderHighlightSections">
           <bool>false</bool>
          </attribute>
-         <attribute name="horizontalHeaderMinimumSectionSize">
-          <number>25</number>
-         </attribute>
          <attribute name="verticalHeaderVisible">
           <bool>false</bool>
+         </attribute>
+         <attribute name="verticalHeaderMinimumSectionSize">
+          <number>20</number>
          </attribute>
          <attribute name="verticalHeaderDefaultSectionSize">
           <number>25</number>
          </attribute>
          <attribute name="verticalHeaderHighlightSections">
           <bool>false</bool>
-         </attribute>
-         <attribute name="verticalHeaderMinimumSectionSize">
-          <number>20</number>
          </attribute>
          <attribute name="verticalHeaderShowSortIndicator" stdset="0">
           <bool>false</bool>

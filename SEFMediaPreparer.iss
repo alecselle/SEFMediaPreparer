@@ -3,7 +3,7 @@
 # define ApplicationName "SEFMediaPreparer"
 #endif
 #ifndef ApplicationVersion
-# define ApplicationVersion FileRead(FileOpen("version.txt"))
+# define ApplicationVersion Trim(FileRead(FileOpen("version.txt")))
 #endif
 #ifndef ApplicationExe
 # define ApplicationExe "SEFMediaPreparer.exe"

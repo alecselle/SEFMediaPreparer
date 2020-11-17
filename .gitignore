@@ -1,10 +1,12 @@
-SEFMediaPreparer.pro.user
+SEFMediaPreparer.pro.*
 
 .settings/
 *.lnk
 
 build/
 bin/
+include/boost/
+include/rapidjson/
 version.txt
 
 SEFMediaPreparer-*-Setup.exe

@@ -21,10 +21,10 @@ class File {
 
 	std::string _vCodec;
 	std::string _aCodec;
-	int _duration = -1;
+	int _duration {-1};
 
-	int _subtitles = -1;
-	bool _loaded   = false;
+	int _subtitles {-1};
+	bool _loaded {false};
 
   public:
 	File() {
@@ -32,8 +32,8 @@ class File {
 
 	File(std::string file) {
 		if (boost::filesystem::exists(boost::filesystem::canonical(file.c_str()))) {
-			boost::filesystem::path path	= boost::filesystem::canonical(file.c_str());
-			boost::filesystem::path pathSub = file;
+			boost::filesystem::path path {boost::filesystem::canonical(file.c_str())};
+			boost::filesystem::path pathSub {file};
 			pathSub.replace_extension(".srt");
 			_path	  = path.string();
 			_pathSub   = pathSub.string();
@@ -95,7 +95,7 @@ class File {
 	}
 
 	bool loadFileInfo(rapidjson::StringStream out) {
-		rapidjson::Document d;
+		rapidjson::Document d {};
 		d.ParseStream(out);
 		if (!d.HasParseError()) {
 			if (d.HasMember("streams") && d["streams"].IsArray()) {
@@ -113,7 +113,7 @@ class File {
 				}
 			}
 			if (d.HasMember("format") && d["format"].HasMember("duration")) {
-				std::string t = d["format"]["duration"].GetString();
+				std::string t {d["format"]["duration"].GetString()};
 				_duration	 = stoi(t) * 1000.0;
 			} else {
 				_duration = 0;

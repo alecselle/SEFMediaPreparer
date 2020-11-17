@@ -8,9 +8,9 @@ namespace SuperEpicFuntime::MediaPreparer {
 
 enum WorkerType { NONE = 0, SCAN = 1, ENCODE = 2 };
 
-static const int RETRY_COUNT = 5;
+static const int RETRY_COUNT {5};
 
-static bool cancelWorker = false;
+static bool cancelWorker {false};
 
 } // namespace SuperEpicFuntime
 #endif // GLOBAL_HPP
