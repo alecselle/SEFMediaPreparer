@@ -30,7 +30,7 @@ class Worker {
 			eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM, 1);
 			eventHandler->newEvent(WORKER_SCAN_ERRORED, "Invalid Library: " + settings->libraryDir);
 		} else {
-			eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM, library->size());
+			eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM, static_cast<int>(library->size()));
 			for (unsigned int i {0}; !cancelWorker && i < library->size(); i++) {
 				worker_scan_item(i);
 			}
@@ -39,7 +39,7 @@ class Worker {
 			if (cancelWorker) {
 				eventHandler->newEvent(WORKER_SCAN_ERRORED, "Cancelled Scanning Library: " + settings->libraryDir);
 			} else {
-				eventHandler->newEvent(WORKER_SCAN_FINISHED, "Finished Scanning Library: " + settings->libraryDir, library->size());
+				eventHandler->newEvent(WORKER_SCAN_FINISHED, "Finished Scanning Library: " + settings->libraryDir, static_cast<int>(library->size()));
 			}
 		}
 	}
@@ -56,7 +56,9 @@ class Worker {
 			rapidjson::StringStream out(process.readAllStandardOutput());
 			r = f.loadFileInfo(out);
 		}
+
 		eventHandler->newEvent(WORKER_SCAN_ITEM_FINISHED, i);
+		eventHandler->newEvent(PROGRESS_PRIMARY_UPDATED, i);
 	}
 
 	void worker_encode() {
@@ -67,6 +69,7 @@ class Worker {
 		for (int i {0}; !cancelWorker && i < (int)library->sizeEncode(); i++) {
 			worker_encode_item(i);
 		}
+
 		if (cancelWorker) {
 			eventHandler->newEvent(WORKER_ENCODE_ERRORED, "Cancelled Encoding Library: " + settings->libraryDir);
 		} else {
@@ -125,7 +128,9 @@ class Worker {
 				boost::filesystem::rename(settings->tempDir + "\\" + f.name() + "." + settings->container, settings->outputDir + "\\" + f.name() + "." + settings->container);
 			}
 		}
+
 		eventHandler->newEvent(WORKER_ENCODE_ITEM_FINISHED, i);
+		eventHandler->newEvent(PROGRESS_PRIMARY_UPDATED, i);
 	}
 
   public:

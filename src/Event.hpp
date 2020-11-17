@@ -139,6 +139,8 @@ class Event {
 
 	template <typename T> bool dataIsType(unsigned int i = 0) {
 		if (i < data.size()) {
+			if (typeid(int) == typeid(T) && data[i].type() == typeid(unsigned int)) return true;
+			if (typeid(long) == typeid(T) && data[i].type() == typeid(unsigned long)) return true;
 			return (data[i].type() == typeid(T));
 		}
 	}
