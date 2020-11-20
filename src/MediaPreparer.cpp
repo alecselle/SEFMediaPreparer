@@ -341,6 +341,7 @@ void MediaPreparer::eventListener(Event *e) {
 		ui->progress_secondary->setValue(0);
 		lockUI(true);
 		ui->list_encode_Library->clearContents();
+		ui->list_complete_Library->clearContents();
 		ui->value_encode_vCodec->setText(settings->vCodec.c_str());
 		ui->value_encode_vQuality->setText(settings->vQuality.c_str());
 		ui->value_encode_aCodec->setText(settings->aCodec.c_str());
@@ -397,7 +398,6 @@ void MediaPreparer::eventListener(Event *e) {
 				ui->progress_primary->setFormat(eventMessage.c_str());
 			}
 			workerItem = library->getFileEncode(eventData);
-			ui->list_encode_Library->selectRow(eventData);
 			ui->value_encode_file->setText(workerItem.name().c_str());
 			ui->value_encode_file_vCodec->setText(workerItem.vcodec().c_str());
 			ui->value_encode_file_aCodec->setText(workerItem.acodec().c_str());
@@ -428,7 +428,7 @@ void MediaPreparer::eventListener(Event *e) {
 												   .arg(workerItemTimeStamp.elapsed() / 3600000, 2, 10, QChar('0'))
 												   .arg((workerItemTimeStamp.elapsed() % 3600000) / 60000, 2, 10, QChar('0'))
 												   .arg(((workerItemTimeStamp.elapsed() % 3600000) % 60000) / 1000, 2, 10, QChar('0')));
-			ui->list_encode_Library->removeRow(eventData);
+			ui->list_encode_Library->removeRow(0);
 			ui->list_complete_Library->setRowCount(eventData + 1);
 			ui->list_complete_Library->setItem(eventData, 0, new QTableWidgetItem(QString(eventFile.name().c_str())));
 			ui->list_complete_Library->setItem(eventData, 1, new QTableWidgetItem(QString("%1:%2:%3")
