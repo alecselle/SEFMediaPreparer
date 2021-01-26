@@ -12,14 +12,12 @@ before_install:
     export mingw64="$msys2 -mingw64 -full-path -here -c "\"\$@"\" --"
     export msys2+=" -msys2 -c "\"\$@"\" --"
     $msys2 pacman --sync --noconfirm --needed mingw-w64-x86_64-toolchain
-    ## Install more MSYS2 packages from https://packages.msys2.org/base here
-    taskkill //IM gpg-agent.exe //F  # https://travis-ci.community/t/4967
+    taskkill //IM gpg-agent.exe //F
     export PATH=/C/tools/msys64/mingw64/bin:$PATH
-    export MAKE=mingw32-make  # so that Autotools can find it
+    export MAKE=mingw32-make
 
 before_cache:
 - |-
-    # https://unix.stackexchange.com/a/137322/107554
     $msys2 pacman --sync --clean --noconfirm
 
 cache:
@@ -28,7 +26,7 @@ cache:
     - /C/tools/msys64
 
 install:
-  - $msys2 pacman -S -noconfirm mingw-w64-x86_64-qt5-static mingw-w64-x86_64-boost mingw-w64-x86_64-rapidjson
+  - $msys2 pacman -S --noconfirm mingw-w64-x86_64-qt5-static mingw-w64-x86_64-boost mingw-w64-x86_64-rapidjson
 
 script: 
   - qmake
