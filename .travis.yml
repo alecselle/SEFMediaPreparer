@@ -1,9 +1,6 @@
 os: Windows
 language: cpp
 
-before_cache:
-- |-
-    $msys2 pacman --sync --clean --noconfirm
 cache:
     directories:
     - $HOME/AppData/Local/Temp/chocolatey
@@ -28,6 +25,11 @@ install:
   - $msys2 pacman -S --noconfirm mingw-w64-x86_64-qt5-static mingw-w64-x86_64-boost mingw-w64-x86_64-rapidjson
 
 script: 
-  - $mingw64 qmake
-  - $mingw64 make
-  - $mingw64 ./SEFMediaPreparer
+- |-
+    cd ./SEFMediaPreparer
+    qmake -makefile
+    mingw32-make
+
+before_cache:
+- |-
+    $msys2 pacman --sync --clean --noconfirm
