@@ -45,6 +45,7 @@ DISTFILES += \
 LIBS += \
 		-L$$PWD/lib -lboost_filesystem-mt
 
+
 INCLUDEPATH += \
 		$$PWD/src \
 		$$PWD/include
