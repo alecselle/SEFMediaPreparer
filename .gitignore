@@ -3,6 +3,8 @@ SEFMediaPreparer.pro.*
 .settings/
 *.lnk
 
+devenv.bat
+
 build/
 bin/
 include/boost/

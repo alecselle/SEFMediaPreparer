@@ -95,6 +95,7 @@ void MediaPreparer::initSignals() {
 	connect(ui->setting_vCodec, SIGNAL(currentIndexChanged(int)), this, SLOT(loadSettings_gui()), Qt::UniqueConnection);
 	connect(ui->setting_aCodec, SIGNAL(currentIndexChanged(int)), this, SLOT(loadSettings_gui()), Qt::UniqueConnection);
 	connect(ui->setting_container, SIGNAL(currentIndexChanged(int)), this, SLOT(loadSettings_gui()), Qt::UniqueConnection);
+	connect(ui->setting_container, SIGNAL(currentIndexChanged(int)), this, SLOT(updateGUI_settings_container()), Qt::UniqueConnection);
 	connect(ui->setting_preset, SIGNAL(currentTextChanged(QString)), this, SLOT(loadSettings_preset(QString)), Qt::UniqueConnection);
 
 	connect(updateTimer, SIGNAL(timeout()), this, SLOT(updateGUI_timers()));
@@ -197,7 +198,18 @@ void MediaPreparer::saveSettings_preset() {
  * (Section) Update GUI
  */
 
-void MediaPreparer::updateGUI_settings() {
+void MediaPreparer::updateGUI_settings_container() {
+	bool enableSub {false};
+	for (unsigned int i {0}; i < settings->SUBTITLE_CONTAINERS.size(); i++) {
+		if (ui->setting_container->currentText().toStdString() == settings->SUBTITLE_CONTAINERS[i]) enableSub = true;
+	}
+	if (!enableSub) {
+		ui->setting_subtitles->setCurrentIndex(2);
+		ui->setting_subtitles->setDisabled(true);
+	} else {
+		ui->setting_subtitles->setCurrentIndex(0);
+		ui->setting_subtitles->setDisabled(false);
+	}
 }
 
 void MediaPreparer::updateGUI_timers() {
@@ -207,15 +219,6 @@ void MediaPreparer::updateGUI_timers() {
 												  .arg(workerTimeStamp.elapsed() / 3600000, 2, 10, QChar('0'))
 												  .arg((workerTimeStamp.elapsed() % 3600000) / 60000, 2, 10, QChar('0'))
 												  .arg(((workerTimeStamp.elapsed() % 3600000) % 60000) / 1000, 2, 10, QChar('0')));
-		}
-		if (workerItemTimeStamp.isValid()) {
-			ui->progress_secondary->setFormat(QString("%1:%2:%3")
-												  .arg(workerItemTimeStamp.elapsed() / 3600000, 2, 10, QChar('0'))
-												  .arg((workerItemTimeStamp.elapsed() % 3600000) / 60000, 2, 10, QChar('0'))
-												  .arg(((workerItemTimeStamp.elapsed() % 3600000) % 60000) / 1000, 2, 10, QChar('0')));
-
-			ui->progress_secondary->setValue(workerItemTimeStamp.elapsed());
-			ui->progress_secondary->repaint();
 		}
 	}
 }
@@ -253,216 +256,248 @@ void MediaPreparer::eventListener(Event *e) {
 	EventType eventType {e->getType()};
 	string eventMessage {e->getMessage()};
 	switch (eventType) {
-		/** ============================================================================================
-		 * (Event) WORKER_SCAN_STARTED
-		 */
-		case WORKER_SCAN_STARTED: {
-			updateTimer->start(100);
-			workerType = SCAN;
-			workerTimeStamp.start();
-			cancelWorker = false;
-			ui->progress_primary->setValue(0);
-			lockUI(true);
-			ui->list_Library->clearContents();
-			break;
+	/** ============================================================================================
+	 * (Event) WORKER_SCAN_STARTED
+	 */
+	case WORKER_SCAN_STARTED: {
+		updateTimer->start(100);
+		workerType = SCAN;
+		workerTimeStamp.start();
+		cancelWorker = false;
+		ui->progress_primary->setValue(0);
+		lockUI(true);
+		ui->list_Library->clearContents();
+		break;
+	}
+	/** ============================================================================================
+	 * (Event) WORKER_SCAN_FINISHED
+	 */
+	case WORKER_SCAN_FINISHED: {
+		updateTimer->stop();
+		if (!eventMessage.empty()) {
+			ui->progress_primary->setFormat(eventMessage.c_str());
 		}
-		/** ============================================================================================
-		 * (Event) WORKER_SCAN_FINISHED
-		 */
-		case WORKER_SCAN_FINISHED: {
-			updateTimer->stop();
+		lockUI(false);
+		ui->progress_primary->setValue(library->size());
+		ui->button_encode->setText(("Encode [" + to_string(library->sizeEncode()) + "]").c_str());
+		ui->button_encode->setEnabled((library->sizeEncode() > 0));
+		break;
+	}
+	/** ============================================================================================
+	 * (Event) WORKER_SCAN_ERRORED
+	 */
+	case WORKER_SCAN_ERRORED: {
+		updateTimer->stop();
+		if (!eventMessage.empty()) {
+			ui->progress_primary->setFormat(eventMessage.c_str());
+		}
+		lockUI(false);
+		ui->progress_primary->setValue(0);
+		ui->button_encode->setText("Encode [0]");
+		ui->button_encode->setEnabled(false);
+		break;
+	}
+	/** ================================================================================================
+	 * (Event) WORKER_SCAN_ITEM_STARTED
+	 */
+	case WORKER_SCAN_ITEM_STARTED: {
+		if (e->dataIsType<int>(0)) {
+			int eventData {e->getData<int>(0)};
+			workerItemTimeStamp.start();
 			if (!eventMessage.empty()) {
 				ui->progress_primary->setFormat(eventMessage.c_str());
 			}
-			lockUI(false);
-			ui->progress_primary->setValue(library->size());
-			ui->button_encode->setText(("Encode [" + to_string(library->sizeEncode()) + "]").c_str());
-			ui->button_encode->setEnabled((library->sizeEncode() > 0));
-			break;
+			workerItem = library->getFile(eventData);
+			ui->label_fileCount->setText(("<html><head/><body><p>" + std::to_string(eventData + 1) + " file(s) found</p></body></html>").c_str());
 		}
-		/** ============================================================================================
-		 * (Event) WORKER_SCAN_ERRORED
-		 */
-		case WORKER_SCAN_ERRORED: {
-			updateTimer->stop();
+		break;
+	}
+	/** ================================================================================================
+	 * (Event) WORKER_SCAN_ITEM_FINISHED
+	 */
+	case WORKER_SCAN_ITEM_FINISHED: {
+		if (e->dataIsType<int>(0)) {
+			int eventData {e->getData<int>(0)};
+			ui->progress_primary->setValue(eventData);
+			File &eventFile {library->getFile(eventData)};
+			ui->list_Library->setRowCount(eventData + 1);
+			ui->list_Library->setItem(eventData, 0, new QTableWidgetItem(QString(eventFile.name().c_str())));
+			ui->list_Library->setItem(eventData, 1, new QTableWidgetItem(QString(eventFile.vcodec().c_str())));
+			ui->list_Library->setItem(eventData, 2, new QTableWidgetItem(QString(eventFile.acodec().c_str())));
+			ui->list_Library->setItem(eventData, 3, new QTableWidgetItem(QString(eventFile.extension().c_str())));
+			ui->list_Library->setItem(eventData, 4, new QTableWidgetItem(QString(eventFile.subtitlesStr().c_str())));
+		}
+		break;
+	}
+	/** ============================================================================================
+	 * (Event) WORKER_ENCODE_STARTED
+	 */
+	case WORKER_ENCODE_STARTED: {
+		updateTimer->start(100);
+		workerType = ENCODE;
+		workerTimeStamp.start();
+		cancelWorker = false;
+		ui->progress_primary->setValue(0);
+		ui->progress_secondary->setValue(0);
+		lockUI(true);
+		ui->list_encode_Library->clearContents();
+		ui->list_complete_Library->clearContents();
+		ui->value_encode_vCodec->setText(settings->vCodec.c_str());
+		ui->value_encode_vQuality->setText(settings->vQuality.c_str());
+		ui->value_encode_aCodec->setText(settings->aCodec.c_str());
+		ui->value_encode_aQuality->setText(settings->aQuality.c_str());
+		ui->value_encode_container->setText(settings->container.c_str());
+		ui->value_encode_subtitles->setText(settings->subtitles.c_str());
+		for (int i {0}; i < library->sizeEncode(); i++) {
+			File &f {library->getFileEncode(i)};
+			ui->list_encode_Library->setRowCount(i + 1);
+			ui->list_encode_Library->setItem(i, 0, new QTableWidgetItem(QString(f.name().c_str())));
+			ui->list_encode_Library->setItem(i, 1, new QTableWidgetItem(QString(f.vcodec().c_str())));
+			ui->list_encode_Library->setItem(i, 2, new QTableWidgetItem(QString(f.acodec().c_str())));
+			ui->list_encode_Library->setItem(i, 3, new QTableWidgetItem(QString(f.extension().c_str())));
+			ui->list_encode_Library->setItem(i, 4, new QTableWidgetItem(QString(f.subtitlesStr().c_str())));
+		}
+		break;
+	}
+	/** ============================================================================================
+	 * (Event) WORKER_ENCODE_FINISHED
+	 */
+	case WORKER_ENCODE_FINISHED: {
+		updateTimer->stop();
+		if (!eventMessage.empty()) {
+			ui->progress_primary->setFormat(eventMessage.c_str());
+		}
+		lockUI(false);
+		ui->button_encode->setText(("Encode [" + to_string(library->sizeEncode()) + "]").c_str());
+		ui->button_encode->setEnabled((library->sizeEncode() > 0));
+		ui->progress_primary->setValue(library->sizeEncode());
+		break;
+	}
+	/** ============================================================================================
+	 * (Event) WORKER_ENCODE_ERRORED
+	 */
+	case WORKER_ENCODE_ERRORED: {
+		updateTimer->stop();
+		if (!eventMessage.empty()) {
+			ui->progress_primary->setFormat(eventMessage.c_str());
+		}
+		lockUI(false);
+		ui->button_encode->setText(("Encode [" + to_string(library->sizeEncode()) + "]").c_str());
+		ui->button_encode->setEnabled((library->sizeEncode() > 0));
+		ui->progress_primary->setValue(0);
+		break;
+	}
+	/** ============================================================================================
+	 * (Event) WORKER_ENCODE_ITEM_STARTED
+	 */
+	case WORKER_ENCODE_ITEM_STARTED: {
+		if (e->dataIsType<int>(0)) {
+			int eventData {e->getData<int>(0)};
+			workerItemTimeStamp.start();
 			if (!eventMessage.empty()) {
 				ui->progress_primary->setFormat(eventMessage.c_str());
 			}
-			lockUI(false);
-			ui->progress_primary->setValue(0);
-			ui->button_encode->setText("Encode [0]");
-			ui->button_encode->setEnabled(false);
-			break;
-		}
-		/** ================================================================================================
-		 * (Event) WORKER_SCAN_ITEM_STARTED
-		 */
-		case WORKER_SCAN_ITEM_STARTED: {
-			if (e->dataIsType<int>(0)) {
-				int eventData {e->getData<int>(0)};
-				workerItemTimeStamp.start();
-				if (!eventMessage.empty()) {
-					ui->progress_primary->setFormat(eventMessage.c_str());
-				}
-				workerItem = library->getFile(eventData);
-				ui->label_fileCount->setText(("<html><head/><body><p>" + std::to_string(eventData + 1) + " file(s) found</p></body></html>").c_str());
-			}
-			break;
-		}
-		/** ================================================================================================
-		 * (Event) WORKER_SCAN_ITEM_FINISHED
-		 */
-		case WORKER_SCAN_ITEM_FINISHED: {
-			if (e->dataIsType<int>(0)) {
-				int eventData {e->getData<int>(0)};
-				ui->progress_primary->setValue(eventData);
-				File &eventFile {library->getFile(eventData)};
-				ui->list_Library->setRowCount(eventData + 1);
-				ui->list_Library->setItem(eventData, 0, new QTableWidgetItem(QString(eventFile.name().c_str())));
-				ui->list_Library->setItem(eventData, 1, new QTableWidgetItem(QString(eventFile.vcodec().c_str())));
-				ui->list_Library->setItem(eventData, 2, new QTableWidgetItem(QString(eventFile.acodec().c_str())));
-				ui->list_Library->setItem(eventData, 3, new QTableWidgetItem(QString(eventFile.extension().c_str())));
-				ui->list_Library->setItem(eventData, 4, new QTableWidgetItem(QString(eventFile.subtitlesStr().c_str())));
-			}
-			break;
-		}
-		/** ============================================================================================
-		 * (Event) WORKER_ENCODE_STARTED
-		 */
-		case WORKER_ENCODE_STARTED: {
-			updateTimer->start(100);
-			workerType = ENCODE;
-			workerTimeStamp.start();
-			cancelWorker = false;
-			ui->progress_primary->setValue(0);
+			workerItem = library->getFileEncode(eventData);
+			ui->value_encode_file->setText(workerItem.name().c_str());
+			ui->value_encode_file_vCodec->setText(workerItem.vcodec().c_str());
+			ui->value_encode_file_aCodec->setText(workerItem.acodec().c_str());
+			ui->value_encode_file_container->setText(ba::replace_all_copy(workerItem.extension(), ".", "").c_str());
+			ui->value_encode_file_subtitles->setText(workerItem.subtitlesStr().c_str());
+			ui->value_encode_file_duration->setText(QString("%1:%2:%3")
+														.arg(workerItem.duration() / 3600000, 2, 10, QChar('0'))
+														.arg((workerItem.duration() % 3600000) / 60000, 2, 10, QChar('0'))
+														.arg(((workerItem.duration() % 3600000) % 60000) / 1000, 2, 10, QChar('0')));
+			ui->progress_secondary->setMaximum(0);
 			ui->progress_secondary->setValue(0);
-			lockUI(true);
-			ui->list_encode_Library->clearContents();
-			ui->value_encode_vCodec->setText(settings->vCodec.c_str());
-			ui->value_encode_vQuality->setText(settings->vQuality.c_str());
-			ui->value_encode_aCodec->setText(settings->aCodec.c_str());
-			ui->value_encode_aQuality->setText(settings->aQuality.c_str());
-			ui->value_encode_container->setText(settings->container.c_str());
-			ui->value_encode_subtitles->setText(settings->subtitles.c_str());
-			for (int i {0}; i < library->sizeEncode(); i++) {
-				File &f {library->getFileEncode(i)};
-				ui->list_encode_Library->setRowCount(i + 1);
-				ui->list_encode_Library->setItem(i, 0, new QTableWidgetItem(QString(f.name().c_str())));
-				ui->list_encode_Library->setItem(i, 1, new QTableWidgetItem(QString(f.vcodec().c_str())));
-				ui->list_encode_Library->setItem(i, 2, new QTableWidgetItem(QString(f.acodec().c_str())));
-				ui->list_encode_Library->setItem(i, 3, new QTableWidgetItem(QString(f.extension().c_str())));
-				ui->list_encode_Library->setItem(i, 4, new QTableWidgetItem(QString(f.subtitlesStr().c_str())));
-			}
-			break;
+			ui->progress_secondary->repaint();
+			ui->value_encode_count->setText((to_string(eventData + 1) + " / " + to_string(library->sizeEncode())).c_str());
 		}
-		/** ============================================================================================
-		 * (Event) WORKER_ENCODE_FINISHED
-		 */
-		case WORKER_ENCODE_FINISHED: {
-			updateTimer->stop();
+		break;
+	}
+	/** ============================================================================================
+	 * (Event) WORKER_ENCODE_ITEM_FINISHED
+	 */
+	case WORKER_ENCODE_ITEM_FINISHED: {
+		if (e->dataIsType<int>(0)) {
+			int eventData {e->getData<int>(0)};
+			File &eventFile {library->getFileEncode(eventData)};
+			ui->progress_secondary->setMaximum(1);
+			ui->progress_secondary->setValue(1);
+			ui->progress_secondary->repaint();
+			ui->value_encode_lastFile->setText(QString("%1:%2:%3")
+												   .arg(workerItemTimeStamp.elapsed() / 3600000, 2, 10, QChar('0'))
+												   .arg((workerItemTimeStamp.elapsed() % 3600000) / 60000, 2, 10, QChar('0'))
+												   .arg(((workerItemTimeStamp.elapsed() % 3600000) % 60000) / 1000, 2, 10, QChar('0')));
+			ui->list_encode_Library->removeRow(0);
+			ui->list_complete_Library->setRowCount(eventData + 1);
+			ui->list_complete_Library->setItem(eventData, 0, new QTableWidgetItem(QString(eventFile.name().c_str())));
+			ui->list_complete_Library->setItem(eventData, 1, new QTableWidgetItem(QString("%1:%2:%3")
+																				  .arg(workerItemTimeStamp.elapsed() / 3600000, 2, 10, QChar('0'))
+																				  .arg((workerItemTimeStamp.elapsed() % 3600000) / 60000, 2, 10, QChar('0'))
+																				  .arg(((workerItemTimeStamp.elapsed() % 3600000) % 60000) / 1000, 2, 10, QChar('0'))));
+		}
+		break;
+	}
+	/** ============================================================================================
+	 * (Event) PROGRESS_PRIMARY_UPDATED
+	 */
+	case PROGRESS_PRIMARY_UPDATED: {
+		if (e->dataIsType<int>(0)) {
+			int eventData {e->getData<int>(0)};
+			ui->progress_primary->setValue(eventData);
 			if (!eventMessage.empty()) {
 				ui->progress_primary->setFormat(eventMessage.c_str());
 			}
-			lockUI(false);
-			ui->button_encode->setText(("Encode [" + to_string(library->sizeEncode()) + "]").c_str());
-			ui->button_encode->setEnabled((library->sizeEncode() > 0));
-			ui->progress_primary->setValue(library->sizeEncode());
-			break;
 		}
-		/** ============================================================================================
-		 * (Event) WORKER_ENCODE_ERRORED
-		 */
-		case WORKER_ENCODE_ERRORED: {
-			updateTimer->stop();
-			if (!eventMessage.empty()) {
-				ui->progress_primary->setFormat(eventMessage.c_str());
-			}
-			lockUI(false);
-			ui->button_encode->setText(("Encode [" + to_string(library->sizeEncode()) + "]").c_str());
-			ui->button_encode->setEnabled((library->sizeEncode() > 0));
-			ui->progress_primary->setValue(0);
-			break;
-		}
-		/** ============================================================================================
-		 * (Event) WORKER_ENCODE_ITEM_STARTED
-		 */
-		case WORKER_ENCODE_ITEM_STARTED: {
-			if (e->dataIsType<int>(0)) {
-				int eventData {e->getData<int>(0)};
-				workerItemTimeStamp.start();
-				if (!eventMessage.empty()) {
-					ui->progress_primary->setFormat(eventMessage.c_str());
-				}
-				workerItem = library->getFileEncode(eventData);
-				ui->list_encode_Library->selectRow(eventData);
-				ui->value_encode_file->setText(workerItem.name().c_str());
-				ui->value_encode_file_vCodec->setText(workerItem.vcodec().c_str());
-				ui->value_encode_file_aCodec->setText(workerItem.acodec().c_str());
-				ui->value_encode_file_container->setText(ba::replace_all_copy(workerItem.extension(), ".", "").c_str());
-				ui->value_encode_file_subtitles->setText(workerItem.subtitlesStr().c_str());
-				ui->value_encode_file_duration->setText(QString("%1:%2:%3")
-															.arg(workerItem.duration() / 3600000, 2, 10, QChar('0'))
-															.arg((workerItem.duration() % 3600000) / 60000, 2, 10, QChar('0'))
-															.arg(((workerItem.duration() % 3600000) % 60000) / 1000, 2, 10, QChar('0')));
-				ui->progress_secondary->setMaximum(workerItem.duration());
-				ui->value_encode_count->setText((to_string(eventData + 1) + " / " + to_string(library->sizeEncode())).c_str());
-			}
-			break;
-		}
-		/** ============================================================================================
-		 * (Event) WORKER_ENCODE_ITEM_FINISHED
-		 */
-		case WORKER_ENCODE_ITEM_FINISHED: {
-			if (e->dataIsType<int>(0)) {
-				//int eventData {e->getData<int>(0)};
-				//File &eventFile {library->getFileEncode(eventData)};
-				ui->value_encode_lastFile->setText(QString("%1:%2:%3")
-													   .arg(workerItemTimeStamp.elapsed() / 3600000, 2, 10, QChar('0'))
-													   .arg((workerItemTimeStamp.elapsed() % 3600000) / 60000, 2, 10, QChar('0'))
-													   .arg(((workerItemTimeStamp.elapsed() % 3600000) % 60000) / 1000, 2, 10, QChar('0')));
-			}
-			break;
-		}
-		/** ============================================================================================
-		 * (Event) PROGRESS_PRIMARY_UPDATED
-		 */
-		case PROGRESS_PRIMARY_UPDATED: {
-			if (e->dataIsType<int>(0)) {
-				int eventData {e->getData<int>(0)};
-				ui->progress_primary->setValue(eventData);
-				if (!eventMessage.empty()) {
-					ui->progress_primary->setFormat(eventMessage.c_str());
-				}
-			}
-			break;
-		}
-		/** ============================================================================================
-		 * (Event) PROGRESS_PRIMARY_MAXIMUM_CHANGED
-		 */
-		case PROGRESS_PRIMARY_MAXIMUM: {
+		break;
+	}
+	/** ============================================================================================
+	 * (Event) PROGRESS_PRIMARY_MAXIMUM
+	 */
+	case PROGRESS_PRIMARY_MAXIMUM: {
 			if (e->dataIsType<int>(0)) {
 				int eventData {e->getData<int>(0)};
 				ui->progress_primary->setMaximum(eventData);
 			}
 			break;
+	}
+	/** ============================================================================================
+	 * (Event) PROGRESS_SECONDARY_UPDATED
+	 */
+	case PROGRESS_SECONDARY_UPDATED: {
+		if (e->dataIsType<int>(0)) {
+			int eventData {e->getData<int>(0)};
+			ui->progress_secondary->setValue(eventData);
+			if (!eventMessage.empty()) {
+				ui->progress_secondary->setFormat(eventMessage.c_str());
+			}
 		}
-		case CONFIG_SAVED: {
+		break;
+	}
+	/** ============================================================================================
+	 * (Event) PROGRESS_SECONDARY_MAXIMUM
+	 */
+	case PROGRESS_SECONDARY_MAXIMUM: {
 
-			break;
-		}
-		case CONFIG_LOADED: {
+		break;
+	}
+	case CONFIG_SAVED: {
 
-			break;
-		}
-		case PRESET_SAVED: {
+		break;
+	}
+	case CONFIG_LOADED: {
 
-			break;
-		}
-		case PRESET_LOADED: {
+		break;
+	}
+	case PRESET_SAVED: {
 
-			break;
-		}
-		default: { break; }
+		break;
+	}
+	case PRESET_LOADED: {
+
+		break;
+	}
+	default: { break; }
 	}
 	blockSignals(false);
 }

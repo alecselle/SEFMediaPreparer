@@ -6,7 +6,7 @@ QMAKE_CXXFLAGS += -std=c++17 -static-libstdc++ -static-libgcc -Wpedantic -Wno-un
 
 !defined(VER_MAJ):VER_MAJ = 3
 !defined(VER_MIN):VER_MIN = 6
-!defined(VER_PAT):VER_PAT = 0
+!defined(VER_PAT):VER_PAT = 3
 VERSION = $${VER_MAJ}.$${VER_MIN}.$${VER_PAT}
 
 DESTDIR = $$PWD/bin
@@ -43,9 +43,8 @@ DISTFILES += \
 		$$PWD/version.txt
 
 LIBS += \
-		-L$$PWD/lib -lboost_filesystem-mt \
-		-L$$PWD/lib -lboost_container-mt \
-		-L$$PWD/lib -lboost_system-mt
+		-L$$PWD/lib -lboost_filesystem-mt
+
 
 INCLUDEPATH += \
 		$$PWD/src \
