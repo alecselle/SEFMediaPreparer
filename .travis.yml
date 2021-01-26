@@ -25,9 +25,8 @@ before_install:
     $msys2 pacman -S --noconfirm mingw-w64-x86_64-qt5-static mingw-w64-x86_64-boost mingw-w64-x86_64-rapidjson
 
 script: 
-- |-
-    qmake -makefile
-    mingw32-make
+    - qmake -makefile
+    - mingw32-make
 
 before_cache:
 - |-
