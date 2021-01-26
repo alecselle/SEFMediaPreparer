@@ -36,7 +36,7 @@ cache:
     - /C/tools/msys64
 
 install:
-  - $msys2 pacman -S mingw-w64-x86_64-qt5-static mingw-w64-x86_64-boost mingw-w64-x86_64-rapidjson
+  - $msys2 pacman -Sy mingw-w64-x86_64-qt5-static mingw-w64-x86_64-boost mingw-w64-x86_64-rapidjson
 
 script: 
   - qmake
