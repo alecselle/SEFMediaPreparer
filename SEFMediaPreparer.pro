@@ -43,9 +43,7 @@ DISTFILES += \
 		$$PWD/version.txt
 
 LIBS += \
-		-L$$PWD/lib -lboost_filesystem-mt \
-		-L$$PWD/lib -lboost_container-mt \
-		-L$$PWD/lib -lboost_system-mt
+		-L$$PWD/lib -lboost_filesystem-mt
 
 INCLUDEPATH += \
 		$$PWD/src \
