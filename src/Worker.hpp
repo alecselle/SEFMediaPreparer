@@ -18,9 +18,15 @@
 #include <QtCore/QProcess>
 
 namespace SuperEpicFuntime::MediaPreparer {
+
+/**
+ * @brief Handles background processes for scanning and encoding files
+ */
 class Worker {
   private:
 	WorkerType type {NONE};
+
+#define SCAN_SECTION {
 
 	void worker_scan() {
 		eventHandler->newEvent(WORKER_SCAN_STARTED, "Scanning Library: " + settings->libraryDir);
@@ -61,6 +67,9 @@ class Worker {
 		eventHandler->newEvent(PROGRESS_PRIMARY_UPDATED, i);
 	}
 
+#define END_SCAN_SECTION }
+#define ENCODE_SECTION {
+
 	void worker_encode() {
 		eventHandler->newEvent(WORKER_ENCODE_STARTED, "Encoding Library: " + settings->libraryDir);
 		eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM, 0);
@@ -80,33 +89,43 @@ class Worker {
 	void worker_encode_item(int i) {
 		File &f {library->getFileEncode(i)};
 		eventHandler->newEvent(WORKER_ENCODE_ITEM_STARTED, "Encoding File: " + f.name(), i);
-		QStringList params {"-y", "-v", "quiet", "-stats", "-hwaccel", "dxva2", "-threads", settings->threads.c_str(), "-i", f.path().c_str()};
-		if (f.subtitles() == 1 && settings->subtitles.compare("Embed") == 0) {
-			params += {"-i", f.pathSub().c_str()};
-		}
-		params += {"-map", "0:0", "-map", "0:1?"};
-		if (f.subtitles() == 1 && settings->subtitles.compare("Embed") == 0) {
-			params += {"-map", "1:0"};
-		}
-		if (f.subtitles() > 0 && settings->subtitles.compare("Remove") != 0 && settings->container == "mkv") {
-			params += {"-map", "0:2?", "-c:s", "srt", "-metadata:s:s:0", "language=eng", "-disposition:s:0", "default"};
-		} else if (f.subtitles() > 0 && settings->subtitles.compare("Remove") != 0 && (settings->container == "mp4" || settings->container == "mov")) {
-			params += {"-map", "0:2?", "-c:s", "mov_text", "-metadata:s:s:0", "language=eng", "-disposition:s:0", "default"};
-		}
-		if (settings->fixMetadata) {
-			params += {"-codec", "copy"};
+		QStringList params {"-y", "-stats", "-hwaccel", "dxva2"};
+		try {
+			int threads = std::stoi(settings->threads);
+			params += {"-threads", std::to_string(threads).c_str()};
+		}  catch (...) {}
+		params += {"-i", f.path().c_str()};
+		if (!settings->override) {
+			if (f.subtitles() == 1 && settings->subtitles.compare("Embed") == 0) {
+				params += {"-i", f.pathSub().c_str()};
+			}
+			params += {"-map", "0:0", "-map", "0:1?"};
+			if (f.subtitles() == 1 && settings->subtitles.compare("Embed") == 0) {
+				params += {"-map", "1:0"};
+			}
+			if (f.subtitles() > 0 && settings->subtitles.compare("Remove") != 0 && settings->container == "mkv") {
+				params += {"-map", "0:2?", "-c:s", "srt", "-metadata:s:s:0", "language=eng", "-disposition:s:0", "default"};
+			} else if (f.subtitles() > 0 && settings->subtitles.compare("Remove") != 0 && (settings->container == "mp4" || settings->container == "mov")) {
+				params += {"-map", "0:2?", "-c:s", "mov_text", "-metadata:s:s:0", "language=eng", "-disposition:s:0", "default"};
+			}
+			if (settings->fixMetadata) {
+				params += {"-codec", "copy"};
+			} else {
+				params += {"-c:v", settings->vCodec.c_str(), "-crf", settings->vQuality.c_str(), "-c:a", settings->aCodec.c_str(), "-b:a", (settings->aQuality + "k").c_str()};
+				// Fix for corruption caused by amf encoder
+				if (settings->vCodec == "hevc_amf") {
+					params += {"-gops_per_idr", "1"};
+				}
+			}
+			if (!settings->extraParams.empty()) {
+				char s[2048];
+				strcpy(s, settings->extraParams.c_str());
+				for (char *p = strtok(s, " "); p != NULL; p = strtok(NULL, " ")) {
+					params.push_back(p);
+				}
+			}
 		} else {
-			params += {"-c:v", settings->vCodec.c_str(), "-crf", settings->vQuality.c_str(), "-c:a", settings->aCodec.c_str(), "-b:a", (settings->aQuality + "k").c_str()};
-			if (settings->vCodec == "hevc_amf") {
-				params += {"-gops_per_idr", "1"};
-			}
-		}
-		if (!settings->extraParams.empty()) {
-			char s[2048];
-			strcpy(s, settings->extraParams.c_str());
-			for (char *p = strtok(s, " "); p != NULL; p = strtok(NULL, " ")) {
-				params.push_back(p);
-			}
+			params += settings->overrideParams;
 		}
 		params += {"-metadata",
 				   ("title=" + f.name()).c_str(),
@@ -115,6 +134,7 @@ class Worker {
 				   "-strict",
 				   "-2",
 				   (settings->tempDir + "\\" + f.name() + "." + settings->container).c_str()};
+		eventHandler->newEvent(CUSTOM, params);
 		QProcess process {};
 		process.setStandardErrorFile((settings->tempDir + "\\" + f.name() + ".txt").c_str());
 		process.start("ffmpeg", params);
@@ -132,6 +152,8 @@ class Worker {
 		eventHandler->newEvent(WORKER_ENCODE_ITEM_FINISHED, i);
 		eventHandler->newEvent(PROGRESS_PRIMARY_UPDATED, i);
 	}
+
+#define END_ENCODE_SECTION }
 
   public:
 	Worker(WorkerType workerType) {

@@ -1,14 +1,10 @@
 #include <Controller.hpp>
 
 using std::string;
-
-using namespace std; // For debugging (cout)
+using namespace std;
 
 namespace SuperEpicFuntime::MediaPreparer {
 
-/** ================================================================================================
- * (Class) MediaPreparerController
- */
 Controller::Controller() {
 
 	eventHandler = new EventHandler();
@@ -26,148 +22,95 @@ void Controller::eventListener(Event *e) {
 	EventType eventType = e->getType();
 	string eventMessage = e->getMessage();
 	switch (eventType) {
-	/** ============================================================================================
-	 * (Event) INITIALIZED
-	 */
 	case INITIALIZED:
 		log(e, true);
 
 		break;
-	/** ============================================================================================
-	 * (Event) TERMINATED
-	 */
 	case TERMINATED:
 		log(e, true);
 
 		break;
-	/** ============================================================================================
-	 * (Event) WORKER_SCAN_STARTED
-	 */
 	case WORKER_SCAN_STARTED: {
 		log(e, true);
 		break;
 	}
-	/** ============================================================================================
-	 * (Event) WORKER_SCAN_FINISHED
-	 */
 	case WORKER_SCAN_FINISHED: {
 		log(e, true);
 		break;
 	}
-	/** ============================================================================================
-	 * (Event) WORKER_SCAN_ERRORED
-	 */
 	case WORKER_SCAN_ERRORED: {
 		log(e, true);
 		break;
 	}
-	/** ================================================================================================
-	 * (Event) WORKER_SCAN_ITEM_STARTED
-	 */
 	case WORKER_SCAN_ITEM_STARTED: {
 		log(e, true);
 		break;
 	}
-	/** ================================================================================================
-	 * (Event) WORKER_SCAN_ITEM_FINISHED
-	 */
 	case WORKER_SCAN_ITEM_FINISHED: {
 		log(e, false);
 		break;
 	}
-	/** ============================================================================================
-	 * (Event) WORKER_ENCODE_STARTED
-	 */
 	case WORKER_ENCODE_STARTED: {
 		log(e, true);
 		break;
 	}
-	/** ============================================================================================
-	 * (Event) WORKER_ENCODE_FINISHED
-	 */
 	case WORKER_ENCODE_FINISHED: {
 		log(e, true);
 		break;
 	}
-	/** ============================================================================================
-	 * (Event) WORKER_ENCODE_ERRORED
-	 */
 	case WORKER_ENCODE_ERRORED: {
 		log(e, true);
 		break;
 	}
-	/** ============================================================================================
-	 * (Event) WORKER_ENCODE_ITEM_STARTED
-	 */
 	case WORKER_ENCODE_ITEM_STARTED: {
 		log(e, true);
 		break;
 	}
-	/** ============================================================================================
-	 * (Event) WORKER_ENCODE_ITEM_FINISHED
-	 */
 	case WORKER_ENCODE_ITEM_FINISHED: {
 		log(e, false);
 		break;
 	}
-	/** ============================================================================================
-	 * (Event) PROGRESS_PRIMARY_UPDATED
-	 */
 	case PROGRESS_PRIMARY_UPDATED: {
 		log(e, false);
 		break;
 	}
-	/** ============================================================================================
-	 * (Event) PROGRESS_PRIMARY_MAXIMUM
-	 */
 	case PROGRESS_PRIMARY_MAXIMUM: {
 		log(e, false);
 		break;
 	}
-	/** ============================================================================================
-	 * (Event) PROGRESS_SECONDARY_UPDATED
-	 */
 	case PROGRESS_SECONDARY_UPDATED: {
 		log(e, false);
 		break;
 	}
-	/** ============================================================================================
-	 * (Event) PROGRESS_SECONDARY_MAXIMUM
-	 */
 	case PROGRESS_SECONDARY_MAXIMUM: {
 		log(e, false);
 		break;
 	}
-	/** ============================================================================================
-	 * (Event) CONFIG_SAVED
-	 */
 	case CONFIG_SAVED: {
 		log(e, false);
 
 		break;
 	}
-	/** ============================================================================================
-	 * (Event) CONFIG_LOADED
-	 */
 	case CONFIG_LOADED: {
 		log(e, false);
 
 		break;
 	}
-	/** ============================================================================================
-	 * (Event) PRESET_SAVED
-	 */
 	case PRESET_SAVED: {
 		log(e, true);
 
 		break;
 	}
-	/** ============================================================================================
-	 * (Event) PRESET_LOADED
-	 */
 	case PRESET_LOADED: {
 		log(e, false);
 
+		break;
+	}
+	case CUSTOM: {
+		QStringList t = e->getData<QStringList>();
+		for (int i {0}; i < t.size(); i++) {
+			log (t[i], false);
+		}
 		break;
 	}
 	default: {

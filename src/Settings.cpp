@@ -40,6 +40,8 @@ void Settings::init() {
 	loadPreset();
 }
 
+#define LOAD_SECTION {
+
 string Settings::parsePath(string path) {
 	string t {path};
 	ba::ireplace_all(path, "%APPDATA%", APPDATA.c_str());
@@ -167,73 +169,6 @@ void Settings::loadConfig() {
 	}
 }
 
-void Settings::saveConfig() {
-	string json {"{}"};
-	StringStream s(json.c_str());
-
-	Document d;
-	Document::AllocatorType &alloc {d.GetAllocator()};
-	d.ParseStream(s);
-
-	d.AddMember(StringRef("preset"), Value(StringRef(presetPath.c_str())), alloc);
-	d.AddMember(StringRef("libraryDir"), Value(StringRef(libraryDir.c_str())), alloc);
-	d.AddMember(StringRef("tempDir"), Value(StringRef(tempDir.c_str())), alloc);
-	d.AddMember(StringRef("outputDir"), Value(StringRef(outputDir.c_str())), alloc);
-	d.AddMember(StringRef("preserveLog"), Value(preserveLog), alloc);
-	d.AddMember(StringRef("forceEncode"), Value(forceEncode), alloc);
-	d.AddMember(StringRef("fixMetadata"), Value(fixMetadata), alloc);
-	d.AddMember(StringRef("subfolders"), Value(subfolders), alloc);
-	d.AddMember(StringRef("vCodecs"), Value(), alloc);
-	d["vCodecs"].SetArray();
-	d.AddMember(StringRef("aCodecs"), Value(), alloc);
-	d["aCodecs"].SetArray();
-	d.AddMember(StringRef("containers"), Value(), alloc);
-	d["containers"].SetArray();
-
-	for (int i {0}; i < (int)vCodecList.size(); i++) {
-		Value a(kArrayType);
-		for (int j = 0; j < (int)vCodecList[i].size(); j++) {
-			a.PushBack(Value().SetString(StringRef(vCodecList[i][j].c_str())), alloc);
-		}
-		d["vCodecs"].PushBack(a, alloc);
-	}
-
-	for (int i {0}; i < (int)aCodecList.size(); i++) {
-		Value a(kArrayType);
-		for (int j = 0; j < (int)aCodecList[i].size(); j++) {
-			a.PushBack(Value().SetString(StringRef(aCodecList[i][j].c_str())), alloc);
-		}
-		d["aCodecs"].PushBack(a, alloc);
-	}
-
-	for (int i {0}; i < (int)containerList.size(); i++) {
-		d["containers"].PushBack(Value().SetString(StringRef(containerList[i].c_str())), alloc);
-	}
-
-	FILE *fp {fopen(parsePath(CONFIG_FILE).c_str(), "wb")};
-	char writeBuffer[65536];
-	FileWriteStream os(fp, writeBuffer, sizeof(writeBuffer));
-	PrettyWriter<FileWriteStream> writer(os);
-	d.Accept(writer);
-	fclose(fp);
-	if (_eventHandler != NULL) {
-		_eventHandler->newEvent(CONFIG_SAVED, "Saved Config");
-	}
-}
-
-void Settings::createDefaultConfig() {
-	presetName	= parsePresetName(DEFAULT_PRESET);
-	presetPath	= DEFAULT_PRESET;
-	libraryDir	= DEFAULT_LIBRARY_DIR;
-	tempDir		  = DEFAULT_TEMP_DIR;
-	outputDir	 = DEFAULT_OUTPUT_DIR;
-	preserveLog   = DEFAULT_PRESERVE_LOG;
-	vCodecList	= DEFAULT_VCODECS;
-	aCodecList	= DEFAULT_ACODECS;
-	containerList = DEFAULT_CONTAINERS;
-	saveConfig();
-}
-
 void Settings::loadPreset() {
 	loadPresetFile(presetPath);
 }
@@ -308,6 +243,87 @@ void Settings::loadPresetFile(std::string path) {
 	}
 }
 
+void Settings::refreshPresets() {
+	presetPathList.clear();
+	presetNameList.clear();
+	for (bf::directory_entry &x : bf::directory_iterator(PRESET_DIR)) {
+		if (x.path().extension().compare(PRESET_EXTENSION) == 0) {
+			presetPathList.push_back(parsePresetPath(x.path().string()));
+			presetNameList.push_back(parsePresetName(x.path().string()));
+		}
+	}
+}
+
+#define END_LOAD_SECTION }
+#define SAVE_SECTION {
+
+void Settings::saveConfig() {
+	string json {"{}"};
+	StringStream s(json.c_str());
+
+	Document d;
+	Document::AllocatorType &alloc {d.GetAllocator()};
+	d.ParseStream(s);
+
+	d.AddMember(StringRef("preset"), Value(StringRef(presetPath.c_str())), alloc);
+	d.AddMember(StringRef("libraryDir"), Value(StringRef(libraryDir.c_str())), alloc);
+	d.AddMember(StringRef("tempDir"), Value(StringRef(tempDir.c_str())), alloc);
+	d.AddMember(StringRef("outputDir"), Value(StringRef(outputDir.c_str())), alloc);
+	d.AddMember(StringRef("preserveLog"), Value(preserveLog), alloc);
+	d.AddMember(StringRef("forceEncode"), Value(forceEncode), alloc);
+	d.AddMember(StringRef("fixMetadata"), Value(fixMetadata), alloc);
+	d.AddMember(StringRef("subfolders"), Value(subfolders), alloc);
+	d.AddMember(StringRef("vCodecs"), Value(), alloc);
+	d["vCodecs"].SetArray();
+	d.AddMember(StringRef("aCodecs"), Value(), alloc);
+	d["aCodecs"].SetArray();
+	d.AddMember(StringRef("containers"), Value(), alloc);
+	d["containers"].SetArray();
+
+	for (int i {0}; i < (int)vCodecList.size(); i++) {
+		Value a(kArrayType);
+		for (int j = 0; j < (int)vCodecList[i].size(); j++) {
+			a.PushBack(Value().SetString(StringRef(vCodecList[i][j].c_str())), alloc);
+		}
+		d["vCodecs"].PushBack(a, alloc);
+	}
+
+	for (int i {0}; i < (int)aCodecList.size(); i++) {
+		Value a(kArrayType);
+		for (int j = 0; j < (int)aCodecList[i].size(); j++) {
+			a.PushBack(Value().SetString(StringRef(aCodecList[i][j].c_str())), alloc);
+		}
+		d["aCodecs"].PushBack(a, alloc);
+	}
+
+	for (int i {0}; i < (int)containerList.size(); i++) {
+		d["containers"].PushBack(Value().SetString(StringRef(containerList[i].c_str())), alloc);
+	}
+
+	FILE *fp {fopen(parsePath(CONFIG_FILE).c_str(), "wb")};
+	char writeBuffer[65536];
+	FileWriteStream os(fp, writeBuffer, sizeof(writeBuffer));
+	PrettyWriter<FileWriteStream> writer(os);
+	d.Accept(writer);
+	fclose(fp);
+	if (_eventHandler != NULL) {
+		_eventHandler->newEvent(CONFIG_SAVED, "Saved Config");
+	}
+}
+
+void Settings::createDefaultConfig() {
+	presetName	= parsePresetName(DEFAULT_PRESET);
+	presetPath	= DEFAULT_PRESET;
+	libraryDir	= DEFAULT_LIBRARY_DIR;
+	tempDir		  = DEFAULT_TEMP_DIR;
+	outputDir	 = DEFAULT_OUTPUT_DIR;
+	preserveLog   = DEFAULT_PRESERVE_LOG;
+	vCodecList	= DEFAULT_VCODECS;
+	aCodecList	= DEFAULT_ACODECS;
+	containerList = DEFAULT_CONTAINERS;
+	saveConfig();
+}
+
 void Settings::savePreset() {
 	savePresetAs(presetName);
 }
@@ -345,17 +361,6 @@ void Settings::savePresetAs(std::string name) {
 	}
 }
 
-void Settings::refreshPresets() {
-	presetPathList.clear();
-	presetNameList.clear();
-	for (bf::directory_entry &x : bf::directory_iterator(PRESET_DIR)) {
-		if (x.path().extension().compare(PRESET_EXTENSION) == 0) {
-			presetPathList.push_back(parsePresetPath(x.path().string()));
-			presetNameList.push_back(parsePresetName(x.path().string()));
-		}
-	}
-}
-
 void Settings::createDefaultPreset() {
 	vCodec		= DEFAULT_VCODEC;
 	vQuality	= DEFAULT_VQUALITY;
@@ -367,4 +372,18 @@ void Settings::createDefaultPreset() {
 	extraParams = DEFAULT_EXTRA_PARAMS;
 	savePresetAs(DEFAULT_PRESET);
 }
+
+#define END_SAVE_SECTION }
+
+void Settings::parseOverrideParams(std::string params) {
+	boost::iostreams::array_source source(params.c_str(), std::strlen(params.c_str()));
+	boost::iostreams::stream<boost::iostreams::array_source> iss(source);
+	std::string s;
+
+	overrideParams.clear();
+	while (iss >> boost::io::quoted(s)) {
+		overrideParams += ba::trim_copy(s).c_str();
+	}
+}
+
 } // namespace SuperEpicFuntime
