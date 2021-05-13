@@ -14,33 +14,54 @@
 
 namespace SuperEpicFuntime::MediaPreparer {
 
-/** ================================================================================================
- * (Class) Library
+/**
+ * @brief Stores, scans, and probes files in a given directory
+ * @author Alec S.
  */
 class Library {
   private:
-	EventHandler *_eventHandler;
-	Settings *_settings;
-
-	boost::container::vector<File> _Library {};
-
-	boost::container::vector<File> _LibraryEncode {};
-
+	// Supported extensions
 	const boost::container::vector<std::string> _extensions {".wmv", ".avi", ".divx", ".mkv", ".mka", ".mks", ".webm", ".mp4", ".mpeg", ".mpg", ".mov", ".qt", ".flv"};
-
+	// EventHandler
+	EventHandler *_eventHandler;
+	// Settings
+	Settings *_settings;
+	// File list
+	boost::container::vector<File> _Library {};
+	// File to encode list
+	boost::container::vector<File> _LibraryEncode {};
+	// Duration of files
 	int _duration {-1};
+	// Duration of files to encode
+	int _durationEncode {-1};
 
   public:
+	// Override to interrupt scan
 	bool cancelScan {false};
 
+	/**
+	 * @brief Constructs library using settings
+	 * @param settings - Settings instance to use
+	 */
 	Library(Settings *settings) {
 		_settings = settings;
 	}
+
+	/**
+	 * @brief Constructs library using settings and an eventhandler
+	 * @param settings - Settings instance to use
+	 * @param eventHandler - EventHandler instance to use
+	 */
 	Library(Settings *settings, EventHandler *eventHandler) {
 		_settings	 = settings;
 		_eventHandler = eventHandler;
 	}
 
+	/**
+	 * @brief Scans the directory (provided by Settings) for media files
+	 * @footnote Ignores files nested in 'Converted' folder
+	 * @param scanRecursive - Whether to scan directory recursively (default: true)
+	 */
 	void scan(bool scanRecursive = true) {
 		_Library.clear();
 		if (boost::filesystem::exists(_settings->libraryDir)) {
@@ -67,9 +88,21 @@ class Library {
 			}
 		}
 	}
+
+#define LIBRARY_SECTION {
+
+	/**
+	 * @brief Returns the size of the library
+	 * @return Number of media files
+	 */
 	unsigned int size() {
 		return _Library.size();
 	}
+
+	/**
+	 * @brief Returns the duration of all files in the library
+	 * @return Duration of all media files
+	 */
 	int duration() {
 		if (_duration == -1) {
 			_duration = 0;
@@ -81,19 +114,39 @@ class Library {
 		}
 		return _duration;
 	}
+
+	/**
+	 * @brief Clears the library of all files
+	 */
 	void clear() {
 		_Library.clear();
 		clearEncode();
 	}
 
+	/**
+	 * @brief Returns all files in library
+	 * @return Vector of Files in library
+	 */
 	boost::container::vector<File> &getFiles() {
 		return _Library;
 	}
+
+	/**
+	 * @brief Returns the file at a specified index
+	 * @param filePosition - Index of file
+	 * @return File
+	 */
 	File &getFile(unsigned int filePosition) {
 		if (filePosition < _Library.size()) {
 			return _Library[filePosition];
 		}
 	}
+
+	/**
+	 * @brief Searches for the file index of a given File
+	 * @param fileObject - File to search for
+	 * @return Index of file or -1 if not found
+	 */
 	int findFile(File fileObject) {
 		for (unsigned int i {0}; i < size(); i++) {
 			if (getFile(i).path() == fileObject.path())
@@ -101,10 +154,21 @@ class Library {
 		}
 		return -1;
 	}
+
+	/**
+	 * @brief Searches for the file index of a given path
+	 * @param filePath - Path of file to search for
+	 * @return Index of file ot -1 if not found
+	 */
 	int findFile(std::string filePath) {
 		return findFile(File(filePath));
 	}
 
+	/**
+	 * @brief Add a file to the library
+	 * @param fileObject - File to add
+	 * @return Whether file was successfully added
+	 */
 	bool addFile(File fileObject) {
 		if (boost::filesystem::exists(fileObject.path().c_str())) {
 			_Library.push_back(fileObject);
@@ -112,13 +176,39 @@ class Library {
 		}
 		return false;
 	}
+
+	/**
+	 * @brief Add a file to the library using its path
+	 * @param filePath - Path of file to add
+	 * @return Whether file was successfully added
+	 */
 	bool addFile(std::string filePath) {
 		return addFile(File(filePath));
 	}
 
+	/**
+	 * @note UNIMPLEMENTED
+	 * @brief Remove a file from the library
+	 * @param fileObject - File to remove
+	 * @return Whether file was found and removed
+	 */
 	bool removeFile(File fileObject);
+
+	/**
+	 * @note UNIMPLEMENTED
+	 * @brief Remove a file from the library using its path
+	 * @param filePath - Path of file to remove
+	 * @return Whether file was found and removed
+	 */
 	bool removeFile(std::string filePath);
 
+#define END_LIBRARY_SECTION }
+
+	/**
+	 * @brief Checks whether a file needs to be encoded, given options specified in Settings and file info
+	 * @param fileObject - File to check
+	 * @return Whether file needs to be encoded
+	 */
 	bool checkEncode(File fileObject) {
 		if (fileObject.isLoaded()) {
 			bool matches[3] = {false, false, false};
@@ -152,6 +242,9 @@ class Library {
 		return false;
 	}
 
+	/**
+	 * @brief Checks which files (if any) need to be encoded, given options specified in Settings and file info
+	 */
 	void scanEncode() {
 		_LibraryEncode.clear();
 		for (unsigned int i {0}; i < size(); i++) {
@@ -180,39 +273,71 @@ class Library {
 				if (f.extension().compare("." + _settings->container) == 0) {
 					matches[2] = true;
 				}
-				if (((!matches[0] || !matches[1] || !matches[2]) && findFileEncode(f) == -1) || _settings->forceEncode == true) {
+				if (((!matches[0] || !matches[1] || !matches[2]) && findFileEncode(f) == -1) || _settings->forceEncode == true || _settings->override == true) {
 					_LibraryEncode.push_back(f);
 				}
 			}
 		}
 	}
 
+#define ENCODE_SECTION {
+
+	/**
+	 * @brief Returns the number of files that need to be encoded
+	 * @return Number of files to encode
+	 */
 	int sizeEncode() {
 		return _LibraryEncode.size();
 	}
+
+	/**
+	 * @brief Returns the duration of all files that need to be encoded
+	 * @return Duration of all files to encode
+	 */
 	int durationEncode() {
-		if (_duration == -1) {
-			_duration = 0;
+		if (_durationEncode == -1) {
+			_durationEncode = 0;
 			for (int i {0}; i < sizeEncode(); i++) {
 				if (getFileEncode(i).duration() > 0) {
-					_duration += getFileEncode(i).duration();
+					_durationEncode += getFileEncode(i).duration();
 				}
 			}
 		}
-		return _duration;
-	}
-	void clearEncode() {
-		_LibraryEncode.clear();
+		return _durationEncode;
 	}
 
+	/**
+	 * @brief Clears the list of files to encode
+	 */
+	void clearEncode() {
+		_LibraryEncode.clear();
+		_durationEncode = -1;
+	}
+
+	/**
+	 * @brief Returns all files that need to be encoded in library
+	 * @return Vector of Files to encode in library
+	 */
 	boost::container::vector<File> &getFilesEncode() {
 		return _LibraryEncode;
 	}
+
+	/**
+	 * @brief Returns the file at a specified index
+	 * @param filePosition - Index of file
+	 * @return File
+	 */
 	File &getFileEncode(unsigned int filePosition) {
 		if (filePosition < _LibraryEncode.size()) {
 			return _LibraryEncode[filePosition];
 		}
 	}
+
+	/**
+	 * @brief Searches for the file index of a given File
+	 * @param fileObject - File to search for
+	 * @return Index of file or -1 if not found
+	 */
 	int findFileEncode(File fileObject) {
 		for (int i {0}; i < sizeEncode(); i++) {
 			if (getFileEncode(i).path().compare(fileObject.path()) == 0)
@@ -220,10 +345,21 @@ class Library {
 		}
 		return -1;
 	}
+
+	/**
+	 * @brief Searches for the file index of a given File
+	 * @param fileObject - File to search for
+	 * @return Index of file or -1 if not found
+	 */
 	int findFileEncode(std::string filePath) {
 		return findFileEncode(File(filePath));
 	}
 
+	/**
+	 * @brief Force a file to be encoded
+	 * @param fileObject - File to encode
+	 * @return Whether file was found and marked
+	 */
 	bool forceEncode(File fileObject) {
 		int i = findFile(fileObject);
 		if (i >= 0 && findFileEncode(fileObject) < 0) {
@@ -232,10 +368,21 @@ class Library {
 		}
 		return false;
 	}
+
+	/**
+	 * @brief Force a file to be encoded using its path
+	 * @param filePath - Path of file to encode
+	 * @return Whether file was found and marked
+	 */
 	bool forceEncode(std::string filePath) {
 		return forceEncode(File(filePath));
 	}
 
+	/**
+	 * @brief Force a file to be skipped when encoding
+	 * @param fileObject - File to skip
+	 * @return Whether file was found and marked
+	 */
 	bool skipEncode(File fileObject) {
 		int i = findFileEncode(fileObject);
 		if (i >= 0) {
@@ -244,11 +391,23 @@ class Library {
 		}
 		return false;
 	}
+
+	/**
+	 * @brief Force a file to be skipped when encoding using its path
+	 * @param filePath - Path of file to skip
+	 * @return Whether file was found and marked
+	 */
 	bool skipEncode(std::string filePath) {
 		return skipEncode(File(filePath));
 	}
+
+#define END_ENCODE_SECTION }
+
 };
 
+/**
+ * @brief Static member for global handling
+ */
 static Library *library;
 
 } // namespace SuperEpicFuntime::MediaPreparer

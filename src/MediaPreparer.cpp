@@ -6,14 +6,12 @@ namespace bc = boost::container;
 namespace ba = boost::algorithm;
 using namespace rapidjson;
 using std::string;
-
-using namespace std; // For debugging (cout)
+using namespace std;
 
 namespace SuperEpicFuntime::MediaPreparer {
 
-/** ================================================================================================
- * (Class) MediaPreparer
- */
+#define INIT_SECTION {
+
 MediaPreparer::MediaPreparer(QWidget *parent) : QMainWindow(parent), ui(new Ui::MediaPreparer) {
 	ui->setupUi(this);
 
@@ -53,9 +51,6 @@ MediaPreparer::~MediaPreparer() {
 	eventHandler->newEvent(TERMINATED, 1);
 }
 
-/** ================================================================================================
- * (Section) Initilization
- */
 void MediaPreparer::init() {
 	this->setWindowTitle(productName.c_str());
 	if (!settings->preserveLog) {
@@ -69,11 +64,15 @@ void MediaPreparer::initGUI() {
 	loadSettings_config();
 	loadSettings_preset();
 
-	ui->list_Library->setColumnWidth(0, 155);
-	ui->list_Library->setColumnWidth(1, 70);
-	ui->list_Library->setColumnWidth(2, 70);
-	ui->list_Library->setColumnWidth(3, 70);
+	ui->list_Library->setColumnWidth(0, 200);
+	ui->list_Library->setColumnWidth(1, 55);
+	ui->list_Library->setColumnWidth(2, 55);
+	ui->list_Library->setColumnWidth(3, 65);
 	ui->list_Library->setColumnWidth(4, 70);
+
+	ui->container_settings_tabs->setTabVisible(3, false);
+	ui->container_settings_tabs->setTabVisible(4, false);
+	ui->container_settings_tabs->setTabVisible(5, false);
 
 	updateGUI_timers();
 }
@@ -97,13 +96,14 @@ void MediaPreparer::initSignals() {
 	connect(ui->setting_container, SIGNAL(currentIndexChanged(int)), this, SLOT(loadSettings_gui()), Qt::UniqueConnection);
 	connect(ui->setting_container, SIGNAL(currentIndexChanged(int)), this, SLOT(updateGUI_settings_container()), Qt::UniqueConnection);
 	connect(ui->setting_preset, SIGNAL(currentTextChanged(QString)), this, SLOT(loadSettings_preset(QString)), Qt::UniqueConnection);
+	connect(ui->setting_override, SIGNAL(stateChanged(int)), this, SLOT(overrideUI(int)), Qt::UniqueConnection);
 
 	connect(updateTimer, SIGNAL(timeout()), this, SLOT(updateGUI_timers()));
 }
 
-/** ================================================================================================
- * (Section) Load Settings
- */
+#define END_INIT_SECTION }
+#define SETTINGS_SECTION {
+
 void MediaPreparer::loadSettings_gui() {
 	settings->vCodec	  = ba::trim_copy(ui->setting_vCodec->currentText().toStdString());
 	settings->aCodec	  = ba::trim_copy(ui->setting_aCodec->currentText().toStdString());
@@ -115,9 +115,11 @@ void MediaPreparer::loadSettings_gui() {
 	settings->outputDir   = ba::trim_copy(ui->setting_dirOutput->text().toStdString());
 	settings->threads	 = ba::trim_copy(ui->setting_threads->text().toStdString());
 	settings->extraParams = ba::trim_copy(ui->setting_extraParams->text().toStdString());
+	settings->parseOverrideParams(ba::trim_copy(ui->setting_override_args->toPlainText().toStdString()));
 	settings->forceEncode = ui->setting_forceEncode->isChecked();
 	settings->fixMetadata = ui->setting_fixMetadata->isChecked();
 	settings->subfolders = ui->setting_subfolders->isChecked();
+	settings->override = ui->setting_override->isChecked();
 	settings->saveConfig();
 }
 
@@ -173,9 +175,6 @@ void MediaPreparer::loadSettings_presets() {
 	}
 }
 
-/** ================================================================================================
- * (Section) Save Settings
- */
 void MediaPreparer::saveSettings_config() {
 	loadSettings_gui();
 	settings->saveConfig();
@@ -194,10 +193,6 @@ void MediaPreparer::saveSettings_preset() {
 	loadSettings_preset(settings->presetPath.c_str());
 }
 
-/** ================================================================================================
- * (Section) Update GUI
- */
-
 void MediaPreparer::updateGUI_settings_container() {
 	bool enableSub {false};
 	for (unsigned int i {0}; i < settings->SUBTITLE_CONTAINERS.size(); i++) {
@@ -212,6 +207,9 @@ void MediaPreparer::updateGUI_settings_container() {
 	}
 }
 
+#define END_SETTINGS_SECTION }
+#define WORKER_SECTION {
+
 void MediaPreparer::updateGUI_timers() {
 	if (workerThread.isRunning() && workerType == ENCODE) {
 		if (workerTimeStamp.isValid()) {
@@ -223,9 +221,6 @@ void MediaPreparer::updateGUI_timers() {
 	}
 }
 
-/** ================================================================================================
- * (Section) Workers
- */
 void MediaPreparer::runWorker_scan() {
 	if (!workerThread.isRunning()) {
 		loadSettings_gui();
@@ -237,7 +232,6 @@ void MediaPreparer::runWorker_scan() {
 void MediaPreparer::runWorker_encode() {
 	if (!workerThread.isRunning()) {
 		loadSettings_gui();
-		ui->container_settings_tabs->setCurrentIndex(3);
 		worker		 = Worker(ENCODE);
 		workerThread = QtConcurrent::run(worker, &Worker::run);
 	} else {
@@ -248,17 +242,11 @@ void MediaPreparer::runWorker_encode() {
 void MediaPreparer::runWorker_cleanup() {
 }
 
-/** ================================================================================================
- * (Section) Event Listener
- */
 void MediaPreparer::eventListener(Event *e) {
 	blockSignals(true);
 	EventType eventType {e->getType()};
 	string eventMessage {e->getMessage()};
 	switch (eventType) {
-	/** ============================================================================================
-	 * (Event) WORKER_SCAN_STARTED
-	 */
 	case WORKER_SCAN_STARTED: {
 		updateTimer->start(100);
 		workerType = SCAN;
@@ -266,12 +254,15 @@ void MediaPreparer::eventListener(Event *e) {
 		cancelWorker = false;
 		ui->progress_primary->setValue(0);
 		lockUI(true);
+		if (ui->container_settings_tabs->currentIndex() >= 3) {
+			ui->container_settings_tabs->setCurrentIndex(0);
+		}
+		ui->container_settings_tabs->setTabVisible(3, false);
+		ui->container_settings_tabs->setTabVisible(4, false);
+		ui->container_settings_tabs->setTabVisible(5, false);
 		ui->list_Library->clearContents();
 		break;
 	}
-	/** ============================================================================================
-	 * (Event) WORKER_SCAN_FINISHED
-	 */
 	case WORKER_SCAN_FINISHED: {
 		updateTimer->stop();
 		if (!eventMessage.empty()) {
@@ -283,9 +274,6 @@ void MediaPreparer::eventListener(Event *e) {
 		ui->button_encode->setEnabled((library->sizeEncode() > 0));
 		break;
 	}
-	/** ============================================================================================
-	 * (Event) WORKER_SCAN_ERRORED
-	 */
 	case WORKER_SCAN_ERRORED: {
 		updateTimer->stop();
 		if (!eventMessage.empty()) {
@@ -297,9 +285,6 @@ void MediaPreparer::eventListener(Event *e) {
 		ui->button_encode->setEnabled(false);
 		break;
 	}
-	/** ================================================================================================
-	 * (Event) WORKER_SCAN_ITEM_STARTED
-	 */
 	case WORKER_SCAN_ITEM_STARTED: {
 		if (e->dataIsType<int>(0)) {
 			int eventData {e->getData<int>(0)};
@@ -312,9 +297,6 @@ void MediaPreparer::eventListener(Event *e) {
 		}
 		break;
 	}
-	/** ================================================================================================
-	 * (Event) WORKER_SCAN_ITEM_FINISHED
-	 */
 	case WORKER_SCAN_ITEM_FINISHED: {
 		if (e->dataIsType<int>(0)) {
 			int eventData {e->getData<int>(0)};
@@ -329,9 +311,6 @@ void MediaPreparer::eventListener(Event *e) {
 		}
 		break;
 	}
-	/** ============================================================================================
-	 * (Event) WORKER_ENCODE_STARTED
-	 */
 	case WORKER_ENCODE_STARTED: {
 		updateTimer->start(100);
 		workerType = ENCODE;
@@ -348,6 +327,10 @@ void MediaPreparer::eventListener(Event *e) {
 		ui->value_encode_aQuality->setText(settings->aQuality.c_str());
 		ui->value_encode_container->setText(settings->container.c_str());
 		ui->value_encode_subtitles->setText(settings->subtitles.c_str());
+		ui->container_settings_tabs->setTabVisible(3, true);
+		ui->container_settings_tabs->setTabVisible(4, true);
+		ui->container_settings_tabs->setTabVisible(5, true);
+		ui->container_settings_tabs->setCurrentIndex(3);
 		for (int i {0}; i < library->sizeEncode(); i++) {
 			File &f {library->getFileEncode(i)};
 			ui->list_encode_Library->setRowCount(i + 1);
@@ -359,9 +342,6 @@ void MediaPreparer::eventListener(Event *e) {
 		}
 		break;
 	}
-	/** ============================================================================================
-	 * (Event) WORKER_ENCODE_FINISHED
-	 */
 	case WORKER_ENCODE_FINISHED: {
 		updateTimer->stop();
 		if (!eventMessage.empty()) {
@@ -373,9 +353,6 @@ void MediaPreparer::eventListener(Event *e) {
 		ui->progress_primary->setValue(library->sizeEncode());
 		break;
 	}
-	/** ============================================================================================
-	 * (Event) WORKER_ENCODE_ERRORED
-	 */
 	case WORKER_ENCODE_ERRORED: {
 		updateTimer->stop();
 		if (!eventMessage.empty()) {
@@ -387,9 +364,6 @@ void MediaPreparer::eventListener(Event *e) {
 		ui->progress_primary->setValue(0);
 		break;
 	}
-	/** ============================================================================================
-	 * (Event) WORKER_ENCODE_ITEM_STARTED
-	 */
 	case WORKER_ENCODE_ITEM_STARTED: {
 		if (e->dataIsType<int>(0)) {
 			int eventData {e->getData<int>(0)};
@@ -414,9 +388,6 @@ void MediaPreparer::eventListener(Event *e) {
 		}
 		break;
 	}
-	/** ============================================================================================
-	 * (Event) WORKER_ENCODE_ITEM_FINISHED
-	 */
 	case WORKER_ENCODE_ITEM_FINISHED: {
 		if (e->dataIsType<int>(0)) {
 			int eventData {e->getData<int>(0)};
@@ -438,9 +409,6 @@ void MediaPreparer::eventListener(Event *e) {
 		}
 		break;
 	}
-	/** ============================================================================================
-	 * (Event) PROGRESS_PRIMARY_UPDATED
-	 */
 	case PROGRESS_PRIMARY_UPDATED: {
 		if (e->dataIsType<int>(0)) {
 			int eventData {e->getData<int>(0)};
@@ -451,9 +419,6 @@ void MediaPreparer::eventListener(Event *e) {
 		}
 		break;
 	}
-	/** ============================================================================================
-	 * (Event) PROGRESS_PRIMARY_MAXIMUM
-	 */
 	case PROGRESS_PRIMARY_MAXIMUM: {
 			if (e->dataIsType<int>(0)) {
 				int eventData {e->getData<int>(0)};
@@ -461,9 +426,6 @@ void MediaPreparer::eventListener(Event *e) {
 			}
 			break;
 	}
-	/** ============================================================================================
-	 * (Event) PROGRESS_SECONDARY_UPDATED
-	 */
 	case PROGRESS_SECONDARY_UPDATED: {
 		if (e->dataIsType<int>(0)) {
 			int eventData {e->getData<int>(0)};
@@ -474,9 +436,6 @@ void MediaPreparer::eventListener(Event *e) {
 		}
 		break;
 	}
-	/** ============================================================================================
-	 * (Event) PROGRESS_SECONDARY_MAXIMUM
-	 */
 	case PROGRESS_SECONDARY_MAXIMUM: {
 
 		break;
@@ -502,9 +461,9 @@ void MediaPreparer::eventListener(Event *e) {
 	blockSignals(false);
 }
 
-/** ================================================================================================
- * (Section) Dialogs
- */
+#define END_WORKER_SECTION }
+#define DIALOG_SECTION {
+
 void MediaPreparer::dialogBrowse(int type) {
 	QFileDialog dialog(this);
 	dialog.setFileMode(QFileDialog::Directory);
@@ -549,9 +508,9 @@ bool MediaPreparer::dialogCancel() {
 	return true;
 }
 
-/** ================================================================================================
- * (Section) Utilities
- */
+#define END_DIALOG_SECTION }
+#define UTIL_SECTION {
+
 bool MediaPreparer::cancel(bool force) {
 	if (!force && !dialogCancel()) {
 		return false;
@@ -591,28 +550,47 @@ bool MediaPreparer::cancel(bool force) {
 }
 
 void MediaPreparer::lockUI(bool b) {
+	if (!ui->setting_override->isChecked()) {
+		ui->setting_vCodec->setEnabled(!b);
+		ui->setting_vQuality->setEnabled(!b);
+		ui->setting_aCodec->setEnabled(!b);
+		ui->setting_aQuality->setEnabled(!b);
+		ui->setting_subtitles->setEnabled(!b);
+		ui->setting_threads->setEnabled(!b);
+		ui->setting_extraParams->setEnabled(!b);
+		ui->setting_preset->setEnabled(!b);
+		ui->setting_forceEncode->setEnabled(!b);
+		ui->setting_fixMetadata->setEnabled(!b);
+	} else {
+		ui->setting_override_args->setEnabled(!b);
+	}
 	ui->setting_directory->setEnabled(!b);
 	ui->button_browse_directory->setEnabled(!b);
 	ui->button_scan_directory->setEnabled(!b);
 	ui->setting_dirOutput->setEnabled(!b);
 	ui->button_browse_dirOutput->setEnabled(!b);
+	ui->setting_container->setEnabled(!b);
+	ui->setting_subdirectories->setEnabled(!b);
+	ui->setting_subfolders->setEnabled(!b);
+	ui->setting_override->setEnabled(!b);
+	if (b) {
+		ui->button_encode->setText("Cancel");
+		ui->button_encode->setEnabled(true);
+	}
+}
+
+void MediaPreparer::overrideUI(int b) {
 	ui->setting_vCodec->setEnabled(!b);
 	ui->setting_vQuality->setEnabled(!b);
 	ui->setting_aCodec->setEnabled(!b);
 	ui->setting_aQuality->setEnabled(!b);
-	ui->setting_container->setEnabled(!b);
 	ui->setting_subtitles->setEnabled(!b);
-	ui->setting_subdirectories->setEnabled(!b);
 	ui->setting_threads->setEnabled(!b);
 	ui->setting_extraParams->setEnabled(!b);
 	ui->setting_preset->setEnabled(!b);
 	ui->setting_forceEncode->setEnabled(!b);
 	ui->setting_fixMetadata->setEnabled(!b);
-	ui->setting_subfolders->setEnabled(!b);
-	if (b) {
-		ui->button_encode->setText("Cancel");
-		ui->button_encode->setEnabled(true);
-	}
+	ui->setting_override_args->setEnabled(b);
 }
 
 void MediaPreparer::blockSignals(bool b) {
@@ -626,5 +604,7 @@ void MediaPreparer::closeEvent(QCloseEvent *e) {
 		e->ignore();
 	}
 }
+
+#define END_UTIL_SECTION }
 
 } // namespace SuperEpicFuntime

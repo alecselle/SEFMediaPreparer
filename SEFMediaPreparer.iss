@@ -54,7 +54,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "bin\*"; DestDir: "{app}\bin"; Flags: ignoreversion recursesubdirs createallsubdirs replacesameversion; Components: Core; Excludes: "ffmpeg.exe,ffprobe.exe"
-Source: "bin\ff*.exe"; DestDir: "{app}\bin"; Components: ffmpeg
+Source: "lib\ff*.exe"; DestDir: "{app}\bin"; Components: ffmpeg
 
 [Icons]
 Name: "{group}\{#ApplicationName}"; Filename: "{app}\bin\{#ApplicationExe}"
