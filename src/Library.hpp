@@ -132,7 +132,7 @@ class Library {
 	 * @return Whether file was found and removed
 	 */
 	bool removeFile(std::string filePath);
-
+	
 	/**
 	 * @brief Checks whether a file needs to be encoded, given options specified in Settings and file info
 	 * @param fileObject - File to check
