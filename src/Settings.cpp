@@ -35,8 +35,6 @@ void Settings::init() {
 	loadPreset();
 }
 
-#define LOAD_SECTION {
-
 std::string Settings::parsePath(std::string path) {
 	std::string t {path};
 	ba::ireplace_all(path, "%APPDATA%", APPDATA.c_str());
@@ -222,6 +220,16 @@ void Settings::loadPresetFile(std::string path) {
 		} else {
 			extraParams = DEFAULT_EXTRA_PARAMS;
 		}
+		if (d.HasMember("override") && d["override"].IsBool()) {
+			override = d["override"].GetBool();
+		} else {
+			override = false;
+		}
+		if (d.HasMember("overrideParams") && d["overrideParams"].IsString()) {
+			parseOverrideParams(d["overrideParams"].GetString());
+		} else {
+			overrideParams.clear();
+		}
 		fclose(fp);
 		presetPath = parsePresetPath(path);
 		presetName = parsePresetName(path);
@@ -248,9 +256,6 @@ void Settings::refreshPresets() {
 		}
 	}
 }
-
-#define END_LOAD_SECTION }
-#define SAVE_SECTION {
 
 void Settings::saveConfig() {
 	std::string json {"{}"};
@@ -339,6 +344,14 @@ void Settings::savePresetAs(std::string name) {
 	d.AddMember(rapidjson::StringRef("subtitles"), rapidjson::Value(rapidjson::StringRef(subtitles.c_str())), alloc);
 	d.AddMember(rapidjson::StringRef("threads"), rapidjson::Value(rapidjson::StringRef(threads.c_str())), alloc);
 	d.AddMember(rapidjson::StringRef("extraParams"), rapidjson::Value(rapidjson::StringRef(extraParams.c_str())), alloc);
+	if (override) {
+		d.AddMember(rapidjson::StringRef("override"), rapidjson::Value(override), alloc);
+		std::string overrideParamsString {""};
+		for (int i = 0; i < overrideParams.size(); ++i) {
+			overrideParamsString += overrideParams.at(i).toStdString() + " ";
+		}
+		d.AddMember(rapidjson::StringRef("overrideParams"), rapidjson::Value(rapidjson::StringRef(overrideParamsString.c_str())), alloc);
+	}
 
 	FILE *fp {fopen(parsePresetPath(name).c_str(), "wb")};
 	char writeBuffer[65536];
@@ -367,8 +380,6 @@ void Settings::createDefaultPreset() {
 	extraParams = DEFAULT_EXTRA_PARAMS;
 	savePresetAs(DEFAULT_PRESET);
 }
-
-#define END_SAVE_SECTION }
 
 void Settings::parseOverrideParams(std::string params) {
 	boost::iostreams::array_source source(params.c_str(), std::strlen(params.c_str()));
