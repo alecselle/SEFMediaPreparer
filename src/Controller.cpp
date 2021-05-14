@@ -1,8 +1,5 @@
 #include <Controller.hpp>
 
-using std::string;
-using namespace std;
-
 namespace SuperEpicFuntime::MediaPreparer {
 
 Controller::Controller() {
@@ -20,7 +17,7 @@ void Controller::show() {
 
 void Controller::eventListener(Event *e) {
 	EventType eventType = e->getType();
-	string eventMessage = e->getMessage();
+	std::string eventMessage = e->getMessage();
 	switch (eventType) {
 	case INITIALIZED:
 		log(e, true);
@@ -107,10 +104,7 @@ void Controller::eventListener(Event *e) {
 		break;
 	}
 	case CUSTOM: {
-		QStringList t = e->getData<QStringList>();
-		for (int i {0}; i < t.size(); i++) {
-			log (t[i], false);
-		}
+		log(e, false);
 		break;
 	}
 	default: {
@@ -128,9 +122,9 @@ void Controller::log(QString message, bool toFile) {
 
 	std::string logStr = "[" + QTime::currentTime().toString("hh:mm:ss.zzz").toStdString() + "] " + message.toStdString();
 
-	std::cout << logStr << endl;
+	std::cout << logStr << std::endl;
 	if (toFile) {
-		fs << logStr << endl;
+		fs << logStr << std::endl;
 		fs.close();
 	}
 }
@@ -167,11 +161,11 @@ void Controller::log(Event *e, std::string optMessage, bool toFile) {
 	}
 	logStr += ")";
 
-	std::cout << logStr << endl;
+	std::cout << logStr << std::endl;
 	if (toFile) {
-		fs << logStr << endl;
+		fs << logStr << std::endl;
 		fs.close();
 	}
 }
 
-} // namespace SuperEpicFuntime
+} // namespace SuperEpicFuntime::MediaPreparer

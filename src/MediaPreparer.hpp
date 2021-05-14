@@ -39,17 +39,6 @@ class MediaPreparer : public QMainWindow {
 	// Main ui object
 	Ui::MediaPreparer *ui;
 
-	// Not sure what this does
-	QMenu *fileMenu;
-	// Not sure what this does
-	QMenu *editMenu;
-	// Not sure what this does
-	QMenu *helpMenu;
-	// Not sure if needed
-	QWidget *containerEncode;
-	// Not sure if needed
-	QWidget *containerEncodeList;
-
 	// Qt signal handler
 	QSignalMapper *signalMapper = new QSignalMapper(this);
 	// Timer to handle data refreshing
@@ -228,5 +217,5 @@ class MediaPreparer : public QMainWindow {
 	void blockSignals(bool b);
 };
 
-} // namespace SuperEpicFuntime
+} // namespace SuperEpicFuntime::MediaPreparer
 #endif // MEDIAPREPARER_HPP

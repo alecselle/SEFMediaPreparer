@@ -1,3 +1,3 @@
 #include <Global.hpp>
 
-namespace SuperEpicFuntime::MediaPreparer {} // namespace SuperEpicFuntime
+namespace SuperEpicFuntime::MediaPreparer {} // namespace SuperEpicFuntime::MediaPreparer

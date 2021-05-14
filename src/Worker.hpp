@@ -26,8 +26,6 @@ class Worker {
   private:
 	WorkerType type {NONE};
 
-#define SCAN_SECTION {
-
 	void worker_scan() {
 		eventHandler->newEvent(WORKER_SCAN_STARTED, "Scanning Library: " + settings->libraryDir);
 		eventHandler->newEvent(PROGRESS_PRIMARY_MAXIMUM, 0);
@@ -66,9 +64,6 @@ class Worker {
 		eventHandler->newEvent(WORKER_SCAN_ITEM_FINISHED, i);
 		eventHandler->newEvent(PROGRESS_PRIMARY_UPDATED, i);
 	}
-
-#define END_SCAN_SECTION }
-#define ENCODE_SECTION {
 
 	void worker_encode() {
 		eventHandler->newEvent(WORKER_ENCODE_STARTED, "Encoding Library: " + settings->libraryDir);
@@ -134,7 +129,6 @@ class Worker {
 				   "-strict",
 				   "-2",
 				   (settings->tempDir + "\\" + f.name() + "." + settings->container).c_str()};
-		eventHandler->newEvent(CUSTOM, params);
 		QProcess process {};
 		process.setStandardErrorFile((settings->tempDir + "\\" + f.name() + ".txt").c_str());
 		process.start("ffmpeg", params);
@@ -152,8 +146,6 @@ class Worker {
 		eventHandler->newEvent(WORKER_ENCODE_ITEM_FINISHED, i);
 		eventHandler->newEvent(PROGRESS_PRIMARY_UPDATED, i);
 	}
-
-#define END_ENCODE_SECTION }
 
   public:
 	Worker(WorkerType workerType) {
@@ -176,9 +168,10 @@ class Worker {
 		}
 	}
 
-	WorkerType getType() {
+	WorkerType getType(){
 		return type;
 	}
+
 };
-} // namespace SuperEpicFuntime
+} // namespace SuperEpicFuntime::MediaPreparer
 #endif // WORKER_HPP

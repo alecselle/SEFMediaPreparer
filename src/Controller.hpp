@@ -60,5 +60,5 @@ class Controller : public QObject {
 	void log(Event *event, std::string optMessage, bool toFile = true);
 };
 
-} // namespace SuperEpicFuntime
+} // namespace SuperEpicFuntime::MediaPreparer
 #endif // CONTROLLER_HPP

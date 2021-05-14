@@ -34,7 +34,6 @@ class Settings {
 	// Preset extension
 	const std::string PRESET_EXTENSION {".preset"};
 
-#define DEFAULT_SECTION {
 	// Default preset path
 	const std::string DEFAULT_PRESET {PRESET_DIR + "\\SEF Standard" + PRESET_EXTENSION};
 	// Default processing path
@@ -96,7 +95,6 @@ class Settings {
 	// Default extra parameters
 	const std::string DEFAULT_EXTRA_PARAMS {"-x265-params pools=3"};
 
-#define END_DEFAULT_SECTION }
 	// EventHandler
 	EventHandler *_eventHandler {};
 
@@ -185,5 +183,5 @@ class Settings {
 
 static Settings *settings;
 
-} // namespace SuperEpicFuntime
+} // namespace SuperEpicFuntime::MediaPreparer
 #endif // SETTINGS_HPP
