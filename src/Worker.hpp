@@ -176,9 +176,10 @@ class Worker {
 		}
 	}
 
-	WorkerType getType() {
+	WorkerType getType(){
 		return type;
 	}
+
 };
-} // namespace SuperEpicFuntime
+} // namespace SuperEpicFuntime::MediaPreparer
 #endif // WORKER_HPP

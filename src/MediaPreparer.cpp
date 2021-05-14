@@ -4,13 +4,8 @@
 namespace bf = boost::filesystem;
 namespace bc = boost::container;
 namespace ba = boost::algorithm;
-using namespace rapidjson;
-using std::string;
-using namespace std;
 
 namespace SuperEpicFuntime::MediaPreparer {
-
-#define INIT_SECTION {
 
 MediaPreparer::MediaPreparer(QWidget *parent) : QMainWindow(parent), ui(new Ui::MediaPreparer) {
 	ui->setupUi(this);
@@ -100,9 +95,6 @@ void MediaPreparer::initSignals() {
 
 	connect(updateTimer, SIGNAL(timeout()), this, SLOT(updateGUI_timers()));
 }
-
-#define END_INIT_SECTION }
-#define SETTINGS_SECTION {
 
 void MediaPreparer::loadSettings_gui() {
 	settings->vCodec	  = ba::trim_copy(ui->setting_vCodec->currentText().toStdString());
@@ -245,7 +237,7 @@ void MediaPreparer::runWorker_cleanup() {
 void MediaPreparer::eventListener(Event *e) {
 	blockSignals(true);
 	EventType eventType {e->getType()};
-	string eventMessage {e->getMessage()};
+	std::string eventMessage {e->getMessage()};
 	switch (eventType) {
 	case WORKER_SCAN_STARTED: {
 		updateTimer->start(100);
@@ -254,13 +246,16 @@ void MediaPreparer::eventListener(Event *e) {
 		cancelWorker = false;
 		ui->progress_primary->setValue(0);
 		lockUI(true);
+		blockSignals(false);
 		if (ui->container_settings_tabs->currentIndex() >= 3) {
 			ui->container_settings_tabs->setCurrentIndex(0);
+			ui->container_settings_tabs->setCurrentWidget(ui->container_settings_basic);
 		}
 		ui->container_settings_tabs->setTabVisible(3, false);
 		ui->container_settings_tabs->setTabVisible(4, false);
 		ui->container_settings_tabs->setTabVisible(5, false);
 		ui->list_Library->clearContents();
+		blockSignals(true);
 		break;
 	}
 	case WORKER_SCAN_FINISHED: {
@@ -270,7 +265,7 @@ void MediaPreparer::eventListener(Event *e) {
 		}
 		lockUI(false);
 		ui->progress_primary->setValue(library->size());
-		ui->button_encode->setText(("Encode [" + to_string(library->sizeEncode()) + "]").c_str());
+		ui->button_encode->setText(("Encode [" + std::to_string(library->sizeEncode()) + "]").c_str());
 		ui->button_encode->setEnabled((library->sizeEncode() > 0));
 		break;
 	}
@@ -327,10 +322,13 @@ void MediaPreparer::eventListener(Event *e) {
 		ui->value_encode_aQuality->setText(settings->aQuality.c_str());
 		ui->value_encode_container->setText(settings->container.c_str());
 		ui->value_encode_subtitles->setText(settings->subtitles.c_str());
+		blockSignals(false);
 		ui->container_settings_tabs->setTabVisible(3, true);
 		ui->container_settings_tabs->setTabVisible(4, true);
 		ui->container_settings_tabs->setTabVisible(5, true);
 		ui->container_settings_tabs->setCurrentIndex(3);
+		ui->container_settings_tabs->setCurrentWidget(ui->container_encode);
+		blockSignals(true);
 		for (int i {0}; i < library->sizeEncode(); i++) {
 			File &f {library->getFileEncode(i)};
 			ui->list_encode_Library->setRowCount(i + 1);
@@ -348,7 +346,7 @@ void MediaPreparer::eventListener(Event *e) {
 			ui->progress_primary->setFormat(eventMessage.c_str());
 		}
 		lockUI(false);
-		ui->button_encode->setText(("Encode [" + to_string(library->sizeEncode()) + "]").c_str());
+		ui->button_encode->setText(("Encode [" + std::to_string(library->sizeEncode()) + "]").c_str());
 		ui->button_encode->setEnabled((library->sizeEncode() > 0));
 		ui->progress_primary->setValue(library->sizeEncode());
 		break;
@@ -359,7 +357,7 @@ void MediaPreparer::eventListener(Event *e) {
 			ui->progress_primary->setFormat(eventMessage.c_str());
 		}
 		lockUI(false);
-		ui->button_encode->setText(("Encode [" + to_string(library->sizeEncode()) + "]").c_str());
+		ui->button_encode->setText(("Encode [" + std::to_string(library->sizeEncode()) + "]").c_str());
 		ui->button_encode->setEnabled((library->sizeEncode() > 0));
 		ui->progress_primary->setValue(0);
 		break;
@@ -384,7 +382,7 @@ void MediaPreparer::eventListener(Event *e) {
 			ui->progress_secondary->setMaximum(0);
 			ui->progress_secondary->setValue(0);
 			ui->progress_secondary->repaint();
-			ui->value_encode_count->setText((to_string(eventData + 1) + " / " + to_string(library->sizeEncode())).c_str());
+			ui->value_encode_count->setText((std::to_string(eventData + 1) + " / " + std::to_string(library->sizeEncode())).c_str());
 		}
 		break;
 	}
@@ -461,9 +459,6 @@ void MediaPreparer::eventListener(Event *e) {
 	blockSignals(false);
 }
 
-#define END_WORKER_SECTION }
-#define DIALOG_SECTION {
-
 void MediaPreparer::dialogBrowse(int type) {
 	QFileDialog dialog(this);
 	dialog.setFileMode(QFileDialog::Directory);
@@ -507,9 +502,6 @@ bool MediaPreparer::dialogCancel() {
 	}
 	return true;
 }
-
-#define END_DIALOG_SECTION }
-#define UTIL_SECTION {
 
 bool MediaPreparer::cancel(bool force) {
 	if (!force && !dialogCancel()) {
@@ -605,6 +597,4 @@ void MediaPreparer::closeEvent(QCloseEvent *e) {
 	}
 }
 
-#define END_UTIL_SECTION }
-
-} // namespace SuperEpicFuntime
+} // namespace SuperEpicFuntime::MediaPreparer

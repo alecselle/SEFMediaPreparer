@@ -5,7 +5,7 @@
 #define str(s) #s
 
 #define PUBLISHER_NAME "SuperEpicFuntime"
-#define PUBLISHER_COPYRIGHT "2018"
+#define PUBLISHER_COPYRIGHT "2021"
 
 #define PRODUCT_VERSION xstr(VER_MAJ) "." xstr(VER_MIN) "." xstr(VER_PAT)
 #define PRODUCT_NAME "SEFMediaPreparer " PRODUCT_VERSION

@@ -3,14 +3,9 @@
 namespace bf = boost::filesystem;
 namespace bc = boost::container;
 namespace ba = boost::algorithm;
-using namespace rapidjson;
-using std::string;
 
 namespace SuperEpicFuntime::MediaPreparer {
 
-/** ================================================================================================
- * (Class) Settings
- */
 Settings::Settings() {
 	init();
 }
@@ -42,16 +37,16 @@ void Settings::init() {
 
 #define LOAD_SECTION {
 
-string Settings::parsePath(string path) {
-	string t {path};
+std::string Settings::parsePath(std::string path) {
+	std::string t {path};
 	ba::ireplace_all(path, "%APPDATA%", APPDATA.c_str());
 	ba::ireplace_all(path, "%USERPROFILE%", USERPROFILE.c_str());
 	return t;
 }
 
-string Settings::parsePresetPath(string path) {
-	string p {parsePath(path)};
-	string t {""};
+std::string Settings::parsePresetPath(std::string path) {
+	std::string p {parsePath(path)};
+	std::string t {""};
 	if (p.find(":/") == p.npos && p.find(":\\") == p.npos) {
 		t += PRESET_DIR + "\\";
 	}
@@ -62,9 +57,9 @@ string Settings::parsePresetPath(string path) {
 	return t;
 }
 
-string Settings::parsePresetName(string name) {
+std::string Settings::parsePresetName(std::string name) {
 	bf::path p {parsePresetPath(name)};
-	string t {p.filename().replace_extension().string()};
+	std::string t {p.filename().replace_extension().string()};
 	return t;
 }
 
@@ -72,8 +67,8 @@ void Settings::loadConfig() {
 	bool save {false};
 	FILE *fp {fopen(parsePath(CONFIG_FILE).c_str(), "rb")};
 	char readBuffer[65536];
-	FileReadStream is(fp, readBuffer, sizeof(readBuffer));
-	Document d;
+	rapidjson::FileReadStream is(fp, readBuffer, sizeof(readBuffer));
+	rapidjson::Document d;
 	d.ParseStream(is);
 
 	if (d.HasMember("preset") && d["preset"].IsString()) {
@@ -183,8 +178,8 @@ void Settings::loadPresetFile(std::string path) {
 
 		FILE *fp {fopen(p.string().c_str(), "rb")};
 		char readBuffer[65536];
-		FileReadStream is(fp, readBuffer, sizeof(readBuffer));
-		Document d;
+		rapidjson::FileReadStream is(fp, readBuffer, sizeof(readBuffer));
+		rapidjson::Document d;
 		d.ParseStream(is);
 
 		if (d.HasMember("vCodec") && d["vCodec"].IsString()) {
@@ -258,52 +253,52 @@ void Settings::refreshPresets() {
 #define SAVE_SECTION {
 
 void Settings::saveConfig() {
-	string json {"{}"};
-	StringStream s(json.c_str());
+	std::string json {"{}"};
+	rapidjson::StringStream s(json.c_str());
 
-	Document d;
-	Document::AllocatorType &alloc {d.GetAllocator()};
+	rapidjson::Document d;
+	rapidjson::Document::AllocatorType &alloc {d.GetAllocator()};
 	d.ParseStream(s);
 
-	d.AddMember(StringRef("preset"), Value(StringRef(presetPath.c_str())), alloc);
-	d.AddMember(StringRef("libraryDir"), Value(StringRef(libraryDir.c_str())), alloc);
-	d.AddMember(StringRef("tempDir"), Value(StringRef(tempDir.c_str())), alloc);
-	d.AddMember(StringRef("outputDir"), Value(StringRef(outputDir.c_str())), alloc);
-	d.AddMember(StringRef("preserveLog"), Value(preserveLog), alloc);
-	d.AddMember(StringRef("forceEncode"), Value(forceEncode), alloc);
-	d.AddMember(StringRef("fixMetadata"), Value(fixMetadata), alloc);
-	d.AddMember(StringRef("subfolders"), Value(subfolders), alloc);
-	d.AddMember(StringRef("vCodecs"), Value(), alloc);
+	d.AddMember(rapidjson::StringRef("preset"), rapidjson::Value(rapidjson::StringRef(presetPath.c_str())), alloc);
+	d.AddMember(rapidjson::StringRef("libraryDir"), rapidjson::Value(rapidjson::StringRef(libraryDir.c_str())), alloc);
+	d.AddMember(rapidjson::StringRef("tempDir"), rapidjson::Value(rapidjson::StringRef(tempDir.c_str())), alloc);
+	d.AddMember(rapidjson::StringRef("outputDir"), rapidjson::Value(rapidjson::StringRef(outputDir.c_str())), alloc);
+	d.AddMember(rapidjson::StringRef("preserveLog"), rapidjson::Value(preserveLog), alloc);
+	d.AddMember(rapidjson::StringRef("forceEncode"), rapidjson::Value(forceEncode), alloc);
+	d.AddMember(rapidjson::StringRef("fixMetadata"), rapidjson::Value(fixMetadata), alloc);
+	d.AddMember(rapidjson::StringRef("subfolders"), rapidjson::Value(subfolders), alloc);
+	d.AddMember(rapidjson::StringRef("vCodecs"), rapidjson::Value(), alloc);
 	d["vCodecs"].SetArray();
-	d.AddMember(StringRef("aCodecs"), Value(), alloc);
+	d.AddMember(rapidjson::StringRef("aCodecs"), rapidjson::Value(), alloc);
 	d["aCodecs"].SetArray();
-	d.AddMember(StringRef("containers"), Value(), alloc);
+	d.AddMember(rapidjson::StringRef("containers"), rapidjson::Value(), alloc);
 	d["containers"].SetArray();
 
 	for (int i {0}; i < (int)vCodecList.size(); i++) {
-		Value a(kArrayType);
+		rapidjson::Value a(rapidjson::kArrayType);
 		for (int j = 0; j < (int)vCodecList[i].size(); j++) {
-			a.PushBack(Value().SetString(StringRef(vCodecList[i][j].c_str())), alloc);
+			a.PushBack(rapidjson::Value().SetString(rapidjson::StringRef(vCodecList[i][j].c_str())), alloc);
 		}
 		d["vCodecs"].PushBack(a, alloc);
 	}
 
 	for (int i {0}; i < (int)aCodecList.size(); i++) {
-		Value a(kArrayType);
+		rapidjson::Value a(rapidjson::kArrayType);
 		for (int j = 0; j < (int)aCodecList[i].size(); j++) {
-			a.PushBack(Value().SetString(StringRef(aCodecList[i][j].c_str())), alloc);
+			a.PushBack(rapidjson::Value().SetString(rapidjson::StringRef(aCodecList[i][j].c_str())), alloc);
 		}
 		d["aCodecs"].PushBack(a, alloc);
 	}
 
 	for (int i {0}; i < (int)containerList.size(); i++) {
-		d["containers"].PushBack(Value().SetString(StringRef(containerList[i].c_str())), alloc);
+		d["containers"].PushBack(rapidjson::Value().SetString(rapidjson::StringRef(containerList[i].c_str())), alloc);
 	}
 
 	FILE *fp {fopen(parsePath(CONFIG_FILE).c_str(), "wb")};
 	char writeBuffer[65536];
-	FileWriteStream os(fp, writeBuffer, sizeof(writeBuffer));
-	PrettyWriter<FileWriteStream> writer(os);
+	rapidjson::FileWriteStream os(fp, writeBuffer, sizeof(writeBuffer));
+	rapidjson::PrettyWriter<rapidjson::FileWriteStream> writer(os);
 	d.Accept(writer);
 	fclose(fp);
 	if (_eventHandler != NULL) {
@@ -329,26 +324,26 @@ void Settings::savePreset() {
 }
 
 void Settings::savePresetAs(std::string name) {
-	string json {"{}"};
-	StringStream s(json.c_str());
+	std::string json {"{}"};
+	rapidjson::StringStream s(json.c_str());
 
-	Document d;
-	Document::AllocatorType &alloc {d.GetAllocator()};
+	rapidjson::Document d;
+	rapidjson::Document::AllocatorType &alloc {d.GetAllocator()};
 	d.ParseStream(s);
 
-	d.AddMember(StringRef("vCodec"), Value(StringRef(vCodec.c_str())), alloc);
-	d.AddMember(StringRef("vQuality"), Value(StringRef(vQuality.c_str())), alloc);
-	d.AddMember(StringRef("aCodec"), Value(StringRef(aCodec.c_str())), alloc);
-	d.AddMember(StringRef("aQuality"), Value(StringRef(aQuality.c_str())), alloc);
-	d.AddMember(StringRef("container"), Value(StringRef(container.c_str())), alloc);
-	d.AddMember(StringRef("subtitles"), Value(StringRef(subtitles.c_str())), alloc);
-	d.AddMember(StringRef("threads"), Value(StringRef(threads.c_str())), alloc);
-	d.AddMember(StringRef("extraParams"), Value(StringRef(extraParams.c_str())), alloc);
+	d.AddMember(rapidjson::StringRef("vCodec"), rapidjson::Value(rapidjson::StringRef(vCodec.c_str())), alloc);
+	d.AddMember(rapidjson::StringRef("vQuality"), rapidjson::Value(rapidjson::StringRef(vQuality.c_str())), alloc);
+	d.AddMember(rapidjson::StringRef("aCodec"), rapidjson::Value(rapidjson::StringRef(aCodec.c_str())), alloc);
+	d.AddMember(rapidjson::StringRef("aQuality"), rapidjson::Value(rapidjson::StringRef(aQuality.c_str())), alloc);
+	d.AddMember(rapidjson::StringRef("container"), rapidjson::Value(rapidjson::StringRef(container.c_str())), alloc);
+	d.AddMember(rapidjson::StringRef("subtitles"), rapidjson::Value(rapidjson::StringRef(subtitles.c_str())), alloc);
+	d.AddMember(rapidjson::StringRef("threads"), rapidjson::Value(rapidjson::StringRef(threads.c_str())), alloc);
+	d.AddMember(rapidjson::StringRef("extraParams"), rapidjson::Value(rapidjson::StringRef(extraParams.c_str())), alloc);
 
 	FILE *fp {fopen(parsePresetPath(name).c_str(), "wb")};
 	char writeBuffer[65536];
-	FileWriteStream os(fp, writeBuffer, sizeof(writeBuffer));
-	PrettyWriter<FileWriteStream> writer(os);
+	rapidjson::FileWriteStream os(fp, writeBuffer, sizeof(writeBuffer));
+	rapidjson::PrettyWriter<rapidjson::FileWriteStream> writer(os);
 	d.Accept(writer);
 	fclose(fp);
 
@@ -386,4 +381,4 @@ void Settings::parseOverrideParams(std::string params) {
 	}
 }
 
-} // namespace SuperEpicFuntime
+} // namespace SuperEpicFuntime::MediaPreparer

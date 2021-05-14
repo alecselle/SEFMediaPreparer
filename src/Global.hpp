@@ -17,5 +17,5 @@ static const int RETRY_COUNT {5};
 // Override to interrupt workers
 static bool cancelWorker {false};
 
-} // namespace SuperEpicFuntime
+} // namespace SuperEpicFuntime::MediaPreparer
 #endif // GLOBAL_HPP
