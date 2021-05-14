@@ -205,6 +205,9 @@ void MediaPreparer::updateGUI_settings_container() {
 	}
 }
 
+#define END_SETTINGS_SECTION }
+#define WORKER_SECTION {
+
 void MediaPreparer::updateGUI_timers() {
 	if (workerThread.isRunning() && workerType == ENCODE) {
 		if (workerTimeStamp.isValid()) {
