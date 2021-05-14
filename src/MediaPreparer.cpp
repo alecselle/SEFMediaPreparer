@@ -107,11 +107,11 @@ void MediaPreparer::loadSettings_gui() {
 	settings->outputDir   = ba::trim_copy(ui->setting_dirOutput->text().toStdString());
 	settings->threads	 = ba::trim_copy(ui->setting_threads->text().toStdString());
 	settings->extraParams = ba::trim_copy(ui->setting_extraParams->text().toStdString());
-	settings->parseOverrideParams(ba::trim_copy(ui->setting_override_args->toPlainText().toStdString()));
 	settings->forceEncode = ui->setting_forceEncode->isChecked();
 	settings->fixMetadata = ui->setting_fixMetadata->isChecked();
 	settings->subfolders = ui->setting_subfolders->isChecked();
 	settings->override = ui->setting_override->isChecked();
+	settings->parseOverrideParams(ba::trim_copy(ui->setting_override_args->toPlainText().toStdString()));
 	settings->saveConfig();
 }
 
@@ -152,6 +152,12 @@ void MediaPreparer::loadSettings_preset(QString preset) {
 	ui->setting_subtitles->setCurrentText(settings->subtitles.c_str());
 	ui->setting_threads->setText(settings->threads.c_str());
 	ui->setting_extraParams->setText(settings->extraParams.c_str());
+	ui->setting_override->setChecked(settings->override);
+	std::string overrideParamsString {""};
+	for (int i = 0; i < settings->overrideParams.size(); ++i) {
+		overrideParamsString += settings->overrideParams.at(i).toStdString() + " ";
+	}
+	ui->setting_override_args->setPlainText(overrideParamsString.c_str());
 	blockSignals(false);
 }
 
@@ -550,12 +556,12 @@ void MediaPreparer::lockUI(bool b) {
 		ui->setting_subtitles->setEnabled(!b);
 		ui->setting_threads->setEnabled(!b);
 		ui->setting_extraParams->setEnabled(!b);
-		ui->setting_preset->setEnabled(!b);
 		ui->setting_forceEncode->setEnabled(!b);
 		ui->setting_fixMetadata->setEnabled(!b);
 	} else {
 		ui->setting_override_args->setEnabled(!b);
 	}
+	ui->setting_preset->setEnabled(!b);
 	ui->setting_directory->setEnabled(!b);
 	ui->button_browse_directory->setEnabled(!b);
 	ui->button_scan_directory->setEnabled(!b);
@@ -579,7 +585,6 @@ void MediaPreparer::overrideUI(int b) {
 	ui->setting_subtitles->setEnabled(!b);
 	ui->setting_threads->setEnabled(!b);
 	ui->setting_extraParams->setEnabled(!b);
-	ui->setting_preset->setEnabled(!b);
 	ui->setting_forceEncode->setEnabled(!b);
 	ui->setting_fixMetadata->setEnabled(!b);
 	ui->setting_override_args->setEnabled(b);
