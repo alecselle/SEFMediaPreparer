@@ -6,14 +6,14 @@ QMAKE_CXXFLAGS += -std=c++17 -static-libstdc++ -static-libgcc -Wno-pedantic -Wno
 
 !defined(VER_MAJ):VER_MAJ = 4
 !defined(VER_MIN):VER_MIN = 1
-!defined(VER_PAT):VER_PAT = 0
+!defined(VER_PAT):VER_PAT = 1
 VERSION = $${VER_MAJ}.$${VER_MIN}.$${VER_PAT}
 
 DESTDIR = $$PWD/bin
 TARGET = SEFMediaPreparer
 
 SOURCES += \
-	$$PWD/src/main.cpp \
+    $$PWD/src/main.cpp \
 	$$PWD/src/MediaPreparer.cpp \
 	$$PWD/src/Controller.cpp \
 	$$PWD/src/Global.cpp \
@@ -23,7 +23,7 @@ SOURCES += \
 	$$PWD/src/Library.cpp
 
 HEADERS += \
-	$$PWD/src/product_info.hpp \
+    $$PWD/src/product_info.hpp \
 	$$PWD/src/MediaPreparer.hpp \
 	$$PWD/src/Controller.hpp \
 	$$PWD/src/Global.hpp \
@@ -34,10 +34,10 @@ HEADERS += \
 	$$PWD/src/Worker.hpp
 
 FORMS += \
-	$$PWD/src/MediaPreparer.ui
+    $$PWD/src/MediaPreparer.ui
 
 DISTFILES += \
-	$$PWD/SEFMediaPreparer.iss \
+    $$PWD/SEFMediaPreparer.iss \
 	$$PWD/seflogo.png \
 	$$PWD/seflogo.ico \
 	$$PWD/README.md \
@@ -45,18 +45,18 @@ DISTFILES += \
 	$$PWD/version.txt
 
 LIBS += \
-	-L$$PWD/lib -lboost_filesystem-mt
+    -L$$PWD/lib -lboost_filesystem-mt
 
 INCLUDEPATH += \
-	$$PWD/src \
+    $$PWD/src \
 	$$PWD/include
 
 DEPENDPATH += \
-	$$PWD/src \
+    $$PWD/src \
 	$$PWD/include
 
 DEFINES += \
-	VER_MAJ=$$VER_MAJ \
+    VER_MAJ=$$VER_MAJ \
 	VER_MIN=$$VER_MIN \
 	VER_PAT=$$VER_PAT \
 	VERSION=$$VERSION

@@ -111,7 +111,11 @@ void MediaPreparer::loadSettings_gui() {
 	settings->fixMetadata = ui->setting_fixMetadata->isChecked();
 	settings->subfolders = ui->setting_subfolders->isChecked();
 	settings->override = ui->setting_override->isChecked();
-	settings->parseOverrideParams(ba::trim_copy(ui->setting_override_args->toPlainText().toStdString()));
+	if (settings->override) {
+		settings->parseOverrideParams(ba::trim_copy(ui->setting_override_args->toPlainText().toStdString()));
+	} else {
+		settings->overrideParams.clear();
+	}
 	settings->saveConfig();
 }
 
@@ -153,11 +157,16 @@ void MediaPreparer::loadSettings_preset(QString preset) {
 	ui->setting_threads->setText(settings->threads.c_str());
 	ui->setting_extraParams->setText(settings->extraParams.c_str());
 	ui->setting_override->setChecked(settings->override);
-	std::string overrideParamsString {""};
-	for (int i = 0; i < settings->overrideParams.size(); ++i) {
-		overrideParamsString += settings->overrideParams.at(i).toStdString() + " ";
+	overrideUI(settings->override);
+	if (settings->override) {
+		std::string overrideParamsString {""};
+		for (int i = 0; i < settings->overrideParams.size(); ++i) {
+			overrideParamsString += settings->overrideParams.at(i).toStdString() + " ";
+		}
+		ui->setting_override_args->setPlainText(overrideParamsString.c_str());
+	} else {
+		ui->setting_override_args->setPlainText("");
 	}
-	ui->setting_override_args->setPlainText(overrideParamsString.c_str());
 	blockSignals(false);
 }
 
