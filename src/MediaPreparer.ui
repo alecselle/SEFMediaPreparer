@@ -19,12 +19,6 @@
     <height>480</height>
    </size>
   </property>
-  <property name="maximumSize">
-   <size>
-    <width>480</width>
-    <height>480</height>
-   </size>
-  </property>
   <property name="windowTitle">
    <string>SEFMediaPreparer</string>
   </property>
@@ -33,1249 +27,1115 @@
     <normaloff>seflogo.png</normaloff>seflogo.png</iconset>
   </property>
   <widget class="QWidget" name="container_main">
-   <widget class="QWidget" name="layoutWidget1">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>10</y>
-      <width>461</width>
-      <height>51</height>
-     </rect>
-    </property>
-    <layout class="QGridLayout" name="container_directory">
-     <property name="sizeConstraint">
-      <enum>QLayout::SetNoConstraint</enum>
-     </property>
-     <item row="0" column="1">
-      <spacer name="spacer2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeType">
-        <enum>QSizePolicy::Fixed</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>10</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item row="2" column="0" colspan="5">
-      <widget class="QLineEdit" name="setting_directory"/>
-     </item>
-     <item row="2" column="5">
-      <widget class="QPushButton" name="button_browse_directory">
-       <property name="text">
-        <string>Browse</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="6">
-      <widget class="QPushButton" name="button_scan_directory">
-       <property name="text">
-        <string>Scan</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="label_directory">
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Directory:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="2">
-      <widget class="QLabel" name="label_fileCount">
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;0 file(s) found&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="3">
-      <spacer name="spacer1">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item row="0" column="4">
-      <widget class="QCheckBox" name="setting_subdirectories">
-       <property name="text">
-        <string>Subdirectories</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QWidget" name="layoutWidget2">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>80</y>
-      <width>461</width>
-      <height>331</height>
-     </rect>
-    </property>
-    <layout class="QGridLayout" name="container_settings">
-     <item row="0" column="3">
-      <widget class="QPushButton" name="button_savePreset">
-       <property name="text">
-        <string>Save</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <spacer name="spacer3">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item row="0" column="2">
-      <widget class="QComboBox" name="setting_preset">
-       <property name="currentText">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="label_settings">
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Settings:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0" colspan="4">
-      <widget class="QTabWidget" name="container_settings_tabs">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
-         <horstretch>0</horstretch>
-         <verstretch>20</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="currentIndex">
-        <number>0</number>
-       </property>
-       <widget class="QWidget" name="container_settings_basic">
-        <attribute name="title">
-         <string>General</string>
-        </attribute>
-        <widget class="QWidget" name="horizontalLayoutWidget">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>230</y>
-           <width>431</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <layout class="QHBoxLayout" name="horizontalLayout">
-          <item>
-           <widget class="QLabel" name="label_dirOutput">
-            <property name="text">
-             <string>Output Directory:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="setting_dirOutput"/>
-          </item>
-          <item>
-           <widget class="QPushButton" name="button_browse_dirOutput">
-            <property name="text">
-             <string>Browse</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="formLayoutWidget">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>10</y>
-           <width>153</width>
-           <height>71</height>
-          </rect>
-         </property>
-         <layout class="QFormLayout" name="formLayout">
-          <property name="formAlignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-          </property>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_vCodec">
-            <property name="text">
-             <string>Video Encoder:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QComboBox" name="setting_vCodec"/>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_aCodec">
-            <property name="text">
-             <string>Audio Encoder:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QComboBox" name="setting_aCodec"/>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="formLayoutWidget_2">
-         <property name="geometry">
-          <rect>
-           <x>170</x>
-           <y>10</y>
-           <width>111</width>
-           <height>71</height>
-          </rect>
-         </property>
-         <layout class="QFormLayout" name="formLayout_2">
-          <property name="formAlignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-          </property>
-          <item row="1" column="1">
-           <widget class="QSpinBox" name="setting_aQuality">
-            <property name="suffix">
-             <string>k</string>
-            </property>
-            <property name="minimum">
-             <number>20</number>
-            </property>
-            <property name="maximum">
-             <number>1024</number>
-            </property>
-            <property name="value">
-             <number>384</number>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_aQuality">
-            <property name="text">
-             <string>Bitrate:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QSpinBox" name="setting_vQuality">
-            <property name="maximum">
-             <number>51</number>
-            </property>
-            <property name="value">
-             <number>24</number>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_vQuality">
-            <property name="text">
-             <string>CRF:</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="formLayoutWidget_4">
-         <property name="geometry">
-          <rect>
-           <x>290</x>
-           <y>10</y>
-           <width>151</width>
-           <height>71</height>
-          </rect>
-         </property>
-         <layout class="QFormLayout" name="formLayout_4">
-          <property name="formAlignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-          </property>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_container">
-            <property name="text">
-             <string>File Container:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QComboBox" name="setting_container"/>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_subtitles">
-            <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Only supported with mkv, mp4, or mov containers.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="text">
-             <string>Subtitles:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QComboBox" name="setting_subtitles">
-            <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Only supported with mkv, mp4, or mov containers.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <item>
-             <property name="text">
-              <string>Embed</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Ignore</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Remove</string>
-             </property>
-            </item>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="formLayoutWidget_12">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>90</y>
-           <width>431</width>
-           <height>71</height>
-          </rect>
-         </property>
-         <layout class="QFormLayout" name="formLayout_12">
-          <property name="formAlignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-          </property>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_threads">
-            <property name="text">
-             <string>Threads:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="setting_threads">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_extraParams">
-            <property name="text">
-             <string>Extra Parameters:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="setting_extraParams"/>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="gridLayoutWidget">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>170</y>
-           <width>431</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <layout class="QGridLayout" name="gridLayout">
-          <item row="0" column="1">
-           <widget class="QCheckBox" name="setting_subfolders">
-            <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Nests output one folder deep, with the same title as the input.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="text">
-             <string>Create Subfolders</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2">
-           <widget class="QCheckBox" name="setting_fixMetadata">
-            <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Intended only to fix issues with metadata.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="text">
-             <string>Fix Metadata Only</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QCheckBox" name="setting_forceEncode">
-            <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Encodes any supported video files, regardless of format. &lt;/p&gt;&lt;p&gt;WARNING: REPEAT ENCODING OF A FILE WILL CAUSE DEGRADATION OF QUALITY&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="statusTip">
-             <string/>
-            </property>
-            <property name="whatsThis">
-             <string/>
-            </property>
-            <property name="text">
-             <string>Force Encode</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </widget>
-       <widget class="QWidget" name="container_settings_advanced">
-        <attribute name="title">
-         <string>Advanced</string>
-        </attribute>
-        <widget class="QWidget" name="horizontalLayoutWidget_2">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>10</y>
-           <width>431</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_3">
-          <item>
-           <widget class="QCheckBox" name="setting_override">
-            <property name="text">
-             <string>Use Override</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_2">
-            <property name="text">
-             <string>This is an advanced tool and not recommended for beginners. </string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="horizontalLayoutWidget_3">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>50</y>
-           <width>431</width>
-           <height>101</height>
-          </rect>
-         </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_4">
-          <item>
-           <widget class="QLabel" name="label_override_ffmpeg">
-            <property name="text">
-             <string>ffmpeg -i &quot;&lt;file&gt;&quot; </string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPlainTextEdit" name="setting_override_args">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string> &quot;&lt;output_dir&gt;/&lt;file&gt;&quot;</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="gridLayoutWidget_2">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>160</y>
-           <width>431</width>
-           <height>91</height>
-          </rect>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_3">
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_6">
-            <property name="text">
-             <string>Default subtitle track can be chosen using '-disposition:s:&lt;index&gt; default'</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_5">
-            <property name="text">
-             <string>When using hevc_amf, '-gops_per_idr 1' is required to avoid corruption.</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_4">
-            <property name="text">
-             <string>Directory and Container Settings are still used.</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </widget>
-       <widget class="QWidget" name="container_fileList">
-        <attribute name="title">
-         <string>Files</string>
-        </attribute>
-        <widget class="QTableWidget" name="list_Library">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="geometry">
-          <rect>
-           <x>0</x>
-           <y>0</y>
-           <width>455</width>
-           <height>276</height>
-          </rect>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::NoFrame</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Plain</enum>
-         </property>
-         <property name="verticalScrollBarPolicy">
-          <enum>Qt::ScrollBarAlwaysOn</enum>
-         </property>
-         <property name="horizontalScrollBarPolicy">
-          <enum>Qt::ScrollBarAlwaysOff</enum>
-         </property>
-         <property name="sizeAdjustPolicy">
-          <enum>QAbstractScrollArea::AdjustToContents</enum>
-         </property>
-         <property name="dragDropOverwriteMode">
-          <bool>false</bool>
-         </property>
-         <property name="selectionBehavior">
-          <enum>QAbstractItemView::SelectRows</enum>
-         </property>
-         <property name="sortingEnabled">
-          <bool>true</bool>
-         </property>
-         <property name="wordWrap">
-          <bool>false</bool>
-         </property>
-         <attribute name="horizontalHeaderCascadingSectionResizes">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="horizontalHeaderMinimumSectionSize">
-          <number>25</number>
-         </attribute>
-         <attribute name="horizontalHeaderDefaultSectionSize">
-          <number>88</number>
-         </attribute>
-         <attribute name="horizontalHeaderHighlightSections">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="verticalHeaderVisible">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="verticalHeaderMinimumSectionSize">
-          <number>20</number>
-         </attribute>
-         <attribute name="verticalHeaderDefaultSectionSize">
-          <number>25</number>
-         </attribute>
-         <attribute name="verticalHeaderHighlightSections">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="verticalHeaderShowSortIndicator" stdset="0">
-          <bool>false</bool>
-         </attribute>
-         <column>
-          <property name="text">
-           <string>File</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Video</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Audio</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Container</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Subtitle</string>
-          </property>
-         </column>
-        </widget>
-       </widget>
-       <widget class="QWidget" name="container_encode">
-        <property name="enabled">
-         <bool>true</bool>
+   <layout class="QVBoxLayout" name="verticalLayout_6">
+    <item>
+     <layout class="QVBoxLayout" name="layout_vertical_main">
+      <property name="sizeConstraint">
+       <enum>QLayout::SetNoConstraint</enum>
+      </property>
+      <item>
+       <layout class="QGridLayout" name="container_directory">
+        <property name="sizeConstraint">
+         <enum>QLayout::SetNoConstraint</enum>
         </property>
-        <attribute name="title">
-         <string>Encode</string>
-        </attribute>
-        <widget class="QProgressBar" name="progress_secondary">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="geometry">
-          <rect>
-           <x>180</x>
-           <y>130</y>
-           <width>261</width>
-           <height>20</height>
-          </rect>
-         </property>
-         <property name="maximum">
-          <number>1000</number>
-         </property>
-         <property name="value">
-          <number>0</number>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-         <property name="format">
-          <string/>
-         </property>
-        </widget>
-        <widget class="QWidget" name="formLayoutWidget_5">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>10</y>
-           <width>431</width>
-           <height>41</height>
-          </rect>
-         </property>
-         <layout class="QFormLayout" name="formLayout_5">
-          <property name="formAlignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        <item row="0" column="2">
+         <widget class="QLabel" name="label_fileCount">
+          <property name="text">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;0 file(s) found&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_encode_file">
-            <property name="text">
-             <string>File:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="value_encode_file">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="formLayoutWidget_6">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>50</y>
-           <width>160</width>
-           <height>108</height>
-          </rect>
-         </property>
-         <layout class="QFormLayout" name="formLayout_6">
-          <property name="formAlignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <spacer name="spacer_directory">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
           </property>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_encode_file_vCodec">
-            <property name="text">
-             <string>Video Codec:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="value_encode_file_vCodec">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="value_encode_file_aCodec">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QLineEdit" name="value_encode_file_container">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_encode_file_aCodec">
-            <property name="text">
-             <string>Audio Codec:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_encode_file_container">
-            <property name="text">
-             <string>Container:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QLineEdit" name="value_encode_file_subtitles">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_encode_file_subtitles">
-            <property name="text">
-             <string>Subtitles:</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-        <widget class="Line" name="line_3">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>159</y>
-           <width>431</width>
-           <height>5</height>
-          </rect>
-         </property>
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-        <widget class="QWidget" name="formLayoutWidget_8">
-         <property name="geometry">
-          <rect>
-           <x>280</x>
-           <y>169</y>
-           <width>160</width>
-           <height>101</height>
-          </rect>
-         </property>
-         <layout class="QFormLayout" name="formLayout_8">
-          <property name="formAlignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
           </property>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_encode_vQuality">
-            <property name="text">
-             <string>CRF:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="value_encode_vQuality">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="value_encode_aQuality">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QLineEdit" name="value_encode_subtitles">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_encode_aQuality">
-            <property name="text">
-             <string>Audio Bitrate:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_encode_subtitle">
-            <property name="text">
-             <string>Subtitles:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_encode_runtime">
-            <property name="text">
-             <string>Total Runtime:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QLabel" name="value_encode_runtime">
-            <property name="text">
-             <string>00:00:00.00</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="formLayoutWidget_9">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>169</y>
-           <width>160</width>
-           <height>101</height>
-          </rect>
-         </property>
-         <layout class="QFormLayout" name="formLayout_9">
-          <property name="formAlignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>10</width>
+            <height>20</height>
+           </size>
           </property>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_encode_vCodec">
-            <property name="text">
-             <string>Video Encoder:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="value_encode_vCodec">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="value_encode_aCodec">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QLineEdit" name="value_encode_container">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_encode_aCodec">
-            <property name="text">
-             <string>Audio Encoder:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_encode_container">
-            <property name="text">
-             <string>Container:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="labe_encode_lastTime">
-            <property name="text">
-             <string>Last File Took:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QLabel" name="value_encode_lastFile">
-            <property name="text">
-             <string>00:00:00.00</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="formLayoutWidget_10">
-         <property name="geometry">
-          <rect>
-           <x>180</x>
-           <y>169</y>
-           <width>91</width>
-           <height>101</height>
-          </rect>
-         </property>
-         <layout class="QFormLayout" name="formLayout_10">
-          <property name="formAlignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         </spacer>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_directory">
+          <property name="text">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Directory:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
-          <item row="0" column="0" colspan="2">
-           <widget class="QLabel" name="label_encode_count">
-            <property name="text">
-             <string>Encoding File</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0" colspan="2">
-           <widget class="QLabel" name="value_encode_count">
-            <property name="text">
-             <string>0 / 0</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="formLayoutWidget_7">
-         <property name="geometry">
-          <rect>
-           <x>180</x>
-           <y>50</y>
-           <width>261</width>
-           <height>71</height>
-          </rect>
-         </property>
-         <layout class="QFormLayout" name="formLayout_7">
-          <property name="formAlignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         </widget>
+        </item>
+        <item row="2" column="6">
+         <widget class="QPushButton" name="button_scan_directory">
+          <property name="text">
+           <string>Scan</string>
           </property>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="value_encode_file_duration">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_encode_file_duration">
-            <property name="text">
-             <string>Duration:</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
+         </widget>
+        </item>
+        <item row="0" column="4">
+         <widget class="QCheckBox" name="setting_subdirectories">
+          <property name="text">
+           <string>Subdirectories</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0" colspan="5">
+         <widget class="QLineEdit" name="setting_directory"/>
+        </item>
+        <item row="2" column="5">
+         <widget class="QPushButton" name="button_browse_directory">
+          <property name="text">
+           <string>Browse</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3">
+         <spacer name="spacer_files">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="Line" name="line_header">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
        </widget>
-       <widget class="QWidget" name="container_encode_fileList">
-        <attribute name="title">
-         <string>Queue</string>
-        </attribute>
-        <widget class="QTableWidget" name="list_encode_Library">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="geometry">
-          <rect>
-           <x>0</x>
-           <y>0</y>
-           <width>455</width>
-           <height>276</height>
-          </rect>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::NoFrame</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Plain</enum>
-         </property>
-         <property name="verticalScrollBarPolicy">
-          <enum>Qt::ScrollBarAlwaysOn</enum>
-         </property>
-         <property name="horizontalScrollBarPolicy">
-          <enum>Qt::ScrollBarAlwaysOff</enum>
-         </property>
-         <property name="sizeAdjustPolicy">
-          <enum>QAbstractScrollArea::AdjustToContents</enum>
-         </property>
-         <property name="dragDropOverwriteMode">
-          <bool>false</bool>
-         </property>
-         <property name="selectionMode">
-          <enum>QAbstractItemView::ExtendedSelection</enum>
-         </property>
-         <property name="selectionBehavior">
-          <enum>QAbstractItemView::SelectRows</enum>
-         </property>
-         <property name="sortingEnabled">
-          <bool>true</bool>
-         </property>
-         <property name="wordWrap">
-          <bool>false</bool>
-         </property>
-         <attribute name="horizontalHeaderCascadingSectionResizes">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="horizontalHeaderMinimumSectionSize">
-          <number>25</number>
-         </attribute>
-         <attribute name="horizontalHeaderDefaultSectionSize">
-          <number>88</number>
-         </attribute>
-         <attribute name="horizontalHeaderHighlightSections">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="verticalHeaderVisible">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="verticalHeaderMinimumSectionSize">
-          <number>20</number>
-         </attribute>
-         <attribute name="verticalHeaderDefaultSectionSize">
-          <number>25</number>
-         </attribute>
-         <attribute name="verticalHeaderHighlightSections">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="verticalHeaderShowSortIndicator" stdset="0">
-          <bool>false</bool>
-         </attribute>
-         <column>
+      </item>
+      <item>
+       <layout class="QGridLayout" name="container_settings">
+        <item row="0" column="3">
+         <widget class="QPushButton" name="button_savePreset">
           <property name="text">
-           <string>File</string>
+           <string>Save</string>
           </property>
-         </column>
-         <column>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_settings">
           <property name="text">
-           <string>Video Codec</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Settings:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Audio Codec</string>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QComboBox" name="setting_preset">
+          <property name="currentText">
+           <string/>
           </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Container</string>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <spacer name="spacer_settings">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
           </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Subtitle</string>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
           </property>
-         </column>
-        </widget>
+         </spacer>
+        </item>
+        <item row="1" column="0" colspan="4">
+         <widget class="QTabWidget" name="container_settings_tabs">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+            <horstretch>0</horstretch>
+            <verstretch>20</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="currentIndex">
+           <number>0</number>
+          </property>
+          <widget class="QWidget" name="container_settings_basic">
+           <attribute name="title">
+            <string>General</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_2">
+            <item row="0" column="0" colspan="3">
+             <layout class="QGridLayout" name="layout_settings_basic_grid" rowstretch="0,0,0,1,0">
+              <item row="0" column="2">
+               <layout class="QFormLayout" name="layout_settings_basic_form_3">
+                <property name="formAlignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                </property>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_container">
+                  <property name="text">
+                   <string>File Container:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QComboBox" name="setting_container"/>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="label_subtitles">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Only supported with mkv, mp4, or mov containers.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                  <property name="text">
+                   <string>Subtitles:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QComboBox" name="setting_subtitles">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Only supported with mkv, mp4, or mov containers.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                  <item>
+                   <property name="text">
+                    <string>Embed</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Ignore</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Remove</string>
+                   </property>
+                  </item>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item row="0" column="0">
+               <layout class="QFormLayout" name="layout_settings_basic_form_1">
+                <property name="formAlignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                </property>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_vCodec">
+                  <property name="text">
+                   <string>Video Encoder:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QComboBox" name="setting_vCodec"/>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="label_aCodec">
+                  <property name="text">
+                   <string>Audio Encoder:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QComboBox" name="setting_aCodec"/>
+                </item>
+               </layout>
+              </item>
+              <item row="3" column="0" colspan="3">
+               <layout class="QHBoxLayout" name="layout_settings_basic_horizontal_1" stretch="1,1,1">
+                <property name="topMargin">
+                 <number>12</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>24</number>
+                </property>
+                <item>
+                 <widget class="QCheckBox" name="setting_forceEncode">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Encodes any supported video files, regardless of format. &lt;/p&gt;&lt;p&gt;WARNING: REPEAT ENCODING OF A FILE WILL CAUSE DEGRADATION OF QUALITY&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                  <property name="statusTip">
+                   <string/>
+                  </property>
+                  <property name="whatsThis">
+                   <string/>
+                  </property>
+                  <property name="text">
+                   <string>Force Encode</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="setting_subfolders">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Nests output one folder deep, with the same title as the input.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                  <property name="text">
+                   <string>Create Subfolders</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="setting_fixMetadata">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Intended only to fix issues with metadata.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                  <property name="text">
+                   <string>Fix Metadata Only</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item row="0" column="1">
+               <layout class="QFormLayout" name="layout_settings_basic_form_2">
+                <property name="formAlignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                </property>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_vQuality">
+                  <property name="text">
+                   <string>CRF:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QSpinBox" name="setting_vQuality">
+                  <property name="maximum">
+                   <number>51</number>
+                  </property>
+                  <property name="value">
+                   <number>24</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="label_aQuality">
+                  <property name="text">
+                   <string>Bitrate:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QSpinBox" name="setting_aQuality">
+                  <property name="suffix">
+                   <string>k</string>
+                  </property>
+                  <property name="minimum">
+                   <number>20</number>
+                  </property>
+                  <property name="maximum">
+                   <number>1024</number>
+                  </property>
+                  <property name="value">
+                   <number>384</number>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item row="4" column="0" colspan="3">
+               <layout class="QHBoxLayout" name="layout_settings_basic_horizontal_2">
+                <item>
+                 <widget class="QLabel" name="label_dirOutput">
+                  <property name="text">
+                   <string>Output Directory:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="setting_dirOutput"/>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="button_browse_dirOutput">
+                  <property name="text">
+                   <string>Browse</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item row="1" column="0" colspan="3">
+               <layout class="QFormLayout" name="layout_settings_basic_form_4">
+                <property name="formAlignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                </property>
+                <property name="verticalSpacing">
+                 <number>6</number>
+                </property>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_threads">
+                  <property name="text">
+                   <string>Threads:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QLineEdit" name="setting_threads">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="label_extraParams">
+                  <property name="text">
+                   <string>Extra Parameters:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QLineEdit" name="setting_extraParams"/>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="container_settings_advanced">
+           <attribute name="title">
+            <string>Advanced</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_4">
+            <item row="0" column="0">
+             <layout class="QHBoxLayout" name="layout_settings_advanced_horizontal_1">
+              <item>
+               <widget class="QCheckBox" name="setting_override">
+                <property name="text">
+                 <string>Use Override</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_override_warning">
+                <property name="text">
+                 <string>This is an advanced tool and not recommended for beginners. </string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item row="1" column="0">
+             <layout class="QHBoxLayout" name="layout_settings_advanced_horizontal_2">
+              <item>
+               <widget class="QLabel" name="label_override_prefix">
+                <property name="text">
+                 <string>ffmpeg -i &quot;&lt;file&gt;&quot; </string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPlainTextEdit" name="setting_override_args">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_override_suffix">
+                <property name="text">
+                 <string> &quot;&lt;output_dir&gt;/&lt;file&gt;&quot;</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item row="2" column="0">
+             <layout class="QVBoxLayout" name="layout_settings_advanced_vertical_1">
+              <item>
+               <widget class="QLabel" name="label_override_tip_1">
+                <property name="text">
+                 <string>Directory and Container Settings are still used.</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_override_tip_2">
+                <property name="text">
+                 <string>When using hevc_amf, '-gops_per_idr 1' is required to avoid corruption.</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_override_tip_3">
+                <property name="text">
+                 <string>Default subtitle track can be chosen using '-disposition:s:&lt;index&gt; default'</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="container_fileList">
+           <attribute name="title">
+            <string>Files</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_5">
+            <item row="0" column="0">
+             <widget class="QTableWidget" name="list_Library">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::NoFrame</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Plain</enum>
+              </property>
+              <property name="verticalScrollBarPolicy">
+               <enum>Qt::ScrollBarAlwaysOn</enum>
+              </property>
+              <property name="horizontalScrollBarPolicy">
+               <enum>Qt::ScrollBarAlwaysOff</enum>
+              </property>
+              <property name="sizeAdjustPolicy">
+               <enum>QAbstractScrollArea::AdjustToContents</enum>
+              </property>
+              <property name="dragDropOverwriteMode">
+               <bool>false</bool>
+              </property>
+              <property name="selectionBehavior">
+               <enum>QAbstractItemView::SelectRows</enum>
+              </property>
+              <property name="sortingEnabled">
+               <bool>true</bool>
+              </property>
+              <property name="wordWrap">
+               <bool>false</bool>
+              </property>
+              <attribute name="horizontalHeaderCascadingSectionResizes">
+               <bool>true</bool>
+              </attribute>
+              <attribute name="horizontalHeaderMinimumSectionSize">
+               <number>25</number>
+              </attribute>
+              <attribute name="horizontalHeaderDefaultSectionSize">
+               <number>88</number>
+              </attribute>
+              <attribute name="horizontalHeaderHighlightSections">
+               <bool>false</bool>
+              </attribute>
+              <attribute name="horizontalHeaderStretchLastSection">
+               <bool>true</bool>
+              </attribute>
+              <attribute name="verticalHeaderVisible">
+               <bool>false</bool>
+              </attribute>
+              <attribute name="verticalHeaderCascadingSectionResizes">
+               <bool>true</bool>
+              </attribute>
+              <attribute name="verticalHeaderMinimumSectionSize">
+               <number>20</number>
+              </attribute>
+              <attribute name="verticalHeaderDefaultSectionSize">
+               <number>25</number>
+              </attribute>
+              <attribute name="verticalHeaderHighlightSections">
+               <bool>false</bool>
+              </attribute>
+              <attribute name="verticalHeaderShowSortIndicator" stdset="0">
+               <bool>false</bool>
+              </attribute>
+              <attribute name="verticalHeaderStretchLastSection">
+               <bool>false</bool>
+              </attribute>
+              <column>
+               <property name="text">
+                <string>File</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Video</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Audio</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Container</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Subtitle</string>
+               </property>
+              </column>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="container_encode">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <attribute name="title">
+            <string>Encode</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_6">
+            <item row="0" column="0" colspan="3">
+             <layout class="QFormLayout" name="layout_encode_form_1">
+              <property name="formAlignment">
+               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+              </property>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_encode_file">
+                <property name="text">
+                 <string>File:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLineEdit" name="value_encode_file">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item row="1" column="0" rowspan="2">
+             <layout class="QFormLayout" name="layout_encode_form_2">
+              <property name="formAlignment">
+               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+              </property>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_encode_file_vCodec">
+                <property name="text">
+                 <string>Video Codec:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLineEdit" name="value_encode_file_vCodec">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLineEdit" name="value_encode_file_aCodec">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QLineEdit" name="value_encode_file_container">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_encode_file_aCodec">
+                <property name="text">
+                 <string>Audio Codec:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_encode_file_container">
+                <property name="text">
+                 <string>Container:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QLineEdit" name="value_encode_file_subtitles">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_encode_file_subtitles">
+                <property name="text">
+                 <string>Subtitles:</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item row="1" column="1" colspan="2">
+             <layout class="QFormLayout" name="layout_encode_form_3">
+              <property name="formAlignment">
+               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+              </property>
+              <item row="0" column="1">
+               <widget class="QLineEdit" name="value_encode_file_duration">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_encode_file_duration">
+                <property name="text">
+                 <string>Duration:</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item row="2" column="1" colspan="2">
+             <widget class="QProgressBar" name="progress_secondary">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="maximum">
+               <number>1000</number>
+              </property>
+              <property name="value">
+               <number>0</number>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+              <property name="format">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0" colspan="3">
+             <widget class="Line" name="line_encode">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="0">
+             <layout class="QFormLayout" name="layout_encode_form_4">
+              <property name="formAlignment">
+               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+              </property>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_encode_vCodec">
+                <property name="text">
+                 <string>Video Encoder:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLineEdit" name="value_encode_vCodec">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLineEdit" name="value_encode_aCodec">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QLineEdit" name="value_encode_container">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_encode_aCodec">
+                <property name="text">
+                 <string>Audio Encoder:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_encode_container">
+                <property name="text">
+                 <string>Container:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="labe_encode_lastTime">
+                <property name="text">
+                 <string>Last File Took:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QLabel" name="value_encode_lastFile">
+                <property name="text">
+                 <string>00:00:00.00</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item row="4" column="1">
+             <layout class="QFormLayout" name="layout_encode_form_5">
+              <property name="formAlignment">
+               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+              </property>
+              <item row="0" column="0" colspan="2">
+               <widget class="QLabel" name="label_encode_count">
+                <property name="text">
+                 <string>Encoding File</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0" colspan="2">
+               <widget class="QLabel" name="value_encode_count">
+                <property name="text">
+                 <string>0 / 0</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item row="4" column="2">
+             <layout class="QFormLayout" name="layout_encode_form_6">
+              <property name="formAlignment">
+               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+              </property>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_encode_vQuality">
+                <property name="text">
+                 <string>CRF:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLineEdit" name="value_encode_vQuality">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLineEdit" name="value_encode_aQuality">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QLineEdit" name="value_encode_subtitles">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_encode_aQuality">
+                <property name="text">
+                 <string>Audio Bitrate:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_encode_subtitle">
+                <property name="text">
+                 <string>Subtitles:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_encode_runtime">
+                <property name="text">
+                 <string>Total Runtime:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QLabel" name="value_encode_runtime">
+                <property name="text">
+                 <string>00:00:00.00</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="container_encode_fileList">
+           <attribute name="title">
+            <string>Queue</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_7">
+            <item row="0" column="0">
+             <widget class="QTableWidget" name="list_encode_Library">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::NoFrame</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Plain</enum>
+              </property>
+              <property name="verticalScrollBarPolicy">
+               <enum>Qt::ScrollBarAlwaysOn</enum>
+              </property>
+              <property name="horizontalScrollBarPolicy">
+               <enum>Qt::ScrollBarAlwaysOff</enum>
+              </property>
+              <property name="sizeAdjustPolicy">
+               <enum>QAbstractScrollArea::AdjustToContents</enum>
+              </property>
+              <property name="dragDropOverwriteMode">
+               <bool>false</bool>
+              </property>
+              <property name="selectionMode">
+               <enum>QAbstractItemView::ExtendedSelection</enum>
+              </property>
+              <property name="selectionBehavior">
+               <enum>QAbstractItemView::SelectRows</enum>
+              </property>
+              <property name="sortingEnabled">
+               <bool>true</bool>
+              </property>
+              <property name="wordWrap">
+               <bool>false</bool>
+              </property>
+              <attribute name="horizontalHeaderCascadingSectionResizes">
+               <bool>true</bool>
+              </attribute>
+              <attribute name="horizontalHeaderMinimumSectionSize">
+               <number>25</number>
+              </attribute>
+              <attribute name="horizontalHeaderDefaultSectionSize">
+               <number>88</number>
+              </attribute>
+              <attribute name="horizontalHeaderHighlightSections">
+               <bool>false</bool>
+              </attribute>
+              <attribute name="horizontalHeaderStretchLastSection">
+               <bool>true</bool>
+              </attribute>
+              <attribute name="verticalHeaderVisible">
+               <bool>false</bool>
+              </attribute>
+              <attribute name="verticalHeaderMinimumSectionSize">
+               <number>20</number>
+              </attribute>
+              <attribute name="verticalHeaderDefaultSectionSize">
+               <number>25</number>
+              </attribute>
+              <attribute name="verticalHeaderHighlightSections">
+               <bool>false</bool>
+              </attribute>
+              <attribute name="verticalHeaderShowSortIndicator" stdset="0">
+               <bool>false</bool>
+              </attribute>
+              <column>
+               <property name="text">
+                <string>File</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Video Codec</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Audio Codec</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Container</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Subtitle</string>
+               </property>
+              </column>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="container_complete_fileList">
+           <attribute name="title">
+            <string>Completed</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_8">
+            <item row="0" column="0">
+             <widget class="QTableWidget" name="list_complete_Library">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::NoFrame</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Plain</enum>
+              </property>
+              <property name="verticalScrollBarPolicy">
+               <enum>Qt::ScrollBarAlwaysOn</enum>
+              </property>
+              <property name="horizontalScrollBarPolicy">
+               <enum>Qt::ScrollBarAlwaysOff</enum>
+              </property>
+              <property name="sizeAdjustPolicy">
+               <enum>QAbstractScrollArea::AdjustToContents</enum>
+              </property>
+              <property name="dragDropOverwriteMode">
+               <bool>false</bool>
+              </property>
+              <property name="selectionMode">
+               <enum>QAbstractItemView::ExtendedSelection</enum>
+              </property>
+              <property name="selectionBehavior">
+               <enum>QAbstractItemView::SelectRows</enum>
+              </property>
+              <property name="sortingEnabled">
+               <bool>true</bool>
+              </property>
+              <property name="wordWrap">
+               <bool>false</bool>
+              </property>
+              <attribute name="horizontalHeaderCascadingSectionResizes">
+               <bool>true</bool>
+              </attribute>
+              <attribute name="horizontalHeaderMinimumSectionSize">
+               <number>25</number>
+              </attribute>
+              <attribute name="horizontalHeaderDefaultSectionSize">
+               <number>220</number>
+              </attribute>
+              <attribute name="horizontalHeaderHighlightSections">
+               <bool>false</bool>
+              </attribute>
+              <attribute name="horizontalHeaderStretchLastSection">
+               <bool>true</bool>
+              </attribute>
+              <attribute name="verticalHeaderVisible">
+               <bool>false</bool>
+              </attribute>
+              <attribute name="verticalHeaderMinimumSectionSize">
+               <number>20</number>
+              </attribute>
+              <attribute name="verticalHeaderDefaultSectionSize">
+               <number>25</number>
+              </attribute>
+              <attribute name="verticalHeaderHighlightSections">
+               <bool>false</bool>
+              </attribute>
+              <attribute name="verticalHeaderShowSortIndicator" stdset="0">
+               <bool>false</bool>
+              </attribute>
+              <column>
+               <property name="text">
+                <string>File</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Time Took</string>
+               </property>
+              </column>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="Line" name="line_footer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
        </widget>
-       <widget class="QWidget" name="container_complete_fileList">
-        <attribute name="title">
-         <string>Completed</string>
-        </attribute>
-        <widget class="QTableWidget" name="list_complete_Library">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="geometry">
-          <rect>
-           <x>0</x>
-           <y>0</y>
-           <width>455</width>
-           <height>276</height>
-          </rect>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::NoFrame</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Plain</enum>
-         </property>
-         <property name="verticalScrollBarPolicy">
-          <enum>Qt::ScrollBarAlwaysOn</enum>
-         </property>
-         <property name="horizontalScrollBarPolicy">
-          <enum>Qt::ScrollBarAlwaysOff</enum>
-         </property>
-         <property name="sizeAdjustPolicy">
-          <enum>QAbstractScrollArea::AdjustToContents</enum>
-         </property>
-         <property name="dragDropOverwriteMode">
-          <bool>false</bool>
-         </property>
-         <property name="selectionMode">
-          <enum>QAbstractItemView::ExtendedSelection</enum>
-         </property>
-         <property name="selectionBehavior">
-          <enum>QAbstractItemView::SelectRows</enum>
-         </property>
-         <property name="sortingEnabled">
-          <bool>true</bool>
-         </property>
-         <property name="wordWrap">
-          <bool>false</bool>
-         </property>
-         <attribute name="horizontalHeaderCascadingSectionResizes">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="horizontalHeaderMinimumSectionSize">
-          <number>25</number>
-         </attribute>
-         <attribute name="horizontalHeaderDefaultSectionSize">
-          <number>220</number>
-         </attribute>
-         <attribute name="horizontalHeaderHighlightSections">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="verticalHeaderVisible">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="verticalHeaderMinimumSectionSize">
-          <number>20</number>
-         </attribute>
-         <attribute name="verticalHeaderDefaultSectionSize">
-          <number>25</number>
-         </attribute>
-         <attribute name="verticalHeaderHighlightSections">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="verticalHeaderShowSortIndicator" stdset="0">
-          <bool>false</bool>
-         </attribute>
-         <column>
-          <property name="text">
-           <string>File</string>
+      </item>
+      <item>
+       <layout class="QGridLayout" name="container_actions">
+        <item row="0" column="1">
+         <widget class="QPushButton" name="button_encode">
+          <property name="enabled">
+           <bool>false</bool>
           </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Time Took</string>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>32</height>
+           </size>
           </property>
-         </column>
-        </widget>
-       </widget>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QWidget" name="layoutWidget3">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>430</y>
-      <width>461</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <layout class="QGridLayout" name="container_actions">
-     <item row="0" column="1">
-      <widget class="QPushButton" name="button_encode">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>32</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>Encode [0]</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QProgressBar" name="progress_primary">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>30</height>
-        </size>
-       </property>
-       <property name="maximum">
-        <number>1</number>
-       </property>
-       <property name="value">
-        <number>0</number>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-       <property name="textVisible">
-        <bool>true</bool>
-       </property>
-       <property name="invertedAppearance">
-        <bool>false</bool>
-       </property>
-       <property name="textDirection">
-        <enum>QProgressBar::TopToBottom</enum>
-       </property>
-       <property name="format">
-        <string/>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-   <widget class="Line" name="line">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>69</y>
-      <width>461</width>
-      <height>5</height>
-     </rect>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Horizontal</enum>
-    </property>
-   </widget>
-   <widget class="Line" name="line_2">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>419</y>
-      <width>461</width>
-      <height>5</height>
-     </rect>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Horizontal</enum>
-    </property>
-   </widget>
+          <property name="text">
+           <string>Encode [0]</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QProgressBar" name="progress_primary">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="maximum">
+           <number>1</number>
+          </property>
+          <property name="value">
+           <number>0</number>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <property name="textVisible">
+           <bool>true</bool>
+          </property>
+          <property name="invertedAppearance">
+           <bool>false</bool>
+          </property>
+          <property name="textDirection">
+           <enum>QProgressBar::TopToBottom</enum>
+          </property>
+          <property name="format">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+   </layout>
   </widget>
   <action name="actionSave">
    <property name="text">

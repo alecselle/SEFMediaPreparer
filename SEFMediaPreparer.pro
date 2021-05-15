@@ -5,8 +5,8 @@ CONFIG += c++17 embed_manifest_exe static
 QMAKE_CXXFLAGS += -std=c++17 -static-libstdc++ -static-libgcc -Wno-pedantic -Wno-unknown-pragmas -Wno-suggest-override -Wno-conversion-null -Wno-return-type -Wno-unused-function -Wno-unused-variable -Wno-sign-compare -Wno-deprecated-declarations -Wno-class-memaccess
 
 !defined(VER_MAJ):VER_MAJ = 4
-!defined(VER_MIN):VER_MIN = 1
-!defined(VER_PAT):VER_PAT = 3
+!defined(VER_MIN):VER_MIN = 2
+!defined(VER_PAT):VER_PAT = 0
 VERSION = $${VER_MAJ}.$${VER_MIN}.$${VER_PAT}
 
 DESTDIR = $$PWD/bin
