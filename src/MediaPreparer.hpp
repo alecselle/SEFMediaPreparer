@@ -22,6 +22,8 @@
 #include <rapidjson/document.h>
 #include <rapidjson/stream.h>
 
+#include <iostream>
+
 namespace SuperEpicFuntime::MediaPreparer {
 
 namespace Ui {
@@ -43,6 +45,8 @@ class MediaPreparer : public QMainWindow {
 	QSignalMapper *signalMapper = new QSignalMapper(this);
 	// Timer to handle data refreshing
 	QTimer *updateTimer {new QTimer(this)};
+	// Offset iterator for certain ui updates
+	int updateOffset = 10;
 
 	// Thread for worker to run in
 	QFuture<void> workerThread;

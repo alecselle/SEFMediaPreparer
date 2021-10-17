@@ -219,6 +219,39 @@ void MediaPreparer::updateGUI_settings_container() {
 
 void MediaPreparer::updateGUI_timers() {
 	if (workerThread.isRunning() && workerType == ENCODE) {
+
+		if (--updateOffset <= 0) {
+			updateOffset = 50;
+
+			if (boost::filesystem::exists(settings->tempDir + "\\" + workerItem.name() + ".txt")) {
+				boost::filesystem::ifstream fileHandler(settings->tempDir + "\\" + workerItem.name() + ".txt");
+				fileHandler.seekg(-55, fileHandler.end);
+				std::string line = "";
+				getline(fileHandler, line);
+				std::string delimiter = ":";
+
+				if (line.size() > 20) {
+					std::string timestamp = line.substr(5,8);
+					int progress = 0;
+					std::string s = timestamp;
+					size_t pos = 0;
+					std::vector<int> tokens;
+					try {
+						while ((pos = s.find(delimiter)) != std::string::npos) {
+							tokens.push_back(stoi(s.substr(0, pos)));
+							s.erase(0, pos + delimiter.length());
+						}
+						tokens.push_back(stoi(s));
+						progress += (tokens[0] * 3600 + tokens[1] * 60 + tokens[2]);
+
+						eventHandler->newEvent(PROGRESS_SECONDARY_UPDATED, timestamp, progress);
+					} catch (...) {
+						// do nothing if string is in wrong format
+					}
+				}
+			}
+		}
+
 		if (workerTimeStamp.isValid()) {
 			ui->value_encode_runtime->setText(QString("%1:%2:%3")
 												  .arg(workerTimeStamp.elapsed() / 3600000, 2, 10, QChar('0'))
@@ -450,7 +483,10 @@ void MediaPreparer::eventListener(Event *e) {
 		break;
 	}
 	case PROGRESS_SECONDARY_MAXIMUM: {
-
+		if (e->dataIsType<int>(0)) {
+			int eventData {e->getData<int>(0)};
+			ui->progress_secondary->setMaximum(eventData);
+		}
 		break;
 	}
 	case CONFIG_SAVED: {

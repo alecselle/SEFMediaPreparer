@@ -89,6 +89,8 @@ class Worker {
 	void worker_encode_item(int i) {
 		File &f {library->getFileEncode(i)};
 		eventHandler->newEvent(WORKER_ENCODE_ITEM_STARTED, "Encoding File: " + f.name(), i);
+		eventHandler->newEvent(PROGRESS_SECONDARY_MAXIMUM, f.duration() / 1000);
+		eventHandler->newEvent(PROGRESS_SECONDARY_UPDATED, "00:00:00", 0);
 		QStringList params {"-y", "-stats", "-hwaccel", "dxva2"};
 		try {
 			int threads = std::stoi(settings->threads);
