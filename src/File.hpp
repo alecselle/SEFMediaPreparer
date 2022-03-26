@@ -13,7 +13,8 @@ enum SubtitleStatus {
 	NOT_LOADED = -0x0001,
 	NOT_FOUND = 0x0000,
 	FOUND = 0x0001,
-	EMBEDDED = 0x0002
+    EMBEDDED = 0x0002,
+    BOTH = 0x0003
 };
 
 /**

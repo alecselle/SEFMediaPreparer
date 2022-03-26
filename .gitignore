@@ -2,6 +2,7 @@ SEFMediaPreparer.pro.*
 
 .settings/
 *.lnk
+.clang-format
 
 devenv.bat
 

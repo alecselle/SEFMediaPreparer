@@ -65,10 +65,12 @@ std::string File::subtitlesStr() {
 		if (_subtitles == NOT_FOUND) {
 			return "Not Found";
 		} else if (_subtitles == FOUND) {
-			return "Found";
+            return "External";
 		} else if (_subtitles == EMBEDDED) {
 			return "Embedded";
-		}
+        } else if (_subtitles == BOTH) {
+            return "Emb.&Ext.";
+        }
 	}
 	return "error";
 }
@@ -103,9 +105,13 @@ bool File::loadFileInfo(rapidjson::StringStream out) {
 		}
 	}
 	if (!_vCodec.empty() && !_aCodec.empty()) {
-		if (_subtitles == -1 && boost::filesystem::exists(_pathSub)) {
+        boost::filesystem::path pathSubAlt = _pathSub;
+        pathSubAlt.replace_extension(".eng.srt");
+        if (_subtitles == EMBEDDED && (boost::filesystem::exists(_pathSub) || boost::filesystem::exists(pathSubAlt))) {
+            _subtitles = BOTH;
+        } else if (_subtitles == NOT_LOADED && (boost::filesystem::exists(_pathSub) || boost::filesystem::exists(pathSubAlt))) {
 			_subtitles = FOUND;
-		} else if (_subtitles == -1) {
+        } else if (_subtitles == NOT_LOADED) {
 			_subtitles = NOT_FOUND;
 		}
 		_loaded = true;
