@@ -3,11 +3,11 @@
 #include <QtWidgets/QApplication>
 
 int main(int argc, char *argv[]) {
-	QApplication app(argc, argv);
+    QApplication app(argc, argv);
 
-	SuperEpicFuntime::MediaPreparer::Controller c = SuperEpicFuntime::MediaPreparer::Controller();
+    SuperEpicFuntime::MediaPreparer::Controller c = SuperEpicFuntime::MediaPreparer::Controller();
 
-	c.show();
+    c.show();
 
-	return app.exec();
+    return app.exec();
 }
