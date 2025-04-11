@@ -97,6 +97,9 @@ class Worker {
             params += {"-threads", std::to_string(threads).c_str()};
         } catch (...) {
         }
+        if (settings->vCodec == "hevc_qsv" || settings->vCodec == "h264_qsv") {
+            params += {"-hwaccel", "qsv"};
+        }
         params += {"-i", f.path().c_str()};
         if (!settings->override) {
             if (f.subtitles() == 1 && settings->subtitles.compare("Embed") == 0) {
@@ -118,9 +121,6 @@ class Worker {
                 // Fix for corruption caused by amf encoder
                 if (settings->vCodec == "hevc_amf") {
 	params += {"-gops_per_idr", "1"};
-                }
-                if (settings->vCodec == "hevc_qsv" || settings->vCodec == "h264_qsv") {
-	params += {"-hwaccel", "qsv"};
                 }
             }
             if (!settings->extraParams.empty()) {
