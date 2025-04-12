@@ -98,7 +98,7 @@ class Worker {
         } catch (...) {
         }
         if (settings->vCodec == "hevc_qsv" || settings->vCodec == "h264_qsv") {
-            params += {"-hwaccel", "qsv"};
+            params += {"-init_hw_device", "qsv=hw", "-filter_hw_device", "hw"};
         }
         params += {"-i", f.path().c_str()};
         if (!settings->override) {
